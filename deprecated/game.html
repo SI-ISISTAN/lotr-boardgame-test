@@ -1,0 +1,184 @@
+<!-- deprecated -->
+
+<!doctype html>
+<html>
+  <head>
+    <title>LOtR Lobby</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./style/lobby.css" media="screen" />
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script data-main="./lotr.js" src="/node_modules/requirejs/require.js"></script>
+  </head>
+  <body class="main-div">
+
+      <div class="row" id="main-game-div">
+
+          <div class="col-md-1">
+
+             <!-- LISTA DE JUGADORES -->
+             <div id="player-list-div">
+                 <div class="player-state-div">
+                    <img src="./assets/img/ripped/frodo.jpg" alt="Tablero maestro" class="player-hobbit-img img-responsive" title="Tablero de locación">
+                    <br><br>
+                    <img src="./assets/img/ripped/heart-mini.png" class="img-responsive player-stat-img"> 4
+                    <img src="./assets/img/ripped/sun-mini.png" class="img-responsive player-stat-img"> 2
+                    <br>
+                    <img src="./assets/img/ripped/ring-mini.png" class="img-responsive player-stat-img"> 1
+                    <img src="./assets/img/ripped/cards-mini.png" class="img-responsive player-stat-img"> 5
+                 </div>
+                 <div class="player-state-div">
+                    <img src="./assets/img/ripped/sam.jpg" alt="Tablero maestro" class="player-hobbit-img img-responsive" title="Tablero de locación">
+                    <br><br>
+                    <img src="./assets/img/ripped/heart-mini.png" class="img-responsive player-stat-img"> 4
+                    <img src="./assets/img/ripped/sun-mini.png" class="img-responsive player-stat-img"> 2
+                    <br>
+                    <img src="./assets/img/ripped/ring-mini.png" class="img-responsive player-stat-img"> 1
+                    <img src="./assets/img/ripped/cards-mini.png" class="img-responsive player-stat-img"> 5
+                 </div>
+                 <div class="player-state-div">
+                    <img src="./assets/img/ripped/merry.jpg" alt="Tablero maestro" class="player-hobbit-img img-responsive" title="Tablero de locación">
+                    <br><br>
+                    <img src="./assets/img/ripped/heart-mini.png" class="img-responsive player-stat-img"> 4
+                    <img src="./assets/img/ripped/sun-mini.png" class="img-responsive player-stat-img"> 2
+                    <br>
+                    <img src="./assets/img/ripped/ring-mini.png" class="img-responsive player-stat-img"> 1
+                    <img src="./assets/img/ripped/cards-mini.png" class="img-responsive player-stat-img"> 5
+                 </div>
+                 <div class="player-state-div">
+                    <img src="./assets/img/ripped/pippin.jpg" alt="Tablero maestro" class="player-hobbit-img img-responsive" title="Tablero de locación">
+                    <br><br>
+                    <img src="./assets/img/ripped/heart-mini.png" class="img-responsive player-stat-img"> 4
+                    <img src="./assets/img/ripped/sun-mini.png" class="img-responsive player-stat-img"> 2
+                    <br>
+                    <img src="./assets/img/ripped/ring-mini.png" class="img-responsive player-stat-img"> 1
+                    <img src="./assets/img/ripped/cards-mini.png" class="img-responsive player-stat-img"> 5
+                 </div>
+                 <div class="player-state-div">
+                    <img src="./assets/img/ripped/fatty.jpg" alt="Tablero maestro" class="player-hobbit-img img-responsive" title="Tablero de locación">
+                    <br><br>
+                    <img src="./assets/img/ripped/heart-mini.png" class="img-responsive player-stat-img"> 4
+                    <img src="./assets/img/ripped/sun-mini.png" class="img-responsive player-stat-img"> 2
+                    <br>
+                    <img src="./assets/img/ripped/ring-mini.png" class="img-responsive player-stat-img"> 1
+                    <img src="./assets/img/ripped/cards-mini.png" class="img-responsive player-stat-img"> 5
+                 </div>
+              </div>
+             
+          </div>
+
+          
+          <div class="col-md-8">
+              <div class="row jumbotron main-container">
+
+                  <div class="col-md-2">
+
+                      <!-- QUEST DECK -->
+                        <div class="board-element-div" id="quest-deck-div">
+                                <img src="./assets/img/ripped/quest-deck.png" class="img-responsive token-img" title="Mazo de campaña">
+                                <br><br>
+                                <button type="button" class="btn btn-danger" id="draw-quest-card-button">Sacar carta</button>
+                        </div>
+                        <br>
+
+                        <!-- TILES -->
+                        <div class="board-element-div" id="story-tiles-div">
+                                <img src="./assets/img/images2/TILE CARD.png" alt="Tiles de historia" class="img-responsive token-img" title="Tiles de eventos">
+                                <br><br>
+                                <button type="button" class="btn btn-danger" id="draw-tile-button">Sacar tile</button>
+                        </div>
+
+                        <br>
+                      <!-- TOKENS -->
+                        <div class="board-element-div" id="tokens-div">
+                            
+                            <img src="./assets/img/ripped/heart.png" alt="Token de vida" class="img-responsive token-img" title="Token de vida">
+                            <img src="./assets/img/ripped/sun.png" alt="Token de sol" class="img-responsive token-img" title="Token de sol">
+                            <img src="./assets/img/ripped/ring.png" alt="Token de anillo" class="img-responsive token-img" title="Token de anillo">
+                        </div>
+
+                        
+                        <br>
+                        <!-- DADO -->
+                        <div class="board-element-div" id="threat-die-div">
+                            <img src="./assets/img/ripped/threat_die.png" alt="Dado de amenaza" class="img-responsive token-img" title="Dado de amenaza">
+                            <br><br>
+                            <button type="button" class="btn btn-danger" id="roll-dice-button">Lanzar</button>
+                        </div>
+
+                  </div>
+
+                 <!-- TABLEROS -->
+                  <div class="col-md-8">
+                  
+                      <div class="">
+                          <div class="master-board-img-container">
+                              <img src="./assets/img/Material LOTR/MasterBoard.jpg" alt="Tablero maestro" class="img-responsive master-board-img" title="Tablero maestro">
+                          </div>
+                          <br>
+                          <div class="location-board-img-container">
+                              <img src="./assets/img/Material LOTR/MoriaBoard.jpg" alt="Tablero maestro" class=" img-responsive master-board-img" title="Tablero de locación">
+                          </div>
+                      </div>
+                      
+                  </div>
+
+                  <div class="col-md-2">
+                      <!-- LOCATION DECK -->
+                        <div class="board-element-div" id="location-deck-div">
+                                <img src="./assets/img/ripped/quest-deck.png" class="img-responsive token-img" title="Mazo de locación">
+                                <br><br>
+                                <button type="button" class="btn btn-danger" id="draw-location-card-button">Sacar carta</button>
+                        </div>
+                        <br>
+
+                        <!-- RUNAS DE GANDALF -->
+                        <div class="board-element-div" id="mage-runes-div">
+                                <h4> Runas de mago </h4>
+                                <img src="./assets/img/ripped/rune.png" class="img-responsive token-img" title="Runas de mago">
+                                <br>
+                                <h4> 8 </h4>
+                        </div>
+                        <br>
+
+                        <!-- CARTAS DE GANDALF -->
+                        <div class="board-element-div" id="mage-cards-div">
+                                <h4> Cartas de mago </h4>
+                                <img src="./assets/img/images2/GANDALF CARD.png" class="img-responsive token-img" title="Cartas de mago">
+                                <br>
+                                <h4> 5 </h4>
+                        </div>
+                        <br>
+
+                  </div>
+                </div>
+
+                <!-- CARTAS -->
+                <div class= "row" id="player-cards-container">
+                      <img src="./assets/img/ripped/frodo.jpg" alt="Tablero maestro" class="player-hobbit-img img-responsive" title="Tablero de locación">
+                </div>
+
+
+
+
+          </div>
+        
+        <div class="col-md-3">
+            <!--CHAT-->
+
+             <div class="chat-div">
+                 <div class="chat-title-div">
+                     <h4> Chat </h4>
+                  </div>
+
+                  <div class="chat-messages-div">
+
+                  </div>
+              </div>
+
+              <br>
+              <input type="text" class="form-control" style="margin-left:5px">
+        </div>
+      </div>
+  </body>
+</html>
