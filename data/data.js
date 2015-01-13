@@ -1,7 +1,7 @@
 
 define([], function () {
 	
-	var names = ["Pijito","Lomu","Chucho","Jurgen", "Tojo","Beglio","Oveja Telch", "Chapo", "Momo", "Anibal", "Randazzo", "Scioli"];
+	var names = ["A","b","c","d","e","f","g","h","i","j"];
 
 	var chatColors = ["#24FC2F", "#AD24FC", "#7BD6FF", "#FF2B7C", "#FF9543"]; 
 

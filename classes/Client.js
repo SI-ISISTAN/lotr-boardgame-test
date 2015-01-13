@@ -3,8 +3,10 @@
 define([], function () {
 	
 	function Client (){
+		this.id = null;
 		this.alias=null;
 		this.currentGame = null;
+		this.connected = false;
 		console.log("Created client");
 	};
 
@@ -15,45 +17,46 @@ define([], function () {
 		////////////////////////////// MANEJO DE MENSAJES //////////////////////////////
 
 		//Me conecto
-		socket.emit('connect user', {});
+		if (!this.connected){
+			socket.emit('connect user', {});
+		}
 
 		//Se conecta un nuevo usuario
 	    socket.on('send connection data', function(res){
+	    		this.connected=true;
 	    		this.alias = res.alias;
+	    		this.id = res.id;
 	    		$("#username-header").append("Welcome, "+this.alias+"!");
-	            console.log(res.clientList);
-	            for (i in res.clientList){
-	              if (res.clientList[i].alias == this.alias){
-	                $("#connected-list").append("<li class='client-list-item-highlighted'>"+res.clientList[i].alias+"</li>");
+	            $("#connected-list").append("<li class='client-list-item-highlighted'>"+this.alias+"</li>");
+	            socket.emit('find game',{'alias' : this.alias, 'id':this.id});
+      	});
+
+      	socket.on('game found', function(res){
+      		this.currentGame = res.game;
+      		console.log("Recibi el game: ");
+      		console.log(this.currentGame);
+      		for (i in this.currentGame.players){
+	              if (this.currentGame.players[i].alias != this.alias){
+	                $("#connected-list").append("<li class='client-list-item'>"+this.currentGame.players[i].alias+"</li>");
 	              }
-	              else{
-	                $("#connected-list").append("<li class='client-list-item'>"+res.clientList[i].alias+"</li>");
-	              }
-	            } 
+	        }
       	});
 
 	    //Se conecta un nuevo usuario
 	    socket.on('user connected', function(res){
-	    		$("#connected-list").append("<li class='client-list-item'>"+res.client.alias+"</li>");
+	    		$("#connected-list").append("<li class='client-list-item'>"+res.alias+"</li>");
       	});
 
 
 	    //Se desconecta un usuario (no éste, otro que haya estado conectado)
 	    socket.on('user disconnect', function(res){
-		        console.log("alias recibido "+res.alias);
+		        console.log("Se desconecto un fulano, "+res.alias);
 			    var clientList = $("#connected-list").find("li");
 			    clientList.each( function (index,item){
 					        if ($(item).text() == res.alias){
 					            $(item).remove();
 					        }
 		        });
-	    });
-
-	    //Recibo notifacion de un nuevo juego creado
-	    socket.on('game created', function(res){  
-		        console.log("Envío petición para unirme a un juego nuevo. El "+res.game.gameID);
-		        this.currentGame = res.game;
-		        socket.emit('join game', {'gameID' : res.game.gameID});
 	    });
 
 	    //Comienza un juego

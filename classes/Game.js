@@ -2,21 +2,20 @@
 
 define(['./Player', '../data/data'], function (Player, gameData) {
 	
-	function Game (clients){
+	function Game (client){
 		console.log("Created new game.");
 
 		this.gameID = Math.random().toString(36).substring(7);	//Nombre random
 		this.players = [];
+			
+		var p = new Player(client,0);		//Add first player
+		p.chat_color = gameData.chatColors[0];
+		this.players.push(p);
 
-		for (var i=0; i<clients.length; i++){
-			var p = new Player(clients[i]);		//Create Player object
-			p.chat_color = gameData.chatColors[i];
-			this.players[p.id] = p;
-		}
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
-	Game.prototype.getPlayer2 = function(client_id){
+	Game.prototype.getPlayerByID= function(client_id){
 		var found = false;
 		var i=0;
 		while (i<this.players.length && !found){
@@ -35,9 +34,26 @@ define(['./Player', '../data/data'], function (Player, gameData) {
 		}
 	}
 
-	//obtener el objeto player proveyendo un id de cliente
-	Game.prototype.getPlayer = function(client_id){
-		return this.players[client_id];
+	Game.prototype.addPlayer = function(client){
+		var p = new Player(client,this.players.length-1);		//Create Player object
+		p.chat_color = gameData.chatColors[this.players.length-1];
+		this.players.push(p);
+	};
+
+	Game.prototype.removePlayer = function(client_id){
+		var found = false;
+		var i=0;
+		while (i<this.players.length && !found){
+			if (this.players[i].id != client_id){
+				i++;
+			}
+			else{
+				found=true;
+			}
+		}
+		if (found){
+			this.players.splice(i,1);
+		}
 	}
 
 
