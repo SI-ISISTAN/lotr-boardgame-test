@@ -9,14 +9,14 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 		this.connectedClients = [];
 		this.activeGames = [];
 		this.loadedData = loadedData;
-		console.log("Created client manager");
+		console.log("Creado manager de clientes.");
 	};
 
 	//Agregar cliente nuevo, se desagregan automáticamente por desconexión
 	ClientManager.prototype.addClient = function(socket){
 		var name = this.getNewAlias();
 		this.connectedClients.push({'id' : socket.id, 'alias' : name});
-		console.log(this.connectedClients);
+		console.log("Cliente agregado.")
 		return {'id' : socket.id, 'alias' : name};
 	}
 	
@@ -50,7 +50,7 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 			var alias = this.connectedClients[i].alias;
 			this.loadedData.names.push(alias);
 			this.connectedClients.splice(i,1);
-			console.log(this.connectedClients);
+			console.log("Cliente desconectado.");
 			return {'alias' : alias};
 		}
 		else{
@@ -60,7 +60,8 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 
 	//Crear una nueva partida
 	ClientManager.prototype.createNewGame = function(client){
-			var game = new Game(client);
+			var game = new Game();
+			game.addPlayer(client);
 			var i=0;
 			this.connectedClients=[];
 			this.activeGames[game.gameID] = game;
@@ -90,20 +91,17 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 				io.to(client.id).emit('send connection data', {'alias': client.alias, 'id' : client.id});	//avisar a los demás clientes
 			});
 
-			//Se conecto un usuario
-			client.in(client.room).broadcast.emit('user connected', {'alias': client.alias});	//avisar a los demás clientes
-
+			//El cliente pide que lo ubique en un juego
 			client.on('find game', function (data){
-				//Recorro el array de juegos activos
+				
 					var game_found = false;
 					var game_to_join = null;
 					var client_obj = {'id' : data.id, 'alias': data.alias};
-					console.log("client object!");
-					console.log(client_obj);
-
+					
+					//Recorro el array de juegos activos
 					Object.keys(self.activeGames).forEach(function(key, index) {
 					  	if (!game_found){
-							  if (Object.keys(this[key].players).length < 5){
+							  if (this[key].players.length < 5 && !this[key].isActive){
 							  		this[key].addPlayer(client_obj);
 							  		game_to_join = key;
 							  		game_found = true;
@@ -114,8 +112,6 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 					if (!game_found){
 						game_to_join = self.createNewGame(client_obj).id;
 					}
-
-
 					
 					client.leave('waiting');	//Dejar la lista de espera
 					client.room = game_to_join;	//Setear la room del juego
@@ -125,22 +121,7 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 					io.to(client.id).emit('game found',{'game' : self.activeGames[client.room]});	//si hay espacio en un juego me uno
 
 					//Se conecto un usuario
-					client.in(client.room).broadcast.emit('user connected', {'alias': client.alias});	//avisar a los demás clientes
-			});
-
-			//Llega una petición para unirse a un juego nuevo
-			client.on('join game', function (data){
-				client.leave('waiting');	//Dejar la lista de espera
-				client.room = data.gameID;	//Setear la room del juego
-				client.player = self.activeGames[client.room].getPlayer(client.id);
-
-				console.log("El player es:");
-				console.log(client.player);
-
-
-				client.join(data.gameID);	//Unirse a la room del juego
-				io.to(client.id).emit('start game',{'gameID' : data.gameID});		//le paso el ID de nuevo solo para la asignacion interna
-				io.to(client.id).emit('log message', {'msg' : "¡El juego ha comenzado!"});		//le paso el ID de nuevo solo para la asignacion interna
+					client.in(client.room).broadcast.emit('user connected', {'player': client.player});	//avisar a los demás clientes
 			});
 
 			//Envio de mensaje
@@ -149,12 +130,39 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 			});
 
 
+			//Comenzar el juego cuando haya los jugadores minimos y todos esten listos
+			client.on('toggle ready', function (data){
+
+				//testeo: lo hago con un evento, para probar
+				var update_event = self.activeGames[client.room].update(data, client.player).event;
+				io.to(client.room).emit('update game', {'data': data, 'emmiter' : client.id});	//repetir el evento a los otros clientes
+
+				if (self.activeGames[client.room].canGameStart()){
+					self.activeGames[client.room].isActive = true;
+					io.to(client.room).emit('start game',{});		
+					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!"});
+				}
+			});
+
+			//Updatear juego
+			client.on('update game', function (data){
+				var update_event = self.activeGames[client.room].update(data, client.player).event;
+				io.to(client.room).emit('update game', {'data': data, 'emmiter' : client.id});	//repetir el evento a los otros clientes
+				io.to(client.room).emit('log message', {'msg' : update_event.log_msg});	//repetir el evento a los otros clientes
+
+			});
+
 			//Se desconecto un usuario
 			client.on('disconnect', function (){
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
 					self.activeGames[client.room].removePlayer(client.id);
 					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});
+					
+					if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
+						console.log("Juego eliminado por falta de usuarios.");
+						delete self.activeGames[client.room];
+					}
 				}
 			});
 

@@ -1,23 +1,19 @@
-  var socket = io();  //habilito el socketo
+
    ////////////////////////////////////////// FUNCIONES VARIAS /////////////////////////////////////////////////////
 
-  $(document).ready(function(){ 
+require(['./classes/Client'], function(Client){
 
-      console.log("JQuery Init");
+    var socket = io();  //habilito el socketo
 
-      ////////////////////////////////////////// MANEJO DE MENSAJES /////////////////////////////////////////////////////
-  		
-      require(['./classes/Client'], function(Client){
+    $(document).ready(function(){ 
 
-          //Mensaje de bienvenida con parámetros inciales
-        	socket.on('hello message', function(res){
-            var c = new Client();
-            c.listen(socket);      
-        	});
+        console.log("JQuery Init");
+            //Mensaje de bienvenida con parámetros inciales
+        socket.on('hello message', function(res){
+              var c = new Client();
+              c.listen(socket);      
+          	});
 
       });
-
-
-
 
   });
