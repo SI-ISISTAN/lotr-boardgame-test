@@ -1,0 +1,19 @@
+Tiles de evento:
+
+	3 X hiding tiles
+
+	3 X Friendship tiles
+
+	3 X travelling tiles
+
+	3 X fighting tiles
+
+	6 X Next Event tiles
+
+	2 X Ringbearer moves 1 space into the dark
+
+	1 X move two spaces into the dark or Eye
+
+	1 X group discard 3 cards or next Event
+
+	1 X group discard a card, a shield and a life token or next Event.

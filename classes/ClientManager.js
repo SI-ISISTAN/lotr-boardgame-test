@@ -139,8 +139,10 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 
 				if (self.activeGames[client.room].canGameStart()){
 					self.activeGames[client.room].isActive = true;
-					io.to(client.room).emit('start game',{});		
+					self.activeGames[client.room].start();
+					io.to(client.room).emit('start game',{'game' : self.activeGames[client.room]});		
 					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!"});
+					io.to(client.room).emit('log message', {'msg' : "Es el turno de "+self.activeGames[client.room].activePlayer.alias}+". ");
 				}
 			});
 

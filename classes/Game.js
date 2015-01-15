@@ -8,6 +8,9 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		this.events = events;
 		this.players = [];
 		this.isActive = false;
+		this.ringBearer = null;
+		this.activePlayer = null;
+		this.storyTiles = [];
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -52,14 +55,20 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		}
 	}
 
+	//setear las variables de un juego usando otro, al principio de la partida
 	//setear las variables de un juego usando otro
 	Game.prototype.setupGame= function(game){
 		this.gameID = game.gameID;
 		this.players = game.players;
 	}
 
+	//Recibe el estado de juego ante algun cambio grande
+	Game.prototype.buildGame= function(game){
+		this.storyTiles = game.storyTiles;
+	}
+
 	//Chequeo si estan dadas las condiciones minimas para que arranque un juego
-	Game.prototype.canGameStart= function(game){
+	Game.prototype.canGameStart= function(){
 		var start = true;
 		if (this.players.length < gameData.constants.PLAYER_MINIMUM){
 			start = false;
@@ -74,6 +83,41 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		return start;
 	}
 
+	Game.prototype.shuffleArray = function(array) {
+	  var currentIndex = array.length, temporaryValue, randomIndex ;
+
+	  // While there remain elements to shuffle...
+	  while (0 !== currentIndex) {
+
+	    // Pick a remaining element...
+	    randomIndex = Math.floor(Math.random() * currentIndex);
+	    currentIndex -= 1;
+
+	    // And swap it with the current element.
+	    temporaryValue = array[currentIndex];
+	    array[currentIndex] = array[randomIndex];
+	    array[randomIndex] = temporaryValue;
+	  }
+
+	  return array;
+	}
+
+	//iniciar juego
+	Game.prototype.start = function(){
+		//asigno a cada player un personaje
+		for (var i = 0; i < this.players.length; i++) {
+			this.players[i].character = gameData.characters[i];
+		};
+		this.ringBearer = this.players[0];
+		this.activePlayer = this.ringBearer;
+		this.ringBearer.turn = true;
+
+		console.log("los mezclo");
+		this.storyTiles = this.shuffleArray(gameData.storyTiles); //Mezclo los tiles
+		console.log(this.storyTiles);
+	}
+
+	//aplico una actualizacion al juego
 	Game.prototype.update = function(data, emmiter){
 		var update_event = null;
 

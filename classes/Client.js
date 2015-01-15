@@ -69,9 +69,26 @@ define(['./Game'], function (Game) {
 
 	    //Comienza un juego
 	    socket.on('start game', function(res){
-	    		this.currentGame.isActive = true;  
+
+	    		this.currentGame.isActive = true;
+
+	    		this.currentGame.start();
+	    		this.currentGame.buildGame(res.game);
+	    		
+
+	    		//Dibujo el juego  
 		        $("#main-lobby-div").remove();
 		        $("#main-game-div").appendTo('body').show('slow');
+
+		        //Inserto el apartado de cada jugador
+		        for (i in this.currentGame.players){
+		        	var panel = $("<div class='player-state-div'> <b>"+this.currentGame.players[i].alias+"</b> <img src='./assets/img/ripped/"+ this.currentGame.players[i].character.image +".jpg' alt='Tablero maestro' class='player-hobbit-img img-responsive'> <br><br><img src='./assets/img/ripped/heart-mini.png' class='img-responsive player-stat-img'> "+ this.currentGame.players[i].lifeTokens +" <img src='./assets/img/ripped/sun-mini.png' class='img-responsive player-stat-img'> "+ this.currentGame.players[i].sunTokens +" <br> <img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img'> "+ this.currentGame.players[i].ringTokens +"<img src='./assets/img/ripped/cards-mini.png' class='img-responsive player-stat-img'> "+ this.currentGame.players[i].hand.length +" </div>");
+		        	if (this.currentGame.players[i].turn){
+		        		panel.addClass("is-active");
+		        	}
+		        	$("#player-list-div").append(panel); 	
+		        }
+		        $("#player-cards-container").append('<img src="./assets/img/ripped/'+this.player.character.image +'.jpg"  class="player-hobbit-img img-responsive" title="'+this.player.character.name+'">');
 	    });
 
 	    //mensaje (test)
