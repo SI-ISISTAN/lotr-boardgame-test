@@ -74,7 +74,6 @@ define(['./Game'], function (Game) {
 
 	    		this.currentGame.start();
 	    		this.currentGame.buildGame(res.game);
-	    		
 
 	    		//Dibujo el juego  
 		        $("#main-lobby-div").remove();
@@ -89,6 +88,7 @@ define(['./Game'], function (Game) {
 		        	$("#player-list-div").append(panel); 	
 		        }
 		        $("#player-cards-container").append('<img src="./assets/img/ripped/'+this.player.character.image +'.jpg"  class="player-hobbit-img img-responsive" title="'+this.player.character.name+'">');
+		        //$("player-list-div").append('<img src="./assets/img/ripped/sauron.png" class="img-responsive" id="sauron-chip" >');
 	    });
 
 	    //mensaje (test)

@@ -112,9 +112,7 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		this.activePlayer = this.ringBearer;
 		this.ringBearer.turn = true;
 
-		console.log("los mezclo");
 		this.storyTiles = this.shuffleArray(gameData.storyTiles); //Mezclo los tiles
-		console.log(this.storyTiles);
 	}
 
 	//aplico una actualizacion al juego
@@ -129,7 +127,6 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		}
 
 		update_event.apply();
-		console.log(this);
 		return {"success" : true, "event" : update_event};
 	}
 

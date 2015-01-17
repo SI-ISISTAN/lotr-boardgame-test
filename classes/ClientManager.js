@@ -142,9 +142,11 @@ define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
 					self.activeGames[client.room].start();
 					io.to(client.room).emit('start game',{'game' : self.activeGames[client.room]});		
 					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!"});
-					io.to(client.room).emit('log message', {'msg' : "Es el turno de "+self.activeGames[client.room].activePlayer.alias}+". ");
+					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". "});
 				}
 			});
+
+
 
 			//Updatear juego
 			client.on('update game', function (data){

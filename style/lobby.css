@@ -85,20 +85,13 @@
 .master-board-img-container{
 	height:27vh;
 	max-height: 27vh;
+	position : relative;
 }
 
 .location-board-img-container{
 	height:40vh;
 	max-height: 40vh;
-}
-
-.master-board-img{
-	border: 2px solid #000000;
-    background: #dddddd;
-    border-radius: 5px;
-    vertical-align: center;
-    margin: 0 auto;
-    height:100%;
+	position : relative;
 }
 
 .player-hobbit-img{
@@ -187,4 +180,34 @@
 
 #chat-msg-div{
 
+}
+
+.master-board-img{
+	border: 2px solid #000000;
+    background: #dddddd;
+    border-radius: 5px;
+    vertical-align: center;
+    margin: 0 auto;
+    height:100%;
+    position : absolute;
+  
+}
+
+/* Pieza de Sauron */
+.sauron-chip{
+	position : absolute;
+	z-index: 10
+}
+
+/*Piezas de los hobbits */
+.hobbit-chip{
+	max-width : 15%;
+	max-height:15%;
+	position : absolute;
+	display:block;
+}
+
+.cont{
+	display:block;
+	position:relative;
 }
