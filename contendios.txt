@@ -17,3 +17,13 @@ Tiles de evento:
 	1 X group discard 3 cards or next Event
 
 	1 X group discard a card, a shield and a life token or next Event.
+	
+
+Hobbit cards:
+
+	Symbol	White	Grey
+	Fighting	7	5
+	Friendship	7	5
+	Hiding	7	5
+	Travelling	7	5
+	Joker	12	

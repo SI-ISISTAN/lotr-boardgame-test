@@ -82,13 +82,13 @@
 
 /* TABLEROS */
 
-.master-board-img-container{
+#master-board-img-container{
 	height:27vh;
 	max-height: 27vh;
 	position : relative;
 }
 
-.location-board-img-container{
+#location-board-img-container{
 	height:40vh;
 	max-height: 40vh;
 	position : relative;
@@ -207,7 +207,13 @@
 	display:block;
 }
 
-.cont{
+/*Piezas de posicion en el master board */
+.cone-chip{
+	position : absolute;
 	display:block;
-	position:relative;
+	z-index: 1
+}
+
+.no-close .ui-dialog-titlebar-close {
+	display: none 
 }

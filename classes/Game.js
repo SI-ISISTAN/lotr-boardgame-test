@@ -11,6 +11,8 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		this.ringBearer = null;
 		this.activePlayer = null;
 		this.storyTiles = [];
+		this.hobbitCards = [];
+		this.currentLocation = null;
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -65,6 +67,8 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 	//Recibe el estado de juego ante algun cambio grande
 	Game.prototype.buildGame= function(game){
 		this.storyTiles = game.storyTiles;
+		this.hobbitCards = game.hobbitCards;
+
 	}
 
 	//Chequeo si estan dadas las condiciones minimas para que arranque un juego
@@ -113,20 +117,26 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		this.ringBearer.turn = true;
 
 		this.storyTiles = this.shuffleArray(gameData.storyTiles); //Mezclo los tiles
+		this.hobbitCards = this.shuffleArray(gameData.hobbitCards); //Mezclo las cartas
 	}
 
 	//aplico una actualizacion al juego
 	Game.prototype.update = function(data, emmiter){
 		var update_event = null;
-
+		console.log("Update de juego con evento: "+data.action);
 		switch (data.action){
 			case "toggleReady":
 				update_event = new this.events.ToggleReady(this, emmiter);
+			break;
+			case "dealHobbitCards":
+				console.log(data);
+				update_event = new this.events.dealHobbitCards(this, data.amount, data.player);
 			break;
 
 		}
 
 		update_event.apply();
+
 		return {"success" : true, "event" : update_event};
 	}
 

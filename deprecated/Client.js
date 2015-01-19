@@ -8,12 +8,11 @@ define(['./Game'], function (Game) {
 		this.player = null;
 		this.connected = false;
 		console.log("Created client");
-	};
+		//Escuchar y responde ra los mensajes del servidor
 
+	}
 
-	//Escuchar y responde ra los mensajes del servidor
 	Client.prototype.listen = function(socket){
-
 		////////////////////////////// MANEJO DE MENSAJES //////////////////////////////
 
 		//Me conecto
@@ -85,10 +84,14 @@ define(['./Game'], function (Game) {
 		        	if (this.currentGame.players[i].turn){
 		        		panel.addClass("is-active");
 		        	}
-		        	$("#player-list-div").append(panel); 	
+		        	$("#player-list-div").append(panel); 
+		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+this.currentGame.players[i].character.image+'.jpg" class="hobbit-chip" style="left: '+0.5+'vw; top: '+(17 + (i*1))+'vh; z-index:'+(i+1)*1+';">');	
 		        }
 		        $("#player-cards-container").append('<img src="./assets/img/ripped/'+this.player.character.image +'.jpg"  class="player-hobbit-img img-responsive" title="'+this.player.character.name+'">');
-		        //$("player-list-div").append('<img src="./assets/img/ripped/sauron.png" class="img-responsive" id="sauron-chip" >');
+		        
+		        $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" class="cone-chip" style="left: 1.4vw; top: 6.0vh;">');
+		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 37vw; top: 14.0vh;">');
+		        $("#dialog").dialog({dialogClass : 'no-close'});
 	    });
 
 	    //mensaje (test)
@@ -108,36 +111,13 @@ define(['./Game'], function (Game) {
 	    		//getear el player que realizo la actualizacion
 	    		var player =  this.currentGame.getPlayerByID(res.emmiter);
 	        	var update_event = this.currentGame.update(res.data, player).event;
-
-	        	update_event.draw();	//actualizar la interfaz
+	        	console.log(this.currentGame);
+	        	update_event.draw(this);	//actualizar la interfaz     	
 
 	    });
 
+	};
 
-	    ////////////////////////////// MANEJO DE INPUT //////////////////////////////
-
-	    //Al apretar enter con el chat activado
-	    $('#chat-input').bind("enterKey",function(e){
-		        if ($('#chat-input').val() != ""){
-		            	socket.emit('send message', {'msg' : $('#chat-input').val() });
-		            	$('#chat-input').val(null);
-		        }
-	    });
-
-	    //función de binding
-	    $('#chat-input').keyup(function(e){
-		        if(e.keyCode == 13){
-		            $(this).trigger("enterKey");
-		        }
-	    });
-
-	    //clicqueo el boton de listo
-	    $('#ready-button').on('click', function(){
-	    	socket.emit('toggle ready', { action: "toggleReady" });
-	    })
-		        
-
-	}
 
 	return Client;
 });

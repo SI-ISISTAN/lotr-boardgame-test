@@ -1,4 +1,4 @@
-define (['./Client','./Game','../data/data'],function(Client,Game,loadedData) {
+define (['./Game','../data/data'],function(Game,loadedData) {
 	
 	var socket_io = require('socket.io');
 	var io;

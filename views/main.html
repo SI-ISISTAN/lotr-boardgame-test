@@ -3,9 +3,9 @@
   <head>
     <title>LOtR</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="./style/lobby.css" media="screen" />
-    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    
     <script data-main="/lobby.js" src="/node_modules/requirejs/require.js"></script>
   </head>
   <body class="main-div">
@@ -89,17 +89,11 @@
                   <div class="col-md-8">
                   
                       <div class="">
-                          <div class="master-board-img-container">
+                          <div id="master-board-img-container">
                               <img src="./assets/img/ripped/MasterBoard.jpg" alt="Tablero maestro" class="img-responsive master-board-img" title="Tablero maestro">
-                              <img src="./assets/img/ripped/frodo.jpg" class="hobbit-chip" style="left: 0.5vw; top: 17vh; z-index:1;">
-                              <img src="./assets/img/ripped/sam.jpg" class="hobbit-chip" style="left: 0.5vw; top: 18vh; z-index:2;">
-                              <img src="./assets/img/ripped/merry.jpg" class="hobbit-chip" style="left: 0.5vw; top: 19vh; z-index:3;">
-                              <img src="./assets/img/ripped/pippin.jpg" class="hobbit-chip" style="left: 0.5vw; top: 20vh; z-index:4;">
-                              <img src="./assets/img/ripped/fatty.jpg" class="hobbit-chip" style="left: 0.5vw; top: 21vh; z-index:5;">
-                              <img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 37vw; top: 14.0vh;">
                           </div>
                           <br>
-                          <div class="location-board-img-container">
+                          <div id="location-board-img-container">
                               <img src="./assets/img/ripped/MoriaBoard.jpg" alt="Tablero maestro" class=" img-responsive master-board-img" title="Tablero de locación">
                           </div>
                       </div>
@@ -161,5 +155,19 @@
         </div>
       </div>
 
+ <!-- POPUS Y COSAS QUE NO SE MUESTRAN AL PRINCIPIO -->
+
+<div id= "popups" style="display:none">
+      <div id="dialog" title="Evento: Gandalf">
+        <p>Se reparte a cada jugador 6 cartas de Hobbit del mazo.</p>
+        <button id="popup-ok-button"> Ok </button>
+      </div>
+</div>
   </body>
+
+
+
+ 
+
+
 </html>
