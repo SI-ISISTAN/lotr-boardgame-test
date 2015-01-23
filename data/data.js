@@ -9,6 +9,7 @@ define([], function () {
 
 	exports.consoleColor = "#FCF34B";
 
+	//muy probablemente haya que pasarlo a un archivo de configuracion
 	exports.constants = {
 		"PLAYER_MINIMUM" : 2
 	};

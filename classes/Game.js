@@ -1,11 +1,10 @@
 //Clase Game, una instancia creada por cada juego en curso
 
-define(['./Player', '../data/data','../data/events'], function (Player, gameData, events) {
+define(['./Player', './EventCreator', '../data/data', '../data/locations','./Location','./Activity'], function (Player, EventCreator, gameData, locations, Location, Activity) {
 	
 	function Game (){
 		console.log("Se ha creado un nuevo juego.");
 		this.gameID = Math.random().toString(36).substring(7);	//Nombre random
-		this.events = events;
 		this.players = [];
 		this.isActive = false;
 		this.ringBearer = null;
@@ -13,6 +12,7 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		this.storyTiles = [];
 		this.hobbitCards = [];
 		this.currentLocation = null;
+		this.eventCreator = new EventCreator();
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -116,28 +116,55 @@ define(['./Player', '../data/data','../data/events'], function (Player, gameData
 		this.activePlayer = this.ringBearer;
 		this.ringBearer.turn = true;
 
-		this.storyTiles = this.shuffleArray(gameData.storyTiles); //Mezclo los tiles
-		this.hobbitCards = this.shuffleArray(gameData.hobbitCards); //Mezclo las cartas
+		//Cargo cartas y tiles y mezclo cada pilon
+		for (i in gameData.storyTiles){
+			this.storyTiles.push(gameData.storyTiles[i]);
+		}
+		this.storyTiles = this.shuffleArray(this.storyTiles);
+
+		for (i in gameData.hobbitCards){
+			this.hobbitCards.push(gameData.hobbitCards[i]);
+		}
+		this.hobbitCards = this.shuffleArray(this.hobbitCards);
+		this.currentLocation = new Location(locations.BagEnd);
+
+	}
+
+	Game.prototype.rollDie = function(){
+		//retorna n random entre 1 y 6
+		var n = Math.floor((Math.random() * 6) + 1);
+		return n; 
 	}
 
 	//aplico una actualizacion al juego
 	Game.prototype.update = function(data, emmiter){
-		var update_event = null;
 		console.log("Update de juego con evento: "+data.action);
-		switch (data.action){
-			case "toggleReady":
-				update_event = new this.events.ToggleReady(this, emmiter);
-			break;
-			case "dealHobbitCards":
-				console.log(data);
-				update_event = new this.events.dealHobbitCards(this, data.amount, data.player);
-			break;
 
+		var update_event = this.eventCreator.getEvent(this,data,emmiter);
+		//aplico y retorno el evento, si existe
+		if (update_event != null){			
+			update_event.apply();
+			console.log(this);
+			return {"success" : true, "event" : update_event};
 		}
+		else{
+			return {"success" : false, "event" : null};
+		}
+	}
 
-		update_event.apply();
-
-		return {"success" : true, "event" : update_event};
+	//aplico una actualizacion al juego
+	Game.prototype.update2 = function(update, data, emmiter){
+		console.log("Update de juego con actividad: ");
+		console.log(data);
+		//aplico y retorno el evento, si existe
+		if (update.apply != null){			
+			update.apply(this, data, emmiter);
+			return {"success" : true};
+		}
+		else{
+			console.log("Este update no tiene metodo apply.");
+			return {"success" : false};
+		}
 	}
 
 	return Game;

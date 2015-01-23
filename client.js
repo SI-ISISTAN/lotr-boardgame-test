@@ -1,7 +1,7 @@
 
    ////////////////////////////////////////// FUNCIONES VARIAS /////////////////////////////////////////////////////
 
-require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'http://code.jquery.com/ui/1.11.2/jquery-ui.min.js'], function(Game, jquery, io, jqueryui){
+require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'http://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity'], function(Game, jquery, io, jqueryui, Activity){
 
     var socket = io();  //habilito el socketo
     var client = {
@@ -9,15 +9,13 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 		'alias' : null,
 		'currentGame' : null,
 		'player' : null,
-		'connected' : false
+		'connected' : false,
+		'socket' : socket
 	};
 
+	////////////////////////////// MANEJO DE MENSAJES ////////////////////////////// 
 
-            //Mensaje de bienvenida con parámetros inciales
-        socket.on('hello message', function(res){
-              //client = new Client();
-              //client.listen(socket);      
-        });
+	function message_listen(){	
 
         //Me conecto
 		if (!client.connected){
@@ -95,9 +93,11 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 		        
 		        $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" class="cone-chip" style="left: 1.4vw; top: 6.0vh;">');
 		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 37vw; top: 14.0vh;">');
-		        if (client.id == client.currentGame.activePlayer.id){
-		        	$("#dialog").dialog({dialogClass : 'no-close'});
+
+		        if (client.player.turn){
+		        	socket.emit('update game2', {'action' : 'ChangeLocation', 'location' : null});	//repetir el evento a los otros clientes
 		        }
+		        
 	    });
 
 	    //mensaje (test)
@@ -107,60 +107,77 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 	        	d.scrollTop(d.prop("scrollHeight"));
 	    });
 
-	    //mensaje (test)
+	    //mensaje de log
 	    socket.on('log message', function(res){
 	        	$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #FCF34B;"> '+ res.msg+' </b> </p>');
 	    });
-
-	    //mensaje (test)
+	    
+	    //actualizacion de juego
 	    socket.on('update game', function(res){
 	    		//getear el player que realizo la actualizacion
 	    		var player =  client.currentGame.getPlayerByID(res.emmiter);
 	        	var update_event = client.currentGame.update(res.data, player).event;
-	        	console.log(client.currentGame);
 	        	update_event.draw(client);	//actualizar la interfaz     	
 
 	    });
 
-        ////////////////////////////// MANEJO DE INPUT //////////////////////////////
+	    socket.on('update game2', function(res){
+	    		//getear el player que realizo la actualizacion
+	    		var player =  client.currentGame.getPlayerByID(res.emmiter);
+	        	var update = new Activity(res.data.action);
+	        	client.currentGame.update2(update, res.data, player);	//actualizar la interfaz
+	        	if (update.draw != null){
+	        		update.draw(client);									//actualizar la interfaz     	
+	        	}
+
+	    });
+	}
+
+    ////////////////////////////// MANEJO DE INPUT ////////////////////////////// 
+
+	function input_listen(){
+			    $(document).keypress(function (e){
+			    	if  (!($("#chat-input").is(":focus"))){
+			    		$("#chat-input").select();
+			    	}
+			    });
+
+			    //Al apretar enter con el chat activado
+			    $('#chat-input').bind("enterKey",function(e){
+				        if ($('#chat-input').val() != ""){
+				            	socket.emit('send message', {'msg' : $('#chat-input').val() });
+				            	$('#chat-input').val(null);
+				        }
+			    });
+
+			    //función de binding
+			    $('#chat-input').keyup(function(e){
+				        if(e.keyCode == 13){
+				            $(this).trigger("enterKey");
+				        }
+			    });
+
+			    //clicqueo el boton de listo
+			    $('#ready-button').on('click', function(){
+			    	socket.emit('toggle ready', { action: "toggleReady" });
+			    })
+				
+
+			    //click en el boton ok de un popup
+			    $('#popup-ok-button').on('click', function(e){
+			    	
+			    });
+	}
+  
 	    
-        $(document).ready(function(){
+        $(document).ready(function(){	
 
-        console.log("JQuery Init");
+        	console.log("JQuery Init");
 
-		    $(document).keypress(function (e){
-		    	if  (!($("#chat-input").is(":focus"))){
-		    		$("#chat-input").select();
-		    	}
-		    });
-
-		    //Al apretar enter con el chat activado
-		    $('#chat-input').bind("enterKey",function(e){
-			        if ($('#chat-input').val() != ""){
-			            	socket.emit('send message', {'msg' : $('#chat-input').val() });
-			            	$('#chat-input').val(null);
-			        }
-		    });
-
-		    //función de binding
-		    $('#chat-input').keyup(function(e){
-			        if(e.keyCode == 13){
-			            $(this).trigger("enterKey");
-			        }
-		    });
-
-		    //clicqueo el boton de listo
-		    $('#ready-button').on('click', function(){
-		    	socket.emit('toggle ready', { action: "toggleReady" });
-		    })
-			
-
-		    //click en el boton ok de un popup
-		    $('#popup-ok-button').on('click', function(e){
-		    	$(this).parent().dialog('close');
-		    	socket.emit('update game', {'action' : 'dealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
-		    	console.log(client.currentGame);
-		    });
-
+        	//MAIN LOOP DEL CLIENTE (no es un loop porque esta todo implementado con listeners)
+        	message_listen();
+        	input_listen();
+	       
+	    
 	    });
   });

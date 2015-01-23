@@ -100,6 +100,7 @@
 
 .player-card-img{
 	display: inline;
+	margin-left : 0.2vw;
 }
 
 .token-img{
@@ -216,4 +217,14 @@
 
 .no-close .ui-dialog-titlebar-close {
 	display: none 
+}
+
+.die-div{
+	
+	color: white;
+	border-style: inset;
+	border-width: 2px;
+	border-color: #6a3b44;
+	background-color: #4d4d4a;
+
 }
