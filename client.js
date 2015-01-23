@@ -51,6 +51,7 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 	              }
 	              else{
 	              	client.player = client.currentGame.players[i];	//Me asigno elplayer
+	              	client.player.upanchorola();
 	              }
 	        }
       	});
@@ -95,7 +96,7 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 37vw; top: 14.0vh;">');
 
 		        if (client.player.turn){
-		        	socket.emit('update game2', {'action' : 'ChangeLocation', 'location' : null});	//repetir el evento a los otros clientes
+		        	socket.emit('update game', {'action' : 'ChangeLocation', 'location' : null});	//repetir el evento a los otros clientes
 		        }
 		        
 	    });
@@ -111,21 +112,36 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 	    socket.on('log message', function(res){
 	        	$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #FCF34B;"> '+ res.msg+' </b> </p>');
 	    });
-	    
-	    //actualizacion de juego
+
+	    socket.on('toggle ready', function(res){
+	    	var player = client.currentGame.getPlayerByID(res.player);
+
+	    	//cambios logica de juego
+	    	if (player!=null){
+				if (player.ready){
+					player.ready = false;
+				}
+				else{
+					player.ready = true;
+				}
+			}
+
+			//cambios graficos
+	    	var alias = player.alias;
+			var text = "(Esperando)";
+			if (player.ready){
+				var text = "(¡Listo!)";
+			}
+
+			$( ".client-list-name:contains('"+alias+"')" ).parent().find(".client-list-state").text(text);
+	    });
+
 	    socket.on('update game', function(res){
 	    		//getear el player que realizo la actualizacion
 	    		var player =  client.currentGame.getPlayerByID(res.emmiter);
-	        	var update_event = client.currentGame.update(res.data, player).event;
-	        	update_event.draw(client);	//actualizar la interfaz     	
-
-	    });
-
-	    socket.on('update game2', function(res){
-	    		//getear el player que realizo la actualizacion
-	    		var player =  client.currentGame.getPlayerByID(res.emmiter);
 	        	var update = new Activity(res.data.action);
-	        	client.currentGame.update2(update, res.data, player);	//actualizar la interfaz
+	        	update.setData(res.data);
+	        	client.currentGame.update(update, player);	//actualizar la interfaz
 	        	if (update.draw != null){
 	        		update.draw(client);									//actualizar la interfaz     	
 	        	}
@@ -159,7 +175,7 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 
 			    //clicqueo el boton de listo
 			    $('#ready-button').on('click', function(){
-			    	socket.emit('toggle ready', { action: "toggleReady" });
+			    	socket.emit('toggle ready',{});
 			    })
 				
 

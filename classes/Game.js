@@ -1,6 +1,6 @@
 //Clase Game, una instancia creada por cada juego en curso
 
-define(['./Player', './EventCreator', '../data/data', '../data/locations','./Location','./Activity'], function (Player, EventCreator, gameData, locations, Location, Activity) {
+define(['./Player', '../data/data', '../data/locations','./Location','./Activity'], function (Player, gameData, locations, Location, Activity) {
 	
 	function Game (){
 		console.log("Se ha creado un nuevo juego.");
@@ -12,7 +12,6 @@ define(['./Player', './EventCreator', '../data/data', '../data/locations','./Loc
 		this.storyTiles = [];
 		this.hobbitCards = [];
 		this.currentLocation = null;
-		this.eventCreator = new EventCreator();
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -61,7 +60,9 @@ define(['./Player', './EventCreator', '../data/data', '../data/locations','./Loc
 	//setear las variables de un juego usando otro
 	Game.prototype.setupGame= function(game){
 		this.gameID = game.gameID;
-		this.players = game.players;
+		for (i in game.players){
+			this.addPlayer({'id': game.players[i].id, 'alias':game.players[i].alias});
+		}
 	}
 
 	//Recibe el estado de juego ante algun cambio grande
@@ -130,35 +131,19 @@ define(['./Player', './EventCreator', '../data/data', '../data/locations','./Loc
 
 	}
 
-	Game.prototype.rollDie = function(){
+	Game.prototype.rollDie = function(client){
 		//retorna n random entre 1 y 6
 		var n = Math.floor((Math.random() * 6) + 1);
-		return n; 
+		client.socket.emit('update game', {'action' : 'RollDie', 'value' : n});	//repetir el evento a los otros clientes 
 	}
 
 	//aplico una actualizacion al juego
-	Game.prototype.update = function(data, emmiter){
-		console.log("Update de juego con evento: "+data.action);
-
-		var update_event = this.eventCreator.getEvent(this,data,emmiter);
-		//aplico y retorno el evento, si existe
-		if (update_event != null){			
-			update_event.apply();
-			console.log(this);
-			return {"success" : true, "event" : update_event};
-		}
-		else{
-			return {"success" : false, "event" : null};
-		}
-	}
-
-	//aplico una actualizacion al juego
-	Game.prototype.update2 = function(update, data, emmiter){
+	Game.prototype.update = function(update, emmiter){
 		console.log("Update de juego con actividad: ");
-		console.log(data);
+		console.log(update);
 		//aplico y retorno el evento, si existe
 		if (update.apply != null){			
-			update.apply(this, data, emmiter);
+			update.apply(this, emmiter);
 			return {"success" : true};
 		}
 		else{

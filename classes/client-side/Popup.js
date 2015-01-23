@@ -45,7 +45,17 @@ define([], function () {
 	//mostrar el popup
 	Popup.prototype.draw = function(client){
 		if (client.id == client.currentGame.activePlayer.id){
-			this.popup.dialog({dialogClass : 'no-close'});
+			this.popup.dialog({
+				dialogClass : 'no-close',
+				show : {
+					effect: "puff",
+					duration: 1000
+				},
+				hide: {
+					effect: "explode",
+					duration: 1000
+				}
+			});
 		}
 	}
 

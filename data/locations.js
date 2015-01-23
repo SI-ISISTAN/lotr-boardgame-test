@@ -15,7 +15,7 @@ define(['../classes/Activity'], function (Activity) {
 	var main_activity = {
 		name: 'Bag End',
 		draw : null,
-		subactivities : ["Gandalf", "DieRoll", "Preparations"]
+		subactivities : ["Gandalf", "Preparations"]
 	};
 
 

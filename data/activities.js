@@ -7,7 +7,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	//Accion que hace todo lo necesario tras resolver una actividad para pasar a la siguiente
 	"ResolveActivity" : {
 		name: 'Resolver actividad',
-		apply : function (game, data, player){
+		apply : function (game, player){
 			var new_act = game.currentLocation.currentActivity.next();
 			if (new_act != null){
 				game.currentLocation.currentActivity = new_act;
@@ -16,7 +16,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		draw : function(client){
 			if (client.currentGame.currentLocation.currentActivity.draw != null){
 				if (client.id == client.currentGame.activePlayer.id)
-					client.socket.emit('update game2', {'action' : client.currentGame.currentLocation.currentActivity.name});	//si no, emito que la termine
+					client.socket.emit('update game', {'action' : client.currentGame.currentLocation.currentActivity.name});	//si no, emito que la termine
 			}
 		}
 	},
@@ -24,10 +24,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
     //Reparte cartas a uno/varios jugadores segun parámetros (cantidad y jugador/es a quien repartir)
 	"DealHobbitCards" : {
 		name: 'Dar cartas de hobbit',
-		apply : function (game, data, player){
+		apply : function (game, player){
 			var i=0;
-			while (i<data.amount){
-				if (data.player == null){			//si me pasan nulo le reparto a todos
+			while (i<this.data.amount){
+				if (this.data.player == null){			//si me pasan nulo le reparto a todos
 					for (j in game.players){
 						game.getPlayerByID(game.players[j].id).hand.push(game.hobbitCards[game.hobbitCards.length-1]);
 						game.hobbitCards.splice(game.hobbitCards.length-1);
@@ -51,27 +51,29 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	//Accion de juego de tirar el dado
 	"ChangeLocation" :  {
 		name: 'Cambiar locacion',
-		apply : function (game, data, player){
+		apply : function (game, player){
 			game.currentLocation.currentActivity = this.newActivity(game.currentLocation.currentActivity.name, game.currentLocation.currentActivity.subactivities, null);
+			game.currentLocation.currentActivity.setData(this.data);
 		},
 		draw : function(client){
 			var self = this;
 
 			if (!client.currentGame.currentLocation.isConflict){
 				if (client.currentGame.activePlayer.id == client.id){
-		        	client.socket.emit('update game2', {'action' : client.currentGame.currentLocation.currentActivity.next().name});	//si no, emito que la termine
+		        	client.socket.emit('update game', {'action' : client.currentGame.currentLocation.currentActivity.next().name});	//si no, emito que la termine
 				}
 			}
 		}
 	},
 
 	//Accion de juego de tirar el dado
-	"DieRoll" :  {
+	"RollDie" :  {
 		name: 'Lanzar dado',
-		apply : function(game, data, player){
-			var value = game.rollDie();
-			console.log("lanze el puto dado oligarca y obtuve: "+value);
-			switch (value){
+		draw : function(client){
+			var self = this;
+
+			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+client.player.alias+" lanza el dado y obtiene..."+this.data.value, buttons : [{name : "Ok"}] });
+			switch (this.data.value){
 				case 1:
 					console.log("Roll blank");
 				break;
@@ -96,11 +98,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 					//this.addSubActivity(this.newActivity("Discard"), [], this);
 				break;
 			}
-		},
-		draw : function(client){
-			var self = this;
-
-			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+client.player.alias+" lanza el dado y obtiene...", buttons : [{name : "Ok"}] });
 			popup.addListener("Ok", function(){ 
 				popup.close();
 				self.end(client); //siguiente subactividad
@@ -121,7 +118,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok"}] });
 			popup.addListener("Ok", function(){
 				popup.close();
-				client.socket.emit('update game2', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
+				client.socket.emit('update game', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
 				self.end(client); //siguiente subactividad
 			});
 			
@@ -142,7 +139,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				buttons : [{name : "Prepararse"},  {name : "No prepararse"}] 
 			});
 			popup.addListener("Prepararse", function(){
-				self.end(client); //siguiente subactividad
+				client.currentGame.rollDie(client);
 				popup.close();
 			});
 			popup.addListener("No prepararse", function(){

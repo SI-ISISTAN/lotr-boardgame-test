@@ -132,10 +132,17 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//Comenzar el juego cuando haya los jugadores minimos y todos esten listos
 			client.on('toggle ready', function (data){
+				var player = self.activeGames[client.room].getPlayerByID(client.id);
+				if (player!=null){
+					if (player.ready){
+						player.ready = false;
+					}
+					else{
+						player.ready = true;
+					}
+				}
 
-				//testeo: lo hago con un evento, para probar
-				var update_event = self.activeGames[client.room].update(data, client.player).event;
-				io.to(client.room).emit('update game', {'data': data, 'emmiter' : client.id});	//repetir el evento a los otros clientes
+				io.to(client.room).emit('toggle ready', {'player': client.id });	//repetir el evento a los otros clientes
 
 				if (self.activeGames[client.room].canGameStart()){
 					self.activeGames[client.room].isActive = true;
@@ -146,25 +153,14 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				}
 			});
 
-
-
-			//Updatear juego
-			client.on('update game', function (data){
-				var update_event = self.activeGames[client.room].update(data, client.player).event;
-				if (update_event != null){
-					io.to(client.room).emit('update game', {'data': data, 'emmiter' : client.id});	//repetir el evento a los otros clientes
-					io.to(client.room).emit('log message', {'msg' : update_event.log_msg});	//emito mensaje de consola si hay
-				}
-
-			});
-
 			//Updatear juego con activity
-			client.on('update game2', function (data){
+			client.on('update game', function (data){
 				console.log("Llego a colient manager un update de actividad: "+data.action);
 				var update = new Activity(data.action);
-				self.activeGames[client.room].update2(update, data, client.player);
+				update.setData(data);
+				self.activeGames[client.room].update(update, client.player);
 				if (update != null){
-					io.to(client.room).emit('update game2', {'data': data, 'emmiter' : client.id});	//repetir el evento a los otros clientes
+					io.to(client.room).emit('update game', {'data': update.data, 'emmiter' : client.id});	//repetir el evento a los otros clientes
 					//io.to(client.room).emit('log message', {'msg' : "U PAN CHO RO LA"});	//emito mensaje de consola si hay
 				}
 

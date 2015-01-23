@@ -15,5 +15,9 @@ define([], function () {
 		this.corruption = 0;
 	};
 
+	Player.prototype.upanchorola = function(){
+		console.log("upanchoola");
+	}
+
 	return Player;
 });
