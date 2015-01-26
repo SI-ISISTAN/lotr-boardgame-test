@@ -25,24 +25,37 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	"DealHobbitCards" : {
 		name: 'Dar cartas de hobbit',
 		apply : function (game, player){
+			//llevo un registro interno de que cartas le doy a cada uno para poder dibujarlo en "draw"
+			this.given = [];
+
 			var i=0;
 			while (i<this.data.amount){
 				if (this.data.player == null){			//si me pasan nulo le reparto a todos
 					for (j in game.players){
-						game.getPlayerByID(game.players[j].id).hand.push(game.hobbitCards[game.hobbitCards.length-1]);
+						var card = game.hobbitCards[game.hobbitCards.length-1];
+						game.getPlayerByID(game.players[j].id).hand.push(card);
 						game.hobbitCards.splice(game.hobbitCards.length-1);
+						this.given.push({'card' : card, 'player' : game.players[j].alias});
 					}
 				}
 				else{
-					game.getPlayerByID(player.id).hand.push(game.hobbitCards[game.hobbitCards.length-1]);
+					console.log("le doy una tacar a "+this.data.player);
+					var card = game.hobbitCards[game.hobbitCards.length-1];
+					game.getPlayerByAlias(this.data.player).hand.push(card);
 					game.hobbitCards.splice(game.hobbitCards.length-1);
+					this.given.push({'card' : card, 'player' : this.data.player});
 				}
 				i++;
 			}
+			console.log(this.given);
 		},
 		draw : function(client){
-			for (i in client.player.hand){	//arreglare
-				$("<img src='./assets/img/ripped/"+client.player.hand[i].image+".png' class='player-card-img img-responsive'>").appendTo("#player-cards-container").show('slow');
+			console.log(this.given);
+			for (j in this.given){	//arreglare
+
+				if (this.given[j].player == client.player.alias){
+					$("<img src='./assets/img/ripped/"+this.given[j].card.image+".png' class='player-card-img img-responsive' style='display : none'>").appendTo("#player-cards-container").show('slow');
+				}
 			}
 			for (i in client.currentGame.players){
 				$("#"+client.currentGame.players[i].alias+"-state-div").find("#cards-span").text(client.currentGame.players[i].hand.length);
@@ -126,6 +139,9 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 						}
 					}
 						popup.close();
+						if (client.isActivePlayer()){
+							client.socket.emit('update game', {'action' : 'PlayerDealCards', 'amount' : 4, 'cards' : []});	//repetir el evento a los otros clientes
+						}
 						self.end(client); //siguiente subactividad	
 				});
 			
@@ -235,6 +251,58 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		
 	},
 
+	//Se sacan algunas cartas y el jugador activo las reparte como desea
+	"PlayerDealCards" : {
+		name : "Distribuir cartas",
+		apply : function(game, player){
+			this.data.cards = [];
+			for (var i=0; i<this.data.amount; i++){
+				this.data.cards.push(game.hobbitCards[game.hobbitCards.length-1-i]);
+			}
+			console.log(game);
+		},
+		draw : function(client){
+			var self=this;
+
+			var popup = new Popup({title: "Repartir cartas", text: "Distribuye las cartas como desees. ",buttons : [{name : "Ok"}],isPublic : false});
+			//pongo los elementos de reparto de cada carta
+			var div = $("<div>  </div>");
+
+			console.log(this.data.cards);
+
+			for (i in this.data.cards){
+				var el = $("<div id='deal-card-div'>  </div> ");
+				el.append("<img src='./assets/img/ripped/"+this.data.cards[i].image+".png' class='player-card-img img-responsive'>");
+
+				var listbox = $("<select class='card-to-selector'> </select>");
+				for (j in client.currentGame.players){
+					$(listbox).append("<option value='"+client.currentGame.players[j].alias+"'> "+client.currentGame.players[j].alias+"</option>");
+				}
+				listbox.data("id",i);
+				$(el).append($(listbox));
+
+				div.append(el);	
+			}
+
+			popup.append(div);
+
+			//cuando me dan ok envio cada carta al jugador correspondiente
+			popup.addListener("Ok", function(){
+					$(".card-to-selector").each(function(){
+						var to = $(this).val();
+						console.log(to);
+						client.socket.emit('update game', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});	//voy dando las cartas de a una
+					})
+					
+				popup.close();
+				self.end(client); //siguiente subactividad
+			});
+
+			popup.draw(client);
+
+		}
+	},
+
 	//////////////// Actividades que se cargan en el juego ////////////////
 
 	//Primera accion del juego
@@ -243,9 +311,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		draw : function(client){
 			var self = this;
 
-			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok"}]});
+			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok"}], isPublic : false});
 			popup.addListener("Ok", function(){
-				console.log("Y CUANDO CAE LA NOCHEEEE");
 				popup.close();
 				client.socket.emit('update game', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
 				self.end(client); //siguiente subactividad

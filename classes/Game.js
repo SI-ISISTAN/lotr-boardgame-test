@@ -175,6 +175,7 @@ define(['./Player', '../data/data', '../data/locations','./Location','./Activity
 		else{
 			return {"success" : false};
 		}
+		console.log(this);
 	}
 
 	return Game;
