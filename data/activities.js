@@ -1,4 +1,4 @@
-define(['../classes/client-side/Popup'], function (Popup) {
+define(['../classes/client-side/Popup','../classes/client-side/Alert'], function (Popup, Alert) {
 	
 	var exports = { //Lo que retorna el módulo
 
@@ -15,7 +15,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 		draw : function(client){
 			if (client.currentGame.currentLocation.currentActivity.draw != null){
-				if (client.id == client.currentGame.activePlayer.id)
+				if (client.isActivePlayer())
 					client.socket.emit('update game', {'action' : client.currentGame.currentLocation.currentActivity.name});	//si no, emito que la termine
 			}
 		}
@@ -44,6 +44,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			for (i in client.player.hand){	//arreglare
 				$("<img src='./assets/img/ripped/"+client.player.hand[i].image+".png' class='player-card-img img-responsive'>").appendTo("#player-cards-container").show('slow');
 			}
+			for (i in client.currentGame.players){
+				$("#"+client.currentGame.players[i].alias+"-state-div").find("#cards-span").text(client.currentGame.players[i].hand.length);
+			}
 			this.end(client);
 		}
 	},
@@ -71,38 +74,163 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		name: 'Lanzar dado',
 		draw : function(client){
 			var self = this;
-
-			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+client.player.alias+" lanza el dado y obtiene..."+this.data.value, buttons : [{name : "Ok"}] });
+			var div = $("<div style = 'display : none'>  </div>")
+			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+client.player.alias+" lanza el dado y obtiene...", buttons : [] , isPublic : true});
+			var action = null;
 			switch (this.data.value){
 				case 1:
-					console.log("Roll blank");
+					div.append($('<img src="./assets/img/ripped/die0.png" alt="Dado de amenaza" class="img-responsive token-img"><br>'));
+					div.append($("<p> No hay consecuencias.</p>"));
 				break;
 				case 2:
-					console.log("Move Sauron");
-					//this.addSubActivity(this.newActivity("Move Sauron"), [], this);
+
+					div.append($('<img src="./assets/img/ripped/die1.png" alt="Dado de amenaza" class="img-responsive token-img"><br><br>'));
+					div.append($("<p> Battión se mueve un espacio hacia los aventureros. </p>"));
+					action = {'action' : 'MoveSauron', 'amount' : 1};
+
 				break;
 				case 3:
-					console.log("Move Hobbit 1");
-					//this.addSubActivity(this.newActivity("Move Hobbit"), [], this);
+
+					div.append($('<img src="./assets/img/ripped/die2.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
+					div.append($("<p> Debe moverse un espacio en la línea de corrupción. </p>"));
+
+					action = {'action' : 'MovePlayer', 'alias' : client.player.alias, 'amount' : 1};
+					
 				break;
 				case 4:
-					console.log("Move Hobbit 2");
-					//this.addSubActivity(this.newActivity("Move Hobbit"), [], this);
+
+					div.append($('<img src="./assets/img/ripped/die3.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
+					div.append($("<p> Debe moverse dos espacios en la línea de corrupción. </p>"));
+					action = {'action' : 'MovePlayer', 'alias' : client.player.alias, 'amount' : 2 };
+					
 				break;
 				case 5:
-					console.log("Move Hobbit 3");
-					//this.addSubActivity(this.newActivity("Move Hobbit"), [], this);
+
+					div.append($('<img src="./assets/img/ripped/die4.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
+					div.append($("<p> Debe moverse tres espacios en la línea de corrupción. </p>"));
+					action = {'action' : 'MovePlayer', 'alias' : client.player.alias, 'amount' : 3};
 				break;
 				case 6:
-					console.log("Discard");
-					//this.addSubActivity(this.newActivity("Discard"), [], this);
+					div.append($('<img src="./assets/img/ripped/die5.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
+					div.append($("<p> Debe descartar dos cartas. </p>"));
+					action = {'action' : 'ForceDiscard', 'alias' : client.player.alias, 'amount' : 2};
 				break;
 			}
-			popup.addListener("Ok", function(){ 
+			popup.append(div);
+			popup.draw(client);
+				
+				div.fadeIn(4000, function(){
+					if (client.isActivePlayer()){
+						if (action!= null){
+							client.socket.emit('update game', action);
+						}
+					}
+						popup.close();
+						self.end(client); //siguiente subactividad	
+				});
+			
+			
+		}
+		
+	},
+
+	//Un jugador se descarta
+	"PlayerDiscard" : {
+		name : "Descartar",
+		apply : function(game, player){
+			game.getPlayerByID(this.data.playerID).discard(this.data.discard);
+		},
+		draw : function(client){
+			var self=this;
+			
+			//dibujar el descarte
+			$(".player-card-img.highlighted-image").remove();
+			$("#"+client.player.alias+"-state-div").find("#cards-span").text(client.player.hand.length);	//que ondis???
+		}
+	},
+
+	//Un jugador debe, forzosamente, elegir algunas cartas de su mano para descartarse
+	"ForceDiscard" :  {
+		name: 'Descartar',
+		draw : function(client){
+			var self=this;
+			var discarded = [];
+			//Dibujo una alerta indicandome
+			var popup = new Popup({title: "Descartar", text: "Debes descartar "+self.data.amount+" cartas de tu mano.", buttons : [{name : "Ok"}] , isPublic : false});
+			popup.addListener("Ok", function(){
+				//ordenar el descarte
+				//getear el numero de cartas seleccionadas
+				var discard = [];
+				var hand = $(".player-card-img");
+				$(".highlighted-image").each(function(){
+					discard.push(client.player.hand[$(this).data("number")].id);	//pushear el id de la carta
+				});
+
+				client.socket.emit('update game', {'action' : 'PlayerDiscard', 'playerID' : client.id, 'discard' : discard});	//si no, emito que la termine
 				popup.close();
-				self.end(client); //siguiente subactividad
+				self.end(client);
 			});
 			popup.draw(client);
+			popup.disableButton("Ok", true);
+
+			//Proceso el descarte (pasar a una clase de input handler??)
+			if (client.isActivePlayer()){
+				var discarded = 0;
+				//como coño hago el descarte?
+				$(".player-card-img").on('click', function(){
+					if (! $(this).data("selected")){	//si ya estaba seleccionada
+						//var index = $(this).index();
+						$(this).addClass("highlighted-image");
+						$(this).data("selected", true);
+						$(this).data("number", $(this).index()-1);
+						discarded++;
+
+					}
+					else{								//si no estaba seleccionada
+						$(this).removeClass("highlighted-image");
+						$(this).data("selected", false);
+						discarded--;
+
+					}
+					if (discarded != self.data.amount){
+						popup.disableButton("Ok", true);
+					}
+					else{
+						popup.disableButton("Ok", false);
+					}
+				});
+			}
+		}
+		
+	},
+
+	//Accion de juego de tirar el dado
+	'MovePlayer' :  {
+		name: 'Mover personaje',
+		apply : function(game, player){
+			game.getPlayerByAlias(this.data.alias).move(this.data.amount);
+		},
+		draw : function(client){
+
+			$("#"+this.data.alias+"-chip").animate({
+				'left' : "+="+2.4*this.data.amount+"vw" //moves right
+			},800);
+			
+		}
+		
+	},
+
+	//Accion de juego de tirar el dado
+	'MoveSauron' :  {
+		name: 'Mover a Battion',
+		apply : function(game, player){
+			game.moveSauron(this.data.amount);
+		},
+		draw : function(client){
+			$(".sauron-chip").animate({
+				'left' : "-="+2.4*this.data.amount+"vw" //moves right
+			},800);
+			
 		}
 		
 	},
@@ -115,8 +243,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		draw : function(client){
 			var self = this;
 
-			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok"}] });
+			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok"}]});
 			popup.addListener("Ok", function(){
+				console.log("Y CUANDO CAE LA NOCHEEEE");
 				popup.close();
 				client.socket.emit('update game', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
 				self.end(client); //siguiente subactividad

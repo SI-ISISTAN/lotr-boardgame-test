@@ -1,4 +1,4 @@
-- Hacer que los players se creen con constructor al recibir el juego un cliente, para poder agregarles métodos
-	(ya esta?= testear)
 - Arreglar el logueo en consola y de paso agregarle parametros
-- Terminar la puta actividad del dado la concha del mono viejo
+
+- implementar ern client side la clase client de nuevo que tenga algunos métodos (si ese cliente es el jugador activo, etc.) (listo hay que ver que agregar)
+- pasar menues a una clase especial??? (Input Manager ponele)

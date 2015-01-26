@@ -1,17 +1,11 @@
 
    ////////////////////////////////////////// FUNCIONES VARIAS /////////////////////////////////////////////////////
 
-require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'http://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity'], function(Game, jquery, io, jqueryui, Activity){
+require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'http://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity'], function(Game, Client, jquery, io, jqueryui, Activity){
 
     var socket = io();  //habilito el socketo
-    var client = {
-    	'id' : null,
-		'alias' : null,
-		'currentGame' : null,
-		'player' : null,
-		'connected' : false,
-		'socket' : socket
-	};
+    var client = new Client();
+    client.socket = socket;
 
 	////////////////////////////// MANEJO DE MENSAJES ////////////////////////////// 
 
@@ -51,7 +45,6 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 	              }
 	              else{
 	              	client.player = client.currentGame.players[i];	//Me asigno elplayer
-	              	client.player.upanchorola();
 	              }
 	        }
       	});
@@ -83,12 +76,12 @@ require(['./classes/Game','http://code.jquery.com/jquery-1.8.3.js','https://cdn.
 
 		        //Inserto el apartado de cada jugador
 		        for (i in client.currentGame.players){
-		        	var panel = $("<div class='player-state-div'> <b>"+client.currentGame.players[i].alias+"</b> <img src='./assets/img/ripped/"+ client.currentGame.players[i].character.image +".jpg' alt='Tablero maestro' class='player-hobbit-img img-responsive'> <br><br><img src='./assets/img/ripped/heart-mini.png' class='img-responsive player-stat-img'> "+ client.currentGame.players[i].lifeTokens +" <img src='./assets/img/ripped/sun-mini.png' class='img-responsive player-stat-img'> "+ client.currentGame.players[i].sunTokens +" <br> <img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img'> "+ client.currentGame.players[i].ringTokens +"<img src='./assets/img/ripped/cards-mini.png' class='img-responsive player-stat-img'> "+ client.currentGame.players[i].hand.length +" </div>");
+		        	var panel = $("<div class='player-state-div' id='"+client.currentGame.players[i].alias+"-state-div'> <b>"+client.currentGame.players[i].alias+"</b> <img src='./assets/img/ripped/"+ client.currentGame.players[i].character.image +".jpg' alt='Tablero maestro' class='player-hobbit-img img-responsive'> <br><br><img src='./assets/img/ripped/heart-mini.png' class='img-responsive player-stat-img'> <span id ='life-span'>"+ client.currentGame.players[i].lifeTokens +" </span> <img src='./assets/img/ripped/sun-mini.png' class='img-responsive player-stat-img'> <span id ='sun-span'>"+ client.currentGame.players[i].sunTokens +"</span> <br> <img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img'> <span id ='ring-span'>"+ client.currentGame.players[i].ringTokens +" </span> <img src='./assets/img/ripped/cards-mini.png' class='img-responsive player-stat-img'> <span id ='cards-span'>"+ client.currentGame.players[i].hand.length +" </span> </div>");
 		        	if (client.currentGame.players[i].turn){
 		        		panel.addClass("is-active");
 		        	}
 		        	$("#player-list-div").append(panel); 
-		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+client.currentGame.players[i].character.image+'.jpg" class="hobbit-chip" style="left: '+0.5+'vw; top: '+(17 + (i*1))+'vh; z-index:'+(i+1)*1+';">');	
+		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+client.currentGame.players[i].character.image+'.jpg" id= "'+client.currentGame.players[i].alias+'-chip" class="hobbit-chip" style="left: '+0.5+'vw; top: '+(17 + (i*1))+'vh; z-index:'+(i+1)*1+';">');	
 		        }
 		        $("#player-cards-container").append('<img src="./assets/img/ripped/'+client.player.character.image +'.jpg"  class="player-hobbit-img img-responsive" title="'+client.player.character.name+'">');
 		        

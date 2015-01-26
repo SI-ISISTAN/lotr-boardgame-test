@@ -35,7 +35,6 @@ define(['../data/activities'], function (activities) {
 
 		if (this.currentSubActivity < this.subactivities.length){	//si quedan sub-actividades
 			this.currentSubActivity++;
-			console.log("Retorno la actividad: " + this.subactivities[this.currentSubActivity-1].name);
 			return this.subactivities[this.currentSubActivity-1];
 		}
 		else{
@@ -47,8 +46,9 @@ define(['../data/activities'], function (activities) {
 	}
 
 	Activity.prototype.end = function(client){
-		if (client.id == client.currentGame.activePlayer.id)
+		if (client.isActivePlayer()){
 			client.socket.emit('update game', {'action' : 'ResolveActivity', 'name' : this.name});	//si no, emito que la termine
+		}
 	};
 
 	Activity.prototype.newActivity = function(name, subactivities, parent){	//"contructor" ayuda para evitar dependencias circulares

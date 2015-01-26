@@ -12,6 +12,7 @@ define(['./Player', '../data/data', '../data/locations','./Location','./Activity
 		this.storyTiles = [];
 		this.hobbitCards = [];
 		this.currentLocation = null;
+		this.sauronPosition = 15;		//Cargar de un file
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -20,6 +21,26 @@ define(['./Player', '../data/data', '../data/locations','./Location','./Activity
 		var i=0;
 		while (i<this.players.length && !found){
 			if (this.players[i].id != client_id){
+				i++;
+			}
+			else{
+				found=true;
+			}
+		}
+		if (found){
+			return this.players[i];
+		}
+		else{
+			return null;
+		}
+	}
+
+	//obtener el objeto player proveyendo un id de cliente
+	Game.prototype.getPlayerByAlias= function(alias){
+		var found = false;
+		var i=0;
+		while (i<this.players.length && !found){
+			if (this.players[i].alias != alias){
 				i++;
 			}
 			else{
@@ -124,7 +145,9 @@ define(['./Player', '../data/data', '../data/locations','./Location','./Activity
 		this.storyTiles = this.shuffleArray(this.storyTiles);
 
 		for (i in gameData.hobbitCards){
-			this.hobbitCards.push(gameData.hobbitCards[i]);
+			var card = gameData.hobbitCards[i];
+			card.id = i;
+			this.hobbitCards.push(card);
 		}
 		this.hobbitCards = this.shuffleArray(this.hobbitCards);
 		this.currentLocation = new Location(locations.BagEnd);
@@ -137,17 +160,19 @@ define(['./Player', '../data/data', '../data/locations','./Location','./Activity
 		client.socket.emit('update game', {'action' : 'RollDie', 'value' : n});	//repetir el evento a los otros clientes 
 	}
 
+	Game.prototype.moveSauron = function(amount){
+		this.sauronPosition+=amount;
+	}
+
 	//aplico una actualizacion al juego
 	Game.prototype.update = function(update, emmiter){
-		console.log("Update de juego con actividad: ");
-		console.log(update);
+		console.log("Update de juego con actividad: "+update.name);
 		//aplico y retorno el evento, si existe
 		if (update.apply != null){			
 			update.apply(this, emmiter);
 			return {"success" : true};
 		}
 		else{
-			console.log("Este update no tiene metodo apply.");
 			return {"success" : false};
 		}
 	}
