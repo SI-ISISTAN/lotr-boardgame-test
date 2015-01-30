@@ -1,12 +1,13 @@
 define(['../data/activities'], function (activities) {
 
-	function Activity(name, subactivities, parent){
-		this.name = name;
+	function Activity(data, subactivities, parent){
+
+		this.name = data.action;
+		this.data = data;
 		this.parent = null;
 		this.subactivities = [];
 		this.draw = null;
 		this.apply = null;
-		this.data = {};
 		this.currentSubActivity = 0;
 		for (i in subactivities){
 			this.subactivities.push(new Activity (subactivities[i], subactivities[i].subactivities, this));
@@ -30,29 +31,39 @@ define(['../data/activities'], function (activities) {
 		this.subactivities.push(subactivity);
 	}
 
+	Activity.prototype.setParent = function(parent){
+		this.parent = parent;
+	}
+
 	//completar la siguiente subactividad
 	Activity.prototype.next = function(){
-
+		//console.log("La actividad "+this.name+" retorna una subactividad");
 		if (this.currentSubActivity < this.subactivities.length){	//si quedan sub-actividades
+			var ret = this.subactivities[this.currentSubActivity];
 			this.currentSubActivity++;
-			return this.subactivities[this.currentSubActivity-1];
+			//console.log("Retorno la subactividad: "+ this.subactivities[this.currentSubActivity-1].name + ", numero "+(this.currentSubActivity-1));
+			return ret
 		}
 		else{
 			if (this.parent!=null){
-				console.log("Retorno el padre de la actividad: "+ this.name);
-				return this.parent;
+				//console.log("Retorno el padre, que es "+this.parent.name);
+				return this.parent.next();
 			}
+
+			else {
+				return null;}
 		}
 	}
 
 	Activity.prototype.end = function(client){
 		if (client.isActivePlayer()){
+			//client.socket.emit('update game', {'action' : 'ResolveActivity', 'name' : this.name});	//si no, emito que la termine
 			client.socket.emit('update game', {'action' : 'ResolveActivity', 'name' : this.name});	//si no, emito que la termine
 		}
 	};
 
-	Activity.prototype.newActivity = function(name, subactivities, parent){	//"contructor" ayuda para evitar dependencias circulares
-		return new Activity(name, subactivities, parent);
+	Activity.prototype.newActivity = function(data, subactivities, parent){	//"contructor" ayuda para evitar dependencias circulares
+		return new Activity(data, subactivities, parent);
 	}
 
 	return Activity;

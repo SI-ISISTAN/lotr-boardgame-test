@@ -60,7 +60,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 	//Crear una nueva partida
 	ClientManager.prototype.createNewGame = function(client){
-			var game = new Game();
+			var game = new Game(io);
 			game.addPlayer(client);
 			var i=0;
 			this.connectedClients=[];
@@ -118,7 +118,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					client.player = self.activeGames[client.room].getPlayerByID(client.id);		
 					client.join(client.room);	//Unirse a la room del juego
 
-					io.to(client.id).emit('game found',{'game' : self.activeGames[client.room]});	//si hay espacio en un juego me uno
+					io.to(client.id).emit('game found',{'game' : {'players' : self.activeGames[client.room].players}});	//si hay espacio en un juego me uno
 
 					//Se conecto un usuario
 					client.in(client.room).broadcast.emit('user connected', {'player': client.player});	//avisar a los demás clientes
@@ -132,6 +132,9 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//Comenzar el juego cuando haya los jugadores minimos y todos esten listos
 			client.on('toggle ready', function (data){
+
+				
+
 				var player = self.activeGames[client.room].getPlayerByID(client.id);
 				if (player!=null){
 					if (player.ready){
@@ -142,28 +145,46 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					}
 				}
 
-				io.to(client.room).emit('toggle ready', {'player': client.id });	//repetir el evento a los otros clientes
+				io.to(client.room).emit('toggle ready', {'player': client.player });	//repetir el evento a los otros clientes
 
 				if (self.activeGames[client.room].canGameStart()){
 					self.activeGames[client.room].isActive = true;
 					self.activeGames[client.room].start();
-					io.to(client.room).emit('start game',{'game' : self.activeGames[client.room]});		
+					io.to(client.room).emit('start game',{'game' : {'players' : self.activeGames[client.room].players}});		
 					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!"});
 					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". "});
+				}
+			});
+
+			//Cambiar el escernario e inicializarlo (act. especial)
+			client.on('change location', function (data){ 
+				
+				if (!self.activeGames[client.room].currentLocation.isConflict){
+					self.activeGames[client.room].currentLocation.currentActivity = new Activity({'action' : self.activeGames[client.room].currentLocation.currentActivity.name}, self.activeGames[client.room].currentLocation.currentActivity.subactivities, null);
+					io.to(client.id).emit('change location');	//enviar siguiente actividad
 				}
 			});
 
 			//Updatear juego con activity
 			client.on('update game', function (data){
 				console.log("Llego a colient manager un update de actividad: "+data.action);
-				var update = new Activity(data.action);
-				update.setData(data);
-				self.activeGames[client.room].update(update, client.player);
-				if (update != null){
-					io.to(client.room).emit('update game', {'data': update.data, 'emmiter' : client.id});	//repetir el evento a los otros clientes
-					//io.to(client.room).emit('log message', {'msg' : "U PAN CHO RO LA"});	//emito mensaje de consola si hay
+				var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
+				if (update.name!="ChangeLocation"){
+					console.log("Setee como nueva act: "+update.name);
+					self.activeGames[client.room].currentLocation.currentActivity = update;
 				}
+				self.activeGames[client.room].update(update, client, data);
+				
+			});
 
+			client.on('add activity', function (data){
+				console.log("Agrego como hijo de la actividad actual, "+self.activeGames[client.room].currentLocation.currentActivity.name+", a la actividad: "+data.action);
+				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
+				self.activeGames[client.room].currentLocation.currentActivity.addSubActivity(new_act);
+			});
+
+			client.on('resolve activity', function (){
+				self.activeGames[client.room].resolveActivity(client);
 			});
 
 			//Se desconecto un usuario
