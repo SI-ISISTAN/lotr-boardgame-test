@@ -4,93 +4,75 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 	//////////////// Actividades genéricas ////////////////
 
-	//Accion que hace todo lo necesario tras resolver una actividad para pasar a la siguiente
-	"ResolveActivity" : {
-		name: 'Resolver actividad',
-		apply : function (game, player){
-			var new_act = game.currentLocation.currentActivity.next();
-			if (new_act != null){
-				game.currentLocation.currentActivity = new_act;
-			}
-		},
-		draw : function(client){
-			if (client.currentGame.currentLocation.currentActivity.draw != null){
-				if (client.isActivePlayer())
-					client.socket.emit('update game', {'action' : client.currentGame.currentLocation.currentActivity.name});	//si no, emito que la termine
-			}
-		}
-	},
-
     //Reparte cartas a uno/varios jugadores segun parámetros (cantidad y jugador/es a quien repartir)
 	"DealHobbitCards" : {
-		name: 'Dar cartas de hobbit',
-		apply : function (game, player){
+		apply : function (game, player, data){
 			//llevo un registro interno de que cartas le doy a cada uno para poder dibujarlo en "draw"
-			this.given = [];
+			var given = [];
 
 			var i=0;
-			while (i<this.data.amount){
-				if (this.data.player == null){			//si me pasan nulo le reparto a todos
+			while (i<data.amount){
+				if (data.player == null){			//si me pasan nulo le reparto a todos
 					for (j in game.players){
 						var card = game.hobbitCards[game.hobbitCards.length-1];
 						game.getPlayerByID(game.players[j].id).hand.push(card);
 						game.hobbitCards.splice(game.hobbitCards.length-1);
-						this.given.push({'card' : card, 'player' : game.players[j].alias});
+						given.push({'card' : card, 'player' : game.players[j].alias});
 					}
 				}
 				else{
-					console.log("le doy una tacar a "+this.data.player);
 					var card = game.hobbitCards[game.hobbitCards.length-1];
-					game.getPlayerByAlias(this.data.player).hand.push(card);
+					game.getPlayerByAlias(data.player).hand.push(card);
 					game.hobbitCards.splice(game.hobbitCards.length-1);
-					this.given.push({'card' : card, 'player' : this.data.player});
+					given.push({'card' : card, 'player' : data.player});
 				}
 				i++;
 			}
-			console.log(this.given);
-		},
-		draw : function(client){
-			console.log(this.given);
-			for (j in this.given){	//arreglare
+			data['given'] = given;
+			game.io.to(player.room).emit('update game', data);	//enviar siguiente actividad
 
-				if (this.given[j].player == client.player.alias){
-					$("<img src='./assets/img/ripped/"+this.given[j].card.image+".png' class='player-card-img img-responsive' style='display : none'>").appendTo("#player-cards-container").show('slow');
+		},
+		draw : function(client, data){
+			for (j in data.given){	//arreglare
+
+				if (data.given[j].player == client.player.alias){
+					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive' style='display : none'>").data("id",data.given[j].card).appendTo("#player-cards-container").show('slow');
 				}
 			}
-			for (i in client.currentGame.players){
-				$("#"+client.currentGame.players[i].alias+"-state-div").find("#cards-span").text(client.currentGame.players[i].hand.length);
+			for (i in data.given){
+				var span = $("#"+data.given[i].player+"-state-div").find("#cards-span");
+				var currentValue = parseInt(span.text());
+				span.text(currentValue+1);
 			}
-			this.end(client);
+
+			if (client.isActivePlayer)
+				client.socket.emit('resolve activity');
 		}
 	},
 
 	//Accion de juego de tirar el dado
 	"ChangeLocation" :  {
-		name: 'Cambiar locacion',
-		apply : function (game, player){
-			game.currentLocation.currentActivity = this.newActivity(game.currentLocation.currentActivity.name, game.currentLocation.currentActivity.subactivities, null);
-			game.currentLocation.currentActivity.setData(this.data);
-		},
-		draw : function(client){
-			var self = this;
-
-			if (!client.currentGame.currentLocation.isConflict){
-				if (client.currentGame.activePlayer.id == client.id){
-		        	client.socket.emit('update game', {'action' : client.currentGame.currentLocation.currentActivity.next().name});	//si no, emito que la termine
-				}
+		apply : function (game, player, data){
+			game.currentLocation.currentActivity = this.newActivity({'action' : game.currentLocation.currentActivity.name}, game.currentLocation.currentActivity.subactivities, null);
+			if (!game.currentLocation.isConflict){
+				game.io.to(player.room).emit('update game', {'action' : game.currentLocation.currentActivity.next().name });	//enviar siguiente actividad
 			}
+		},
+		draw : function(client, data){
+			
 		}
 	},
 
 	//Accion de juego de tirar el dado
 	"RollDie" :  {
-		name: 'Lanzar dado',
-		draw : function(client){
-			var self = this;
+		apply : function(game,player,data){
+			game.io.to(player.room).emit('update game', {'action' : 'RollDie', 'value' : game.rollDie(), 'player': player.alias});	
+		},
+		draw : function(client, data){
 			var div = $("<div style = 'display : none'>  </div>")
-			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+client.player.alias+" lanza el dado y obtiene...", buttons : [] , isPublic : true});
+			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+data.player+" lanza el dado y obtiene...", buttons : [] , isPublic : true});
 			var action = null;
-			switch (this.data.value){
+			switch (data.value){
 				case 1:
 					div.append($('<img src="./assets/img/ripped/die0.png" alt="Dado de amenaza" class="img-responsive token-img"><br>'));
 					div.append($("<p> No hay consecuencias.</p>"));
@@ -107,26 +89,26 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 					div.append($('<img src="./assets/img/ripped/die2.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Debe moverse un espacio en la línea de corrupción. </p>"));
 
-					action = {'action' : 'MovePlayer', 'alias' : client.player.alias, 'amount' : 1};
+					action = {'action' : 'MovePlayer', 'alias' : data.player, 'amount' : 1};
 					
 				break;
 				case 4:
 
 					div.append($('<img src="./assets/img/ripped/die3.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Debe moverse dos espacios en la línea de corrupción. </p>"));
-					action = {'action' : 'MovePlayer', 'alias' : client.player.alias, 'amount' : 2 };
+					action = {'action' : 'MovePlayer', 'alias' : data.player, 'amount' : 2 };
 					
 				break;
 				case 5:
 
 					div.append($('<img src="./assets/img/ripped/die4.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Debe moverse tres espacios en la línea de corrupción. </p>"));
-					action = {'action' : 'MovePlayer', 'alias' : client.player.alias, 'amount' : 3};
+					action = {'action' : 'MovePlayer', 'alias' : data.player, 'amount' : 3};
 				break;
 				case 6:
 					div.append($('<img src="./assets/img/ripped/die5.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Debe descartar dos cartas. </p>"));
-					action = {'action' : 'ForceDiscard', 'alias' : client.player.alias, 'amount' : 2};
+					action = {'action' : 'ForceDiscard', 'alias' : data.player, 'amount' : 2};
 				break;
 			}
 			popup.append(div);
@@ -135,14 +117,12 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				div.fadeIn(4000, function(){
 					if (client.isActivePlayer()){
 						if (action!= null){
-							client.socket.emit('update game', action);
+							client.socket.emit('add activity', action);
 						}
+						client.socket.emit('resolve activity');
 					}
-						popup.close();
-						if (client.isActivePlayer()){
-							client.socket.emit('update game', {'action' : 'PlayerDealCards', 'amount' : 4, 'cards' : []});	//repetir el evento a los otros clientes
-						}
-						self.end(client); //siguiente subactividad	
+					
+					popup.close();
 				});
 			
 			
@@ -152,39 +132,44 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 	//Un jugador se descarta
 	"PlayerDiscard" : {
-		name : "Descartar",
-		apply : function(game, player){
-			game.getPlayerByID(this.data.playerID).discard(this.data.discard);
+		apply : function(game, player,data){
+			game.getPlayerByAlias(data.player).discard(data.discard);
+			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
 		},
-		draw : function(client){
-			var self=this;
+		draw : function(client, data){
 			
 			//dibujar el descarte
 			$(".player-card-img.highlighted-image").remove();
-			$("#"+client.player.alias+"-state-div").find("#cards-span").text(client.player.hand.length);	//que ondis???
+			var span = $("#"+data.player+"-state-div").find("#cards-span");
+			var currentValue = parseInt(span.text());
+			span.text(currentValue-data.discard.length);
+			if (client.isActivePlayer){
+				client.socket.emit('resolve activity');
+			}
 		}
 	},
 
 	//Un jugador debe, forzosamente, elegir algunas cartas de su mano para descartarse
 	"ForceDiscard" :  {
-		name: 'Descartar',
-		draw : function(client){
-			var self=this;
+		apply: function(game,player,data){
+			game.io.to(player.id).emit('update game', data);	//repetir el evento a los usuarios
+		},
+		draw : function(client, data){
 			var discarded = [];
 			//Dibujo una alerta indicandome
-			var popup = new Popup({title: "Descartar", text: "Debes descartar "+self.data.amount+" cartas de tu mano.", buttons : [{name : "Ok"}] , isPublic : false});
+			var popup = new Popup({title: "Descartar", text: "Debes descartar "+data.amount+" cartas de tu mano.", buttons : [{name : "Ok"}] , isPublic : false});
 			popup.addListener("Ok", function(){
 				//ordenar el descarte
 				//getear el numero de cartas seleccionadas
 				var discard = [];
 				var hand = $(".player-card-img");
 				$(".highlighted-image").each(function(){
-					discard.push(client.player.hand[$(this).data("number")].id);	//pushear el id de la carta
+					discard.push($(this).data("id"));	//pushear el id de la carta
 				});
 
-				client.socket.emit('update game', {'action' : 'PlayerDiscard', 'playerID' : client.id, 'discard' : discard});	//si no, emito que la termine
+				client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	//si no, emito que la termine
+				client.socket.emit('resolve activity');
 				popup.close();
-				self.end(client);
 			});
 			popup.draw(client);
 			popup.disableButton("Ok", true);
@@ -208,7 +193,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 						discarded--;
 
 					}
-					if (discarded != self.data.amount){
+					if (discarded != data.amount){
 						popup.disableButton("Ok", true);
 					}
 					else{
@@ -222,61 +207,57 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 	//Accion de juego de tirar el dado
 	'MovePlayer' :  {
-		name: 'Mover personaje',
-		apply : function(game, player){
-			game.getPlayerByAlias(this.data.alias).move(this.data.amount);
+		apply : function(game, player,data){
+			game.getPlayerByAlias(data.alias).move(data.amount);
+			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
 		},
-		draw : function(client){
-
-			$("#"+this.data.alias+"-chip").animate({
-				'left' : "+="+2.4*this.data.amount+"vw" //moves right
+		draw : function(client, data){
+			$("#"+data.alias+"-chip").animate({
+				'left' : "+="+2.4*data.amount+"vw" //moves right
 			},800);
-			
+			client.socket.emit('resolve activity');
 		}
 		
 	},
 
 	//Accion de juego de tirar el dado
 	'MoveSauron' :  {
-		name: 'Mover a Battion',
-		apply : function(game, player){
-			game.moveSauron(this.data.amount);
+		apply : function(game, player,data){
+			game.moveSauron(data.amount);
+			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
 		},
-		draw : function(client){
+		draw : function(client, data){
 			$(".sauron-chip").animate({
-				'left' : "-="+2.4*this.data.amount+"vw" //moves right
+				'left' : "-="+2.4*data.amount+"vw" //moves right
 			},800);
-			
+		client.socket.emit('resolve activity');	
 		}
 		
 	},
 
 	//Se sacan algunas cartas y el jugador activo las reparte como desea
 	"PlayerDealCards" : {
-		name : "Distribuir cartas",
-		apply : function(game, player){
-			this.data.cards = [];
-			for (var i=0; i<this.data.amount; i++){
-				this.data.cards.push(game.hobbitCards[game.hobbitCards.length-1-i]);
+		apply : function(game, player,data){
+			data.cards = [];
+			for (var i=0; i<data.amount; i++){
+				data.cards.push(game.hobbitCards[game.hobbitCards.length-1-i]);
 			}
-			console.log(game);
+			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
 		},
-		draw : function(client){
-			var self=this;
-
+		draw : function(client, data){
 			var popup = new Popup({title: "Repartir cartas", text: "Distribuye las cartas como desees. ",buttons : [{name : "Ok"}],isPublic : false});
 			//pongo los elementos de reparto de cada carta
 			var div = $("<div>  </div>");
 
-			console.log(this.data.cards);
+			console.log(data.cards);
 
-			for (i in this.data.cards){
+			for (i in data.cards){
 				var el = $("<div id='deal-card-div'>  </div> ");
-				el.append("<img src='./assets/img/ripped/"+this.data.cards[i].image+".png' class='player-card-img img-responsive'>");
+				el.append("<img src='./assets/img/ripped/"+data.cards[i].image+".png' class='player-card-img img-responsive'>");
 
 				var listbox = $("<select class='card-to-selector'> </select>");
-				for (j in client.currentGame.players){
-					$(listbox).append("<option value='"+client.currentGame.players[j].alias+"'> "+client.currentGame.players[j].alias+"</option>");
+				for (j in client.players){
+					$(listbox).append("<option value='"+client.players[j].alias+"'> "+client.players[j].alias+"</option>");
 				}
 				listbox.data("id",i);
 				$(el).append($(listbox));
@@ -288,14 +269,15 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 			//cuando me dan ok envio cada carta al jugador correspondiente
 			popup.addListener("Ok", function(){
+					console.log("Voy a emitir los eventos");
 					$(".card-to-selector").each(function(){
+						console.log("cumabiabama");
 						var to = $(this).val();
 						console.log(to);
-						client.socket.emit('update game', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});	//voy dando las cartas de a una
+						client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});	//voy dando las cartas de a una
 					})
-					
-				popup.close();
-				self.end(client); //siguiente subactividad
+				popup.close(); 
+				client.socket.emit('resolve activity');
 			});
 
 			popup.draw(client);
@@ -307,17 +289,15 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 	//Primera accion del juego
 	"Gandalf" : {
-		name: 'Gandalf',
-		draw : function(client){
-			var self = this;
+		draw : function(client, data){
 
 			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok"}], isPublic : false});
 			popup.addListener("Ok", function(){
 				popup.close();
 				client.socket.emit('update game', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
-				self.end(client); //siguiente subactividad
+				client.socket.emit('resolve activity');
 			});
-			
+
 			popup.draw(client);
 			
 		}
@@ -325,21 +305,23 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 	//Accion de juego Preparations
 	"Preparations" : {
-		name : 'Preparación',
-		draw : function(client){
-			var self = this;
-
+		apply : function(game,player,data){
+			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+		},
+		draw : function(client, data){
+			console.log("llega a ejecutarse el draw");
 			var popup = new Popup({
 				title: "Preparaciones", 
 				text: "Puedes prepararte para el viaje. Si deseas hacerlo, tirarás el Dado de Corrupción, pero luego podrás sacar 4 cartas y distribuirlas como desees.", 
 				buttons : [{name : "Prepararse"},  {name : "No prepararse"}] 
 			});
 			popup.addListener("Prepararse", function(){
-				client.currentGame.rollDie(client);
-				popup.close();
+				client.socket.emit('add activity', {'action' : 'RollDie'});	//repetir el evento a los otros clientes
+				client.socket.emit('add activity', {'action' : 'PlayerDealCards', 'amount' : 1});	//repetir el evento a los otros clientes
+				client.socket.emit('resolve activity');
+				popup.close();	
 			});
 			popup.addListener("No prepararse", function(){
-				self.end(client); //siguiente subactividad
 				popup.close();
 			});
 			popup.draw(client);

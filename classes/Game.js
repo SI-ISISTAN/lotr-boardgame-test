@@ -2,9 +2,10 @@
 
 define(['./Player', '../data/data', '../data/locations','./Location','./Activity'], function (Player, gameData, locations, Location, Activity) {
 	
-	function Game (){
+	function Game (io){
 		console.log("Se ha creado un nuevo juego.");
 		this.gameID = Math.random().toString(36).substring(7);	//Nombre random
+		this.io = io;
 		this.players = [];
 		this.isActive = false;
 		this.ringBearer = null;
@@ -154,28 +155,35 @@ define(['./Player', '../data/data', '../data/locations','./Location','./Activity
 
 	}
 
-	Game.prototype.rollDie = function(client){
+	Game.prototype.rollDie = function(){
 		//retorna n random entre 1 y 6
 		var n = Math.floor((Math.random() * 6) + 1);
-		client.socket.emit('update game', {'action' : 'RollDie', 'value' : n});	//repetir el evento a los otros clientes 
+		return n; 
 	}
 
 	Game.prototype.moveSauron = function(amount){
 		this.sauronPosition+=amount;
 	}
 
+	Game.prototype.resolveActivity = function(client){
+		var new_act = this.currentLocation.currentActivity.next();
+		if (new_act != null){
+				this.currentLocation.currentActivity = new_act;
+				this.io.to(client.id).emit('resolve activity', this.currentLocation.currentActivity.data);	//si no, emito que la termine
+		}
+		
+	}
+
 	//aplico una actualizacion al juego
-	Game.prototype.update = function(update, emmiter){
-		console.log("Update de juego con actividad: "+update.name);
+	Game.prototype.update = function(update, emmiter, data){
 		//aplico y retorno el evento, si existe
-		if (update.apply != null){			
-			update.apply(this, emmiter);
-			return {"success" : true};
+		if (update.apply != null){		
+
+			update.apply(this, emmiter, data);
 		}
 		else{
-			return {"success" : false};
+			
 		}
-		console.log(this);
 	}
 
 	return Game;

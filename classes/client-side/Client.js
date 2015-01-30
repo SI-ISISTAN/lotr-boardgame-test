@@ -3,14 +3,16 @@ define([], function () {
 	function Client(){
 		this.id = null,
 		this.alias = null,
-		this.currentGame = null,
 		this.player = null,
 		this.connected = false,
+		this.isMyTurn = false,
+		this.gameID = null,
 		this.socket = null
+		this.players = [];
 	}
 
 	Client.prototype.isActivePlayer = function(){
-		if (this.id == this.currentGame.activePlayer.id){
+		if (this.player.turn){
 			return true;
 		}
 		else{

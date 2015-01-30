@@ -1,7 +1,7 @@
 
    ////////////////////////////////////////// FUNCIONES VARIAS /////////////////////////////////////////////////////
 
-require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'http://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity'], function(Game, Client, jquery, io, jqueryui, Activity){
+require(['./data/activities','./classes/client-side/Client','http://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'http://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity'], function(activities, Client, jquery, io, jqueryui, Activity){
 
     var socket = io();  //habilito el socketo
     var client = new Client();
@@ -28,23 +28,22 @@ require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com
 
       	socket.on('game found', function(res){
       		
-      		client.currentGame = new Game();
-      		client.currentGame.setupGame(res.game);
-
+      		client.currentGame = res.game.gameID;
       		console.log("Recibi el game: ");
-      		console.log(client.currentGame);
-      		for (i in client.currentGame.players){
-	              if (client.currentGame.players[i].alias != client.alias){
+
+      		for (i in res.game.players){
+
+	              if (res.game.players[i].alias != client.alias){
 
 	              	var state = "Esperando";							//Si está listo o esperando
-	              	if (client.currentGame.players[i].ready){
+	              	if (res.game.players[i].ready){
 	              		state="¡Listo!";
 	              	}
 
-	                $("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+client.currentGame.players[i].alias+"</b> </span> <span class='client-list-state'>("+state+") "+" </span> </li>");
+	                $("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.game.players[i].alias+"</b> </span> <span class='client-list-state'>("+state+") "+" </span> </li>");
 	              }
 	              else{
-	              	client.player = client.currentGame.players[i];	//Me asigno elplayer
+	              	client.player = res.game.players[i];	//Me asigno elplayer
 	              }
 	        }
       	});
@@ -52,7 +51,6 @@ require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com
 	    //Se conecta un nuevo usuario
 	    socket.on('user connected', function(res){
 	    		$("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.player.alias+"</b> </span> <span class='client-list-state'>(Esperando)  </span> </li>");
-	    		client.currentGame.addPlayer(res.player);
       	});
 
 
@@ -65,24 +63,36 @@ require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com
 	    //Comienza un juego
 	    socket.on('start game', function(res){
 
-	    		client.currentGame.isActive = true;
-
-	    		client.currentGame.start();
-	    		client.currentGame.buildGame(res.game);
-
 	    		//Dibujo el juego  
 		        $("#main-lobby-div").remove();
 		        $("#main-game-div").appendTo('body').show('slow');
 
 		        //Inserto el apartado de cada jugador
-		        for (i in client.currentGame.players){
-		        	var panel = $("<div class='player-state-div' id='"+client.currentGame.players[i].alias+"-state-div'> <b>"+client.currentGame.players[i].alias+"</b> <img src='./assets/img/ripped/"+ client.currentGame.players[i].character.image +".jpg' alt='Tablero maestro' class='player-hobbit-img img-responsive'> <br><br><img src='./assets/img/ripped/heart-mini.png' class='img-responsive player-stat-img'> <span id ='life-span'>"+ client.currentGame.players[i].lifeTokens +" </span> <img src='./assets/img/ripped/sun-mini.png' class='img-responsive player-stat-img'> <span id ='sun-span'>"+ client.currentGame.players[i].sunTokens +"</span> <br> <img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img'> <span id ='ring-span'>"+ client.currentGame.players[i].ringTokens +" </span> <img src='./assets/img/ripped/cards-mini.png' class='img-responsive player-stat-img'> <span id ='cards-span'>"+ client.currentGame.players[i].hand.length +" </span> </div>");
-		        	if (client.currentGame.players[i].turn){
+		        for (i in res.game.players){
+		        	var panel = $("<div class='player-state-div' id='"+res.game.players[i].alias+"-state-div'> <b>"+res.game.players[i].alias+"</b> <img src='./assets/img/ripped/"+ res.game.players[i].character.image +".jpg' alt='Tablero maestro' class='player-hobbit-img img-responsive'> <br><br><img src='./assets/img/ripped/heart-mini.png' class='img-responsive player-stat-img'> <span id ='life-span'>"+ res.game.players[i].lifeTokens +" </span> <img src='./assets/img/ripped/sun-mini.png' class='img-responsive player-stat-img'> <span id ='sun-span'>"+ res.game.players[i].sunTokens +"</span> <br> <img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img'> <span id ='ring-span'>"+ res.game.players[i].ringTokens +" </span> <img src='./assets/img/ripped/cards-mini.png' class='img-responsive player-stat-img'> <span id ='cards-span'>"+ res.game.players[i].hand.length +" </span> </div>");
+		        	if (res.game.players[i].turn){
 		        		panel.addClass("is-active");
 		        	}
 		        	$("#player-list-div").append(panel); 
-		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+client.currentGame.players[i].character.image+'.jpg" id= "'+client.currentGame.players[i].alias+'-chip" class="hobbit-chip" style="left: '+0.5+'vw; top: '+(17 + (i*1))+'vh; z-index:'+(i+1)*1+';">');	
+		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+res.game.players[i].character.image+'.jpg" id= "'+res.game.players[i].alias+'-chip" class="hobbit-chip" style="left: '+0.5+'vw; top: '+(17 + (i*1))+'vh; z-index:'+(i+1)*1+';">');	
 		        }
+
+		       for (i in res.game.players){
+		       		client.players.push({'id':res.game.players[i].id, 'alias': res.game.players[i].alias});
+		       } 
+
+		       var found = false;
+		       var i = 0;
+		       while (!found && i<res.game.players.length){
+		       		if (res.game.players[i].id == client.id){
+		       			client.player = res.game.players[i];
+		       			found = true;
+		       		}
+		       		else{
+		       			i++;
+		       		}
+		       }
+
 		        $("#player-cards-container").append('<img src="./assets/img/ripped/'+client.player.character.image +'.jpg"  class="player-hobbit-img img-responsive" title="'+client.player.character.name+'">');
 		        
 		        $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" class="cone-chip" style="left: 1.4vw; top: 6.0vh;">');
@@ -94,7 +104,7 @@ require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com
 		        
 	    });
 
-	    //mensaje (test)
+	    //mensaje (test) (habria que reformatearlo a client)
 	    socket.on('recieve message', function(res){
 	    		var d = $('#chat-msg-div');	
 	        	d.append('<p class="chat-message"> <b style= "color: '+res.player.chat_color+';"> '+ res.player.alias +': </b>'+ res.msg+' </p>');
@@ -107,22 +117,12 @@ require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com
 	    });
 
 	    socket.on('toggle ready', function(res){
-	    	var player = client.currentGame.getPlayerByID(res.player);
-
-	    	//cambios logica de juego
-	    	if (player!=null){
-				if (player.ready){
-					player.ready = false;
-				}
-				else{
-					player.ready = true;
-				}
-			}
+	    	//var player = client.currentGame.getPlayerByID(res.player);
 
 			//cambios graficos
-	    	var alias = player.alias;
+	    	var alias = res.player.alias;
 			var text = "(Esperando)";
-			if (player.ready){
+			if (res.player.ready){
 				var text = "(¡Listo!)";
 			}
 
@@ -131,14 +131,20 @@ require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com
 
 	    socket.on('update game', function(res){
 	    		//getear el player que realizo la actualizacion
-	    		var player =  client.currentGame.getPlayerByID(res.emmiter);
-	        	var update = new Activity(res.data.action);
-	        	update.setData(res.data);
-	        	client.currentGame.update(update, player);	//actualizar la interfaz
-	        	if (update.draw != null){
-	        		update.draw(client);									//actualizar la interfaz     	
-	        	}
+	    		console.log("update game de cliente");
+	    		console.log(res);
+	    		if (activities[res.action] != null && typeof activities[res.action] != 'undefined'){
+	        		activities[res.action].draw(client, res);									//actualizar la interfaz     			
+	    		}
+	    		
+	    });
 
+	    socket.on('resolve activity', function(res){
+	    	console.log("resolve act de cliente");
+	    	console.log(res);
+	    	if (client.isActivePlayer()){
+	    		socket.emit('update game', res);	//repetir el evento a los otros clientes
+	    	}
 	    });
 	}
 
@@ -168,6 +174,7 @@ require(['./classes/Game','./classes/client-side/Client','http://code.jquery.com
 
 			    //clicqueo el boton de listo
 			    $('#ready-button').on('click', function(){
+			    	console.log("Toggle ready");
 			    	socket.emit('toggle ready',{});
 			    })
 				
