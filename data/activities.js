@@ -47,6 +47,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 			if (client.isActivePlayer())
 				client.socket.emit('resolve activity');
+
 		}
 	},
 
@@ -131,6 +132,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			var currentValue = parseInt(span.text());
 			span.text(currentValue-data.discard.length);
 			if (client.isActivePlayer()){
+
 				client.socket.emit('resolve activity');
 			}
 		}
@@ -200,11 +202,13 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		},
 		draw : function(client, data){
 			$("#"+data.alias+"-chip").animate({
+
 				'left' : "+="+2.38*data.amount+"vw" //moves right
 			},800);
 			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
 			}
+
 		}
 		
 	},
@@ -291,7 +295,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			popup.addListener("Ok", function(){
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
-				console.log("you");
 				client.socket.emit('resolve activity');
 			});
 
@@ -313,11 +316,13 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			});
 			popup.addListener("Prepararse", function(){
 				client.socket.emit('add activity', {'action' : 'RollDie'});	//repetir el evento a los otros clientes
+
 				client.socket.emit('add activity', {'action' : 'PlayerDealCards', 'amount' : 4});	//repetir el evento a los otros clientes
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
 			popup.addListener("No prepararse", function(){
+
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
