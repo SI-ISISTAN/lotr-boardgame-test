@@ -36,7 +36,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			for (j in data.given){	//arreglare
 
 				if (data.given[j].player == client.player.alias){
-					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive' style='display : none'>").data("id",data.given[j].card).appendTo("#player-cards-container").show('slow');
+					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.given[j].card).data("selected",false).appendTo("#player-cards-container").show('slow');
 				}
 			}
 			for (i in data.given){
@@ -58,7 +58,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		},
 		draw : function(client, data){
 			var div = $("<div style = 'display : none'>  </div>")
-			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+data.player+" lanza el dado y obtiene...", buttons : [] , isPublic : true});
+			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+data.player+" lanza el dado y obtiene...", buttons : [] , visibility : "all"});
 			var action = null;
 			switch (data.value){
 				case 1:
@@ -96,7 +96,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				case 6:
 					div.append($('<img src="./assets/img/ripped/die5.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Debe descartar dos cartas. </p>"));
-					action = {'action' : 'ForceDiscard', 'alias' : data.player, 'amount' : 2};
+					action = {'action' : 'ForceDiscard', 'alias' : data.player, 'amount' : 2, 'card' : null };
 				break;
 			}
 			popup.append(div);
@@ -127,12 +127,12 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		draw : function(client, data){
 			
 			//dibujar el descarte
+			console.log("upanchorolaaaaaaaaa");
 			$(".player-card-img.highlighted-image").remove();
 			var span = $("#"+data.player+"-state-div").find("#cards-span");
 			var currentValue = parseInt(span.text());
 			span.text(currentValue-data.discard.length);
-			if (client.isActivePlayer()){
-
+			if (client.alias == data.player){
 				client.socket.emit('resolve activity');
 			}
 		}
@@ -141,54 +141,51 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	//Un jugador debe, forzosamente, elegir algunas cartas de su mano para descartarse
 	"ForceDiscard" :  {
 		apply: function(game,player,data){
-			game.io.to(player.id).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
 		},
 		draw : function(client, data){
+			console.log("alias: "+data.alias);
 			var discarded = [];
+			//Elijo el titulo segun la cantidad y tipo de cartas que deba descartar
+			var texto = "";
+			if (data.card == null){
+				texto = "Debes descartar "+data.amount+" cartas cualesquiera de tu mano.";
+			}
+			else{
+				texto = "Debes descartar una carta ";
+				if (data.card.color!=null){
+					if (data.card.color=="White") texto+="blanca "
+					else texto+="gris "
+				}
+				if (data.card.symbol!=null){
+					if (data.card.symbol=="Fighting") texto+="de símbolo Luchar "
+					else if (data.card.symbol=="Hiding") texto+="de símbolo Esconderse "
+					else if (data.card.symbol=="Travelling") texto+="de símbolo Viajar "
+					else if (data.card.symbol=="Friendship") texto+="de símbolo Amistad "
+					else texto+="de Comodín "
+				}
+				texto+="(o un comodín) de tu mano."
+			}
 			//Dibujo una alerta indicandome
-			var popup = new Popup({title: "Descartar", text: "Debes descartar "+data.amount+" cartas de tu mano.", buttons : [{name : "Ok"}] , isPublic : false});
-			popup.addListener("Ok", function(){
+			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias});
+			popup.addListener("ok", function(){
 				//ordenar el descarte
 				//getear el numero de cartas seleccionadas
 				var discard = [];
 				var hand = $(".player-card-img");
 				$(".highlighted-image").each(function(){
-					discard.push($(this).data("id"));	//pushear el id de la carta
+					discard.push($(this).data("card").id);	//pushear el id de la carta
 				});
-
+				$(".player-card-img").off('click');
 				client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	//si no, emito que la termine
 				client.socket.emit('resolve activity');
 				popup.close();
 			});
 			popup.draw(client);
-			popup.disableButton("Ok", true);
+			popup.disableButton("ok", true);
 
-			//Proceso el descarte (pasar a una clase de input handler??)
-			if (client.isActivePlayer()){
-				var discarded = 0;
-				//como coño hago el descarte?
-				$(".player-card-img").on('click', function(){
-					if (! $(this).data("selected")){	//si ya estaba seleccionada
-						//var index = $(this).index();
-						$(this).addClass("highlighted-image");
-						$(this).data("selected", true);
-						$(this).data("number", $(this).index()-1);
-						discarded++;
-
-					}
-					else{								//si no estaba seleccionada
-						$(this).removeClass("highlighted-image");
-						$(this).data("selected", false);
-						discarded--;
-
-					}
-					if (discarded != data.amount){
-						popup.disableButton("Ok", true);
-					}
-					else{
-						popup.disableButton("Ok", false);
-					}
-				});
+			if (client.alias == data.alias){
+				client.discard(data, popup);	//chequeo que el descarte sea correcto
 			}
 		}
 		
@@ -240,7 +237,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Repartir cartas", text: "Distribuye las cartas como desees. ",buttons : [{name : "Ok"}],isPublic : false});
+			var popup = new Popup({title: "Repartir cartas", text: "Distribuye las cartas como desees. ",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
 			//pongo los elementos de reparto de cada carta
 			var div = $("<div>  </div>");
 
@@ -263,10 +260,9 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			popup.append(div);
 
 			//cuando me dan ok envio cada carta al jugador correspondiente
-			popup.addListener("Ok", function(){
+			popup.addListener("ok", function(){
 					console.log("Voy a emitir los eventos");
 					$(".card-to-selector").each(function(){
-						console.log("cumabiabama");
 						var to = $(this).val();
 						console.log(to);
 						client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});	//voy dando las cartas de a una
@@ -291,8 +287,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		},
 		draw : function(client, data){
 
-			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok"}], isPublic : false});
-			popup.addListener("Ok", function(){
+			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+			popup.addListener("ok", function(){
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
 				client.socket.emit('resolve activity');
@@ -312,21 +308,68 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			var popup = new Popup({
 				title: "Preparaciones", 
 				text: "Puedes prepararte para el viaje. Si deseas hacerlo, tirarás el Dado de Corrupción, pero luego podrás sacar 4 cartas y distribuirlas como desees.", 
-				buttons : [{name : "Prepararse"},  {name : "No prepararse"}] 
+				buttons : [{name : "Prepararse", id:"prepare"},  {name : "No prepararse", id:"dont-prepare"}] 
 			});
-			popup.addListener("Prepararse", function(){
+			popup.addListener("prepare", function(){
 				client.socket.emit('add activity', {'action' : 'RollDie'});	//repetir el evento a los otros clientes
 
 				client.socket.emit('add activity', {'action' : 'PlayerDealCards', 'amount' : 4});	//repetir el evento a los otros clientes
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
-			popup.addListener("No prepararse", function(){
+			popup.addListener("dont-prepare", function(){
 
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
 			popup.draw(client);
+		}
+		
+	},
+
+		//Accion de juego Preparations
+	"Nazgul Appears" : {
+		apply : function(game,player,data){
+			var candidates = [];
+			var cards = [{symbol: 'Hiding', color: null}, {symbol: 'Hiding', color: null}]; //son dos cartas de Esconderse
+			for (v in game.players){
+				if (game.players[v].hasCards(cards)){
+					candidates.push(game.players[v].alias);
+					console.log("uno que vale: "+game.players[v].alias);
+				}
+			}
+			data['candidates'] = candidates;
+			data['cards'] = cards;
+			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+		},
+		draw : function(client, data){
+			var popup = new Popup({
+				title: "Un Sah'mid Aparece", 
+				text: "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, Battión avanza un espacio hacia los aventureros. Cuando estés listo, elige un jugador de la siguiente lista, que contiene sólo a quienes pueden hacer este descarte:", 
+				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
+			});
+			popup.addListener("discard", function(){
+				for (i in data.cards){
+					client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : $(".discard-to-selector").val(),'card': data.cards[i]});
+				}
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("dont-discard", function(){
+				client.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 1});
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+
+			var listbox = $("<select class='discard-to-selector'> </select>");
+			for (j in data.candidates){
+				$(listbox).append("<option value='"+data.candidates[j]+"'> "+data.candidates[j]+"</option>");
+			}
+			popup.append($(listbox));
+			popup.draw(client);
+			if (data.candidates.length == 0){
+				popup.disableButton("discard", true);
+			}
 		}
 		
 	}

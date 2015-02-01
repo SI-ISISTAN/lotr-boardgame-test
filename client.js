@@ -146,9 +146,9 @@ require(['./data/activities','./classes/client-side/Client','http://code.jquery.
 	    socket.on('resolve activity', function(res){
 	    	console.log("resolve act de cliente");
 	    	console.log(res);
-	    	if (client.isActivePlayer()){
+	    	//if (client.isActivePlayer()){
 	    		socket.emit('update game', res);	//repetir el evento a los otros clientes
-	    	}
+	    	//}
 	    });
 	}
 

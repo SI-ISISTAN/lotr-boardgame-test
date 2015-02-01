@@ -4,11 +4,11 @@ define([], function () {
 	function Popup(data){
 		this.title = data.title;
 		this.text=data.text;
-		if (typeof data.isPublic != 'undefined'){
-			this.isPublic = data.isPublic;
+		if (typeof data.visibility != 'undefined'){
+			this.visibility = data.visibility;
 		}
 		else{
-			this.isPublic = false;
+			this.visibility = "active";
 		}
 		if (data.id != null){
 			this.id = data.id;
@@ -23,10 +23,12 @@ define([], function () {
 							'html': '<div id= "main-popup-div"> <p>'+data.text+'</p> </div>'
 						});
 		for (i in this.buttons){
+				this.popup.append('<br>');
 				this.popup.append($('<button/>', {
-									'id':this.buttons[i].name,
+									'id':this.buttons[i].id,
 									'html': this.buttons[i].name
 				}));
+				this.popup.append('<br>');
 		}
 	}
 
@@ -35,7 +37,7 @@ define([], function () {
 		var found = false;
 		var i=0;
 		while (!found && i<this.buttons.length){
-			if (this.buttons[i].name == button){
+			if (this.buttons[i].id == button){
 				found = true;
 				var name = "#"+button;
 				//this.popup.find(name).off('click');
@@ -51,6 +53,7 @@ define([], function () {
 
 	//agregarle un elemento desde "afuera"
 	Popup.prototype.append = function(element){
+		this.popup.find("#main-popup-div").append("<br>");
 		this.popup.find("#main-popup-div").append(element);
 	}
 
@@ -61,7 +64,7 @@ define([], function () {
 
 	//mostrar el popup
 	Popup.prototype.draw = function(client){
-		if (this.isPublic || client.isActivePlayer()){
+		if ( (this.visibility == "all" ) || (this.visibility == "active" && client.isActivePlayer())  || (this.visibility == "rest" && !client.isActivePlayer()) || (this.visibility == client.alias) ){
 			this.popup.dialog({
 				dialogClass : 'no-close',
 				show : {
@@ -81,7 +84,7 @@ define([], function () {
 	//cerrar el popup, eliminar los listeners
 	Popup.prototype.close = function(){
 		for (i in this.buttons){
-			var name = "#"+this.buttons[i].name;
+			var name = "#"+this.buttons[i].id;
 			$(name).off('click');
 		}
 		this.popup.dialog('close');

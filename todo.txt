@@ -1,4 +1,12 @@
-- Arreglar el logueo en consola y de paso agregarle parametros
+Hacer:
 
-- implementar ern client side la clase client de nuevo que tenga algunos métodos (si ese cliente es el jugador activo, etc.) (listo hay que ver que agregar)
-- pasar menues a una clase especial??? (Input Manager ponele)
+- Arreglar el logueo en consola y de paso agregarle parametros (yaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)
+
+- pasar menues a una clase especial???
+
+
+Proximo commit:
+-Agregue el 3º actividad de Bag End
+-Agregue chequeo de discard correcto para descartar ciertas cartas con metodo en clase Client
+-Corregi la propiedad de popp para que se muestre al activo, a los demas, o a todos
+-Corregido el sistema de botones de popup, ahora se identifican por id y nombre (revisar, aunque parece funcional)
