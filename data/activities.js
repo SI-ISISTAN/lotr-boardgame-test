@@ -151,24 +151,28 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				texto = "Debes descartar "+data.amount+" cartas cualesquiera de tu mano.";
 			}
 			else{
-				texto = "Son 2 carta de Esconderse son";
-				//esto lo arreglo dps
-				/*
-				texto = "Debes descartar una carta ";
-				if (data.card.color!=null){
-					if (data.card.color=="White") texto+="blanca "
-					else texto+="gris "
+				texto = "Debes descartar las siguientes cartas: ";
+				for (i in data.cards){
+					texto+= "una carta "
+					if (data.cards[i].color!=null){
+						if (data.cards[i].color=="White") texto+="blanca "
+						else texto+="gris "
+					}
+					if (data.cards[i].symbol!=null){
+						if (data.cards[i].symbol=="Fighting") texto+="de símbolo Luchar"
+						else if (data.cards[i].symbol=="Hiding") texto+="de símbolo Esconderse"
+						else if (data.cards[i].symbol=="Travelling") texto+="de símbolo Viajar"
+						else if (data.cards[i].symbol=="Friendship") texto+="de símbolo Amistad"
+						else texto+="de Comodín"
+					}
+					if (i<data.cards.length-1){
+						texto+=", "
+					}
+					else{
+						texto+=". ";
+					}
 				}
-				if (data.card.symbol!=null){
-					if (data.card.symbol=="Fighting") texto+="de símbolo Luchar "
-					else if (data.card.symbol=="Hiding") texto+="de símbolo Esconderse "
-					else if (data.card.symbol=="Travelling") texto+="de símbolo Viajar "
-					else if (data.card.symbol=="Friendship") texto+="de símbolo Amistad "
-					else texto+="de Comodín "
-				}
-				texto+="(o un comodín) de tu mano."
-				*/
-				//hasta aca
+				texto+="Salvo que se haya indicado lo contrario, puedes usar comodines en el lugar de cualquiera de estas cartas."
 			}
 			//Dibujo una alerta indicandome
 			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias});

@@ -59,7 +59,10 @@ define([], function () {
 								{
 									valid = true;
 									$(this).data("discarded", cards[j]);
+									console.log("Me estoy deshaciendo de la carta: ");
+									console.log(cards[j]);
 									cards.splice(j,1);
+
 								}
 								else j++;
 							}			
@@ -68,7 +71,6 @@ define([], function () {
 								$(this).data("selected", true);
 								$(this).data("number", $(this).index()-1);
 								discarded+= $(this).data("card").amount;
-								console.log($(this).data("card").amount);
 							}
 							else{
 
