@@ -8,6 +8,7 @@ define([], function () {
 		this.isConflict = location.isConflict;
 		this.activities = location.activities;
 		this.currentActivity = location.activities[0];
+		this.featureCards = [];
 	}
 
 	return Location;

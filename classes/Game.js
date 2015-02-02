@@ -1,6 +1,6 @@
 //Clase Game, una instancia creada por cada juego en curso
 
-define(['./Player', '../data/data', '../data/locations','./Location','./Activity'], function (Player, gameData, locations, Location, Activity) {
+define(['./Player','./Card', '../data/data', '../data/locations','./Location','./Activity'], function (Player, Card, gameData, locations, Location, Activity) {
 	
 	function Game (io){
 		console.log("Se ha creado un nuevo juego.");
@@ -146,7 +146,7 @@ define(['./Player', '../data/data', '../data/locations','./Location','./Activity
 		this.storyTiles = this.shuffleArray(this.storyTiles);
 
 		for (i in gameData.hobbitCards){
-			var card = gameData.hobbitCards[i];
+			var card = new Card(gameData.hobbitCards[i]);
 			card.id = i;
 			this.hobbitCards.push(card);
 		}
@@ -158,7 +158,7 @@ define(['./Player', '../data/data', '../data/locations','./Location','./Activity
 	Game.prototype.rollDie = function(){
 		//retorna n random entre 1 y 6
 		var n = Math.floor((Math.random() * 6) + 1);
-		return n; 
+		return 6; 
 	}
 
 	Game.prototype.moveSauron = function(amount){

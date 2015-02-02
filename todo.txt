@@ -1,7 +1,7 @@
 Hacer:
 
 - Arreglar el logueo en consola y de paso agregarle parametros (yaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)
-
+- LOS HOBBITS SE MUEVEN CUANDO SE LES CANTA LA PIJA
 - pasar menues a una clase especial???
 
 

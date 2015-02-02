@@ -127,7 +127,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		draw : function(client, data){
 			
 			//dibujar el descarte
-			console.log("upanchorolaaaaaaaaa");
 			$(".player-card-img.highlighted-image").remove();
 			var span = $("#"+data.player+"-state-div").find("#cards-span");
 			var currentValue = parseInt(span.text());
@@ -148,10 +147,13 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			var discarded = [];
 			//Elijo el titulo segun la cantidad y tipo de cartas que deba descartar
 			var texto = "";
-			if (data.card == null){
+			if (data.cards == null){
 				texto = "Debes descartar "+data.amount+" cartas cualesquiera de tu mano.";
 			}
 			else{
+				texto = "Son 2 carta de Esconderse son";
+				//esto lo arreglo dps
+				/*
 				texto = "Debes descartar una carta ";
 				if (data.card.color!=null){
 					if (data.card.color=="White") texto+="blanca "
@@ -165,6 +167,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 					else texto+="de Comodín "
 				}
 				texto+="(o un comodín) de tu mano."
+				*/
+				//hasta aca
 			}
 			//Dibujo una alerta indicandome
 			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias});
@@ -185,7 +189,12 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			popup.disableButton("ok", true);
 
 			if (client.alias == data.alias){
-				client.discard(data, popup);	//chequeo que el descarte sea correcto
+				if (data.cards == null){
+					client.discardAny(data, popup);	//chequeo que el descarte sea correcto
+				}
+				else{
+					client.discard(data, popup);	//chequeo que el descarte sea correcto
+				}
 			}
 		}
 		
@@ -199,8 +208,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		},
 		draw : function(client, data){
 			$("#"+data.alias+"-chip").animate({
-
-				'left' : "+="+2.38*data.amount+"vw" //moves right
+				'left' : "+="+2.39*data.amount+"vw" //moves right
 			},800);
 			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
@@ -349,9 +357,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
 			});
 			popup.addListener("discard", function(){
-				for (i in data.cards){
-					client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : $(".discard-to-selector").val(),'card': data.cards[i]});
-				}
+					client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards});
+				
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
