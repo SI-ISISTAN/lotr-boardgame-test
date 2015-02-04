@@ -151,8 +151,8 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					self.activeGames[client.room].isActive = true;
 					self.activeGames[client.room].start();
 					io.to(client.room).emit('start game',{'game' : {'players' : self.activeGames[client.room].players}});		
-					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!"});
-					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". "});
+					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!", 'mode':'alert'});
+					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". ", 'mode':'alert'});
 				}
 			});
 
@@ -178,7 +178,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			});
 
 			client.on('add activity', function (data){
-				console.log("Agrego como hijo de la actividad actual, "+self.activeGames[client.room].currentLocation.currentActivity.name+", a la actividad: "+data.action);
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				self.activeGames[client.room].currentLocation.currentActivity.addSubActivity(new_act);
 			});

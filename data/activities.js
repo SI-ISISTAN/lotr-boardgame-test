@@ -17,18 +17,24 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 						var card = game.hobbitCards[game.hobbitCards.length-1];
 						game.getPlayerByID(game.players[j].id).hand.push(card);
 						game.hobbitCards.splice(game.hobbitCards.length-1);
-						given.push({'card' : card, 'player' : game.players[j].alias});
+						given.push({'card' : card, 'player' : game.players[j].alias});	
 					}
+					
 				}
 				else{
 					var card = game.hobbitCards[game.hobbitCards.length-1];
 					game.getPlayerByAlias(data.player).hand.push(card);
 					game.hobbitCards.splice(game.hobbitCards.length-1);
 					given.push({'card' : card, 'player' : data.player});
+					game.io.to(player.room).emit('log message', {'msg' : "Se reparten "+data.amount+" cartas a  "+data.player+".", 'mode':'info'});
 				}
 				i++;
 			}
 			data['given'] = given;
+			if (data.player == null){
+				game.io.to(player.room).emit('log message', {'msg' : "Se reparten "+data.amount+" cartas a cada jugador. ", 'mode':'info'});
+			}
+			
 			game.io.to(player.room).emit('update game', data);	//enviar siguiente actividad
 
 		},
@@ -45,8 +51,9 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				span.text(currentValue+1);
 			}
 
-			if (client.isActivePlayer())
+			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
+			}
 
 		}
 	},
@@ -179,6 +186,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			var currentValue = parseInt(span.text());
 			span.text(currentValue-data.discard.length);
 			if (client.alias == data.player){
+				console.log("remitoooooo");
 				client.socket.emit('resolve activity');
 			}
 		}
@@ -224,7 +232,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 						texto+=". ";
 					}
 				}
-				texto+="Salvo que se haya indicado lo contrario, puedes usar comodines en el lugar de cualquiera de estas cartas."
 			}
 			//Dibujo una alerta indicandome
 			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias});
@@ -239,11 +246,12 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				$(".player-card-img").off('click');
 				//Si el "to" es null las cartas se descartan, si no se las dan al compañero indicado
 				if (data.to==null){
-					client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	//si no, emito que la termine
+					console.log("cuchaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+					client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	
 					client.socket.emit('resolve activity');
 				}
 				else{
-					client.socket.emit('add activity', {'action' : 'PlayerGiveCards', 'from' : client.alias, 'to':data.to, 'cards' : discard});	//si no, emito que la termine
+					client.socket.emit('add activity', {'action' : 'PlayerGiveCards', 'from' : client.alias, 'to':data.to, 'cards' : discard});	
 					client.socket.emit('resolve activity');
 				}
 				
@@ -268,6 +276,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	'MovePlayer' :  {
 		apply : function(game, player,data){
 			game.getPlayerByAlias(data.alias).move(data.amount);
+			game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se mueve "+data.amount+" lugares hacia el peligro!", 'mode':'danger'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -286,6 +295,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	'MoveSauron' :  {
 		apply : function(game, player,data){
 			game.moveSauron(data.amount);
+			game.io.to(player.room).emit('log message', {'msg' : "¡Battion se mueve "+data.amount+" lugares hacia los aventureros!", 'mode':'danger'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -333,10 +343,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 			//cuando me dan ok envio cada carta al jugador correspondiente
 			popup.addListener("ok", function(){
-					console.log("Voy a emitir los eventos");
 					$(".card-to-selector").each(function(){
 						var to = $(this).val();
-						console.log(to);
 						client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});	//voy dando las cartas de a una
 					})
 				popup.close(); 
@@ -365,8 +373,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	"PlayerGiveCards" : {
 		apply : function(game, player,data){
 			game.getPlayerByAlias(data.from).giveCards(data.cards, game.getPlayerByAlias(data.to));
-			console.log(game.getPlayerByAlias(data.from).hand);
-			console.log(game.getPlayerByAlias(data.to).hand);
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -382,18 +388,17 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			}
 			//dibujar el descarte en el que dio
 			if (client.alias == data.from){
-				$(".player-card-img.highlighted-image").remove();
-				client.socket.emit('resolve activity');
-				
+				$(".player-card-img.highlighted-image").remove();			
 			}
 			//Dibujar las cartas recibidas en el receptor
 			if (client.alias == data.to){
 				for (j in data.cards){	//arreglare
 					$("<img src='./assets/img/ripped/"+data.cards[j].image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.cards[j]).data("selected",false).appendTo("#player-cards-container").show('slow');
 				}
-				
 			}
-			;
+			if (client.alias == data.from ){
+				client.socket.emit('resolve activity');
+			}
 		}
 	},
 
@@ -402,6 +407,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	//Primera accion del juego
 	"Gandalf" : {
 		apply: function(game,player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Gandalf.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Debe repartirse a cada jugador 6 cartas del mazo.", 'mode':'info'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -421,6 +428,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	//Accion de juego Preparations
 	"Preparations" : {
 		apply : function(game,player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Preparaciones.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Puede elegir entre pasar a la actividad siguiente o tirar el Dado de Corrupción para luego sacar 4 cartas del mazo y repartirlas como desee entre todos los jugadores.", 'mode':'info'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -459,6 +468,10 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			}
 			data['candidates'] = candidates;
 			data['cards'] = cards;
+
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Un Sah'mid Aparece.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, Battión avanza un espacio hacia los aventureros.", 'mode':'info'});
+
 			game.io.to(player.room).emit('update game', data);	
 		},
 
@@ -469,8 +482,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
 			});
 			popup.addListener("discard", function(){
-					client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards, 'to':null});
-				
+				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards, 'to':null});
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
@@ -496,6 +508,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 	"Elrond" : {
 		apply: function(game,player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Elorond.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "LAs cartas de locación de Rivendell se reparten entre los jugadores.", 'mode':'info'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -514,6 +528,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 
 	"Council" : {
 		apply: function(game,player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Consejo.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador y siguiendo hasta el último, debe elegir una carta para pasársela al jugador siguiente (el últino le pasa al primero).", 'mode':'info'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -533,6 +549,56 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			});
 
 			popup.draw(client);
+			
+		}
+	},
+
+	"Fellowship" : {
+		apply: function(game,player,data){
+			if (data.player =='first'){
+				data['player']=game.players[0].alias;
+				game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Comunidad.", 'mode':'alert'});
+				game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador y siguiendo hasta el último, debe elegir entre descartar una carta de símbolo Comodín o, de no poder o no querer hacerlo, tirar el Dado de Corrupción.", 'mode':'info'});
+			}
+			if (game.getPlayerByAlias(data.player).hasCards([{color:null, symbol:"Joker"}])){
+				data['canDiscard']=true;
+			}
+			else{
+				data['canDiscard']=false;
+			}
+			game.io.to(player.room).emit('update game', data);
+		},
+		draw : function(client, data){
+
+			var popup = new Popup({title: "Comunidad", text: "Cada jugador, comenzando por el Portador y siguiendo hasta el último, debe elegir entre descartar una carta de símbolo Comodín o, de no poder o no querer hacerlo, tirar el Dado de Corrupción.", buttons : [{name : "Descartar", id:"discard"},  {name : "Tirar el Dado", id:"rolldie"}] , visibility : data.player});
+			popup.addListener("discard", function(){
+				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': [{color:null, symbol:"Joker"}], 'to': null});
+				if (client.isActivePlayer()){
+					for (var i=1; i < client.players.length; i++){
+						if (i<client.players.length){
+							client.socket.emit('add activity', {'action' : "Fellowship", 'player' : client.players[i].alias});	
+						}
+					}
+				}
+				client.socket.emit('resolve activity');
+				popup.close();
+			});
+			popup.addListener("rolldie", function(){
+				client.socket.emit('add activity', {'action' : 'RollDie'});	
+				if (client.isActivePlayer()){
+					for (var i=1; i < client.players.length; i++){
+						if (i<client.players.length){
+							client.socket.emit('add activity', {'action' : "Fellowship", 'player' : client.players[i].alias});
+						}
+					}
+				}
+				client.socket.emit('resolve activity');
+				popup.close();
+			});
+			popup.draw(client);
+			if (!data.canDiscard){
+				popup.disableButton("discard",true);
+			}
 			
 		}
 	},

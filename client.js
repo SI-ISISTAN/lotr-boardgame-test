@@ -113,7 +113,19 @@ require(['./data/activities','./classes/client-side/Client','http://code.jquery.
 
 	    //mensaje de log
 	    socket.on('log message', function(res){
-	        	$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #FCF34B;"> '+ res.msg+' </b> </p>');
+	    	if (res.mode=='alert'){
+	        	$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #BDBDBD;"> '+ res.msg+' </b> </p>');
+	    	}
+	    	else if (res.mode=='info'){
+	    		$("#chat-msg-div").append('<p style= "color: #BDBDBD" class="chat-message"> '+ res.msg+' </p>');
+	    	}
+	    	else if (res.mode=='danger'){
+	    		$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #FE9A2E;"> '+ res.msg+' </b> </p>');
+	    	}
+	    	else if (res.mode=='tip'){
+	    		$("#chat-msg-div").append('<p style= "color: #58D3F7" class="chat-message"> '+ res.msg+' </p>');
+	    	}
+	    	$('#chat-msg-div').scrollTop(d.prop("scrollHeight"));
 	    });
 
 	    socket.on('toggle ready', function(res){
