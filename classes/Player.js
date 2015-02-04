@@ -19,6 +19,7 @@ define([], function () {
 		this.lifeTokens = 0;
 		this.sunTokens = 0;
 		this.ringTokens = 0;
+		this.shields = 0;
 		this.hand = [];
 		this.corruption = 0;
 		this.cardState = this.CARD_STATE.NONE;
@@ -76,7 +77,17 @@ define([], function () {
 	//Descartar cartas basadas en su ID
 	Player.prototype.discard= function(discard){
 		for (i in discard){
-			this.hand.splice(this.findCardByID(discard[i]),1);
+			this.hand.splice(this.findCardByID(discard[i].id),1);
+		}
+	}
+
+	//Dar cartas a otro jugador
+	Player.prototype.giveCards= function(discard, to){
+		for (i in discard){
+			var card = this.hand[this.findCardByID(discard[i].id)];
+			this.hand.splice(card.id,1);
+			to.hand.push(card);
+
 		}
 	}
 

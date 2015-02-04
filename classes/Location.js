@@ -9,6 +9,9 @@ define([], function () {
 		this.activities = location.activities;
 		this.currentActivity = location.activities[0];
 		this.featureCards = [];
+		for (i in location.featureCards){
+			this.featureCards.push(location.featureCards[i]);
+		}
 	}
 
 	return Location;

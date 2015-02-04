@@ -12,7 +12,9 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.activePlayer = null;
 		this.storyTiles = [];
 		this.hobbitCards = [];
+		this.locations = [];
 		this.currentLocation = null;
+		this.locationNumber = 0;
 		this.sauronPosition = 15;		//Cargar de un file
 	};
 
@@ -151,7 +153,13 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 			this.hobbitCards.push(card);
 		}
 		this.hobbitCards = this.shuffleArray(this.hobbitCards);
-		this.currentLocation = new Location(locations.BagEnd);
+
+		//Cargo escenarios
+		this.locations.push(locations.BagEnd);
+		this.locations.push(locations.Rivendell);
+
+		//inicio en la 1º location
+		this.currentLocation = new Location(this.locations[this.locationNumber]);
 
 	}
 
@@ -172,6 +180,12 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 				this.io.to(client.id).emit('resolve activity', this.currentLocation.currentActivity.data);	//si no, emito que la termine
 		}
 		
+	}
+
+	//Paso a la location siguiente
+	Game.prototype.advanceLocation = function(){
+		this.locationNumber++;
+		this.currentLocation = new Location(this.locations[this.locationNumber]);
 	}
 
 	//aplico una actualizacion al juego

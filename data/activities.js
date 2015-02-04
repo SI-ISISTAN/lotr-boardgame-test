@@ -51,6 +51,53 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		}
 	},
 
+	//Reparte cartas a uno/varios jugadores segun parámetros (cantidad y jugador/es a quien repartir)
+	"DealFeatureCards" : {
+		apply : function (game, player, data){
+			//llevo un registro interno de que cartas le doy a cada uno para poder dibujarlo en "draw"
+			var given = [];
+
+			var turn=0;
+			var len=game.currentLocation.featureCards.length;
+			for (var j=0; j<len;j++){
+				console.log("len de feature: "+game.currentLocation.featureCards.length);
+				console.log("Give card to: "+game.players[turn].alias);
+				var card = game.currentLocation.featureCards[game.currentLocation.featureCards.length-1];
+				game.players[turn].hand.push(card);
+				game.currentLocation.featureCards.splice(game.currentLocation.featureCards.length-1,1);
+				given.push({'card' : card, 'player' : game.players[turn].alias});
+				if (turn < game.players.length-1){
+					turn++;
+				}
+				else{
+					turn=0;
+				}
+			}
+
+
+			data['given'] = given;
+			game.io.to(player.room).emit('update game', data);	//enviar siguiente actividad
+
+		},
+		draw : function(client, data){
+			for (j in data.given){	//arreglare
+
+				if (data.given[j].player == client.player.alias){
+					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.given[j].card).data("selected",false).appendTo("#player-cards-container").show('slow');
+				}
+			}
+			for (i in data.given){
+				var span = $("#"+data.given[i].player+"-state-div").find("#cards-span");
+				var currentValue = parseInt(span.text());
+				span.text(currentValue+1);
+			}
+
+			if (client.isActivePlayer())
+				client.socket.emit('resolve activity');
+
+		}
+	},
+
 	//Accion de juego de tirar el dado
 	"RollDie" :  {
 		apply : function(game,player,data){
@@ -96,7 +143,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				case 6:
 					div.append($('<img src="./assets/img/ripped/die5.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Debe descartar dos cartas. </p>"));
-					action = {'action' : 'ForceDiscard', 'alias' : data.player, 'amount' : 2, 'card' : null };
+					action = {'action' : 'ForceDiscard', 'alias' : data.player, 'amount' : 2, 'card' : null, 'to':null };
 				break;
 			}
 			popup.append(div);
@@ -122,7 +169,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	"PlayerDiscard" : {
 		apply : function(game, player,data){
 			game.getPlayerByAlias(data.player).discard(data.discard);
-			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
 			
@@ -140,7 +187,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	//Un jugador debe, forzosamente, elegir algunas cartas de su mano para descartarse
 	"ForceDiscard" :  {
 		apply: function(game,player,data){
-			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
 			console.log("alias: "+data.alias);
@@ -148,7 +195,12 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			//Elijo el titulo segun la cantidad y tipo de cartas que deba descartar
 			var texto = "";
 			if (data.cards == null){
-				texto = "Debes descartar "+data.amount+" cartas cualesquiera de tu mano.";
+				if (data.to==null){
+					texto = "Debes descartar "+data.amount+" cartas cualesquiera de tu mano.";
+				}
+				else{
+					texto = "Escoge "+data.amount+" cartas para dar a otro jugador.";
+				}
 			}
 			else{
 				texto = "Debes descartar las siguientes cartas: ";
@@ -182,11 +234,19 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				var discard = [];
 				var hand = $(".player-card-img");
 				$(".highlighted-image").each(function(){
-					discard.push($(this).data("card").id);	//pushear el id de la carta
+					discard.push($(this).data("card"));	//pushear el id de la carta
 				});
 				$(".player-card-img").off('click');
-				client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	//si no, emito que la termine
-				client.socket.emit('resolve activity');
+				//Si el "to" es null las cartas se descartan, si no se las dan al compañero indicado
+				if (data.to==null){
+					client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	//si no, emito que la termine
+					client.socket.emit('resolve activity');
+				}
+				else{
+					client.socket.emit('add activity', {'action' : 'PlayerGiveCards', 'from' : client.alias, 'to':data.to, 'cards' : discard});	//si no, emito que la termine
+					client.socket.emit('resolve activity');
+				}
+				
 				popup.close();
 			});
 			popup.draw(client);
@@ -208,7 +268,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	'MovePlayer' :  {
 		apply : function(game, player,data){
 			game.getPlayerByAlias(data.alias).move(data.amount);
-			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
 			$("#"+data.alias+"-chip").animate({
@@ -226,7 +286,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	'MoveSauron' :  {
 		apply : function(game, player,data){
 			game.moveSauron(data.amount);
-			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
 			$(".sauron-chip").animate({
@@ -246,7 +306,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			for (var i=0; i<data.amount; i++){
 				data.cards.push(game.hobbitCards[game.hobbitCards.length-1-i]);
 			}
-			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
 			var popup = new Popup({title: "Repartir cartas", text: "Distribuye las cartas como desees. ",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
@@ -290,19 +350,66 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		}
 	},
 
+	//Se pasa a la siguiente locacion
+	"AdvanceLocation" : {
+		apply : function(game, player,data){
+			game.advanceLocation();
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.socket.emit('change location');	
+		}
+	},
+
+	//Un jugador selecciona y da cartas a otro
+	"PlayerGiveCards" : {
+		apply : function(game, player,data){
+			game.getPlayerByAlias(data.from).giveCards(data.cards, game.getPlayerByAlias(data.to));
+			console.log(game.getPlayerByAlias(data.from).hand);
+			console.log(game.getPlayerByAlias(data.to).hand);
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			//Dibujar lo comun a todos
+			for (i in data.cards){
+				var span = $("#"+data.to+"-state-div").find("#cards-span");
+				var currentValue = parseInt(span.text());
+				span.text(currentValue+1);
+
+				var span2 = $("#"+data.from+"-state-div").find("#cards-span");
+				var currentValue = parseInt(span.text());
+				span.text(currentValue-1);
+			}
+			//dibujar el descarte en el que dio
+			if (client.alias == data.from){
+				$(".player-card-img.highlighted-image").remove();
+				client.socket.emit('resolve activity');
+				
+			}
+			//Dibujar las cartas recibidas en el receptor
+			if (client.alias == data.to){
+				for (j in data.cards){	//arreglare
+					$("<img src='./assets/img/ripped/"+data.cards[j].image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.cards[j]).data("selected",false).appendTo("#player-cards-container").show('slow');
+				}
+				
+			}
+			;
+		}
+	},
+
 	//////////////// Actividades que se cargan en el juego ////////////////
 
 	//Primera accion del juego
 	"Gandalf" : {
 		apply: function(game,player,data){
-			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
 
 			var popup = new Popup({title: "Gandalf", text: "Se reparte a cada jugador 6 cartas de Hobbit del mazo.", buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
 			popup.addListener("ok", function(){
 				popup.close();
-				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	//repetir el evento a los otros clientes
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	
 				client.socket.emit('resolve activity');
 			});
 
@@ -314,7 +421,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	//Accion de juego Preparations
 	"Preparations" : {
 		apply : function(game,player,data){
-			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
 			var popup = new Popup({
@@ -323,9 +430,9 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				buttons : [{name : "Prepararse", id:"prepare"},  {name : "No prepararse", id:"dont-prepare"}] 
 			});
 			popup.addListener("prepare", function(){
-				client.socket.emit('add activity', {'action' : 'RollDie'});	//repetir el evento a los otros clientes
+				client.socket.emit('add activity', {'action' : 'RollDie'});	
 
-				client.socket.emit('add activity', {'action' : 'PlayerDealCards', 'amount' : 4});	//repetir el evento a los otros clientes
+				client.socket.emit('add activity', {'action' : 'PlayerDealCards', 'amount' : 4});	
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
@@ -352,8 +459,9 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			}
 			data['candidates'] = candidates;
 			data['cards'] = cards;
-			game.io.to(player.room).emit('update game', data);	//repetir el evento a los usuarios
+			game.io.to(player.room).emit('update game', data);	
 		},
+
 		draw : function(client, data){
 			var popup = new Popup({
 				title: "Un Sah'mid Aparece", 
@@ -361,13 +469,14 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
 			});
 			popup.addListener("discard", function(){
-					client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards});
+					client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards, 'to':null});
 				
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
 			popup.addListener("dont-discard", function(){
 				client.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 1});
+				client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
@@ -383,7 +492,50 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			}
 		}
 		
-	}
+	},
+
+	"Elrond" : {
+		apply: function(game,player,data){
+			game.io.to(player.room).emit('update game', data);	
+		},
+		draw : function(client, data){
+
+			var popup = new Popup({title: "Elrond", text: "Se reparten las cartas de locación entre los jugadores.", buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+			popup.addListener("ok", function(){
+				popup.close();
+				client.socket.emit('add activity', {'action' : 'DealFeatureCards'});	
+				client.socket.emit('resolve activity');
+			});
+
+			popup.draw(client);
+			
+		}
+	},
+
+	"Council" : {
+		apply: function(game,player,data){
+			game.io.to(player.room).emit('update game', data);	
+		},
+		draw : function(client, data){
+
+			var popup = new Popup({title: "Elrond", text: "Cada jugador, comenzando por el Portador y siguiendo hasta el último, debe elegir una carta para pasársela al jugador siguiente.", buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+			popup.addListener("ok", function(){
+				popup.close();
+				for (var i=0; i < client.players.length; i++){
+					if (i<client.players.length-1){
+						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.players[i].alias, 'cards': null, 'to':client.players[i+1].alias});	
+					}
+					else{
+						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.players[i].alias, 'cards': null, 'to':client.players[0].alias});
+					}
+				}
+				client.socket.emit('resolve activity');
+			});
+
+			popup.draw(client);
+			
+		}
+	},
 
 
 	};
