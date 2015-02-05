@@ -183,6 +183,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			});
 
 			client.on('resolve activity', function (){
+				
 				self.activeGames[client.room].resolveActivity(client);
 			});
 

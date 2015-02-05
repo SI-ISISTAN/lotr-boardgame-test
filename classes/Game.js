@@ -179,6 +179,9 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 				this.currentLocation.currentActivity = new_act;
 				this.io.to(client.id).emit('resolve activity', this.currentLocation.currentActivity.data);	//si no, emito que la termine
 		}
+		else{
+			console.log("No mas actividades!");
+		}
 		
 	}
 

@@ -186,7 +186,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			var currentValue = parseInt(span.text());
 			span.text(currentValue-data.discard.length);
 			if (client.alias == data.player){
-				console.log("remitoooooo");
 				client.socket.emit('resolve activity');
 			}
 		}
@@ -365,6 +364,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
+			console.log("watch me expoooooooooooooole");
 			client.socket.emit('change location');	
 		}
 	},
@@ -483,6 +483,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			});
 			popup.addListener("discard", function(){
 				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards, 'to':null});
+				client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});

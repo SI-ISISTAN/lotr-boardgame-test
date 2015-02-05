@@ -18,7 +18,7 @@ define(['../classes/Activity'], function (Activity) {
 	exports.BagEnd.activities.push({
 		name: 'Bag End',
 		draw : null,
-		subactivities : [ {'action' : "Gandalf"}, {'action': "Preparations"}, {'action': "Nazgul Appears"}]
+		subactivities : [ {'action' : "Gandalf"}, {'action': "Preparations"}, {'action': "Nazgul Appears"} ]
 	});
 
 	

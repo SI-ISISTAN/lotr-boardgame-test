@@ -125,7 +125,7 @@ require(['./data/activities','./classes/client-side/Client','http://code.jquery.
 	    	else if (res.mode=='tip'){
 	    		$("#chat-msg-div").append('<p style= "color: #58D3F7" class="chat-message"> '+ res.msg+' </p>');
 	    	}
-	    	$('#chat-msg-div').scrollTop(d.prop("scrollHeight"));
+	    	$('#chat-msg-div').scrollTop($('#chat-msg-div').prop("scrollHeight"));
 	    });
 
 	    socket.on('toggle ready', function(res){
