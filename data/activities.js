@@ -280,7 +280,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		},
 		draw : function(client, data){
 			$("#"+data.alias+"-chip").animate({
-				'left' : "+="+2.39*data.amount+"vw" //moves right
+				'left' : "+="+41*data.amount+"px" //moves right
 			},800);
 			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
@@ -299,7 +299,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		},
 		draw : function(client, data){
 			$(".sauron-chip").animate({
-				'left' : "-="+2.38*data.amount+"vw" //moves right
+				'left' : "-="+41*data.amount+"px" //moves right
 			},800);
 			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
