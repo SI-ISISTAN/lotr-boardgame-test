@@ -161,7 +161,11 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				
 				if (!self.activeGames[client.room].currentLocation.isConflict){
 					self.activeGames[client.room].currentLocation.currentActivity = new Activity({'action' : self.activeGames[client.room].currentLocation.currentActivity.name}, self.activeGames[client.room].currentLocation.currentActivity.subactivities, null);
-					io.to(client.id).emit('change location');	//enviar siguiente actividad
+					io.to(client.id).emit('next activity');	//enviar siguiente actividad
+				}
+				else{
+					self.activeGames[client.room].startConflict();
+					io.to(client.room).emit('next turn', {activePlayer : self.activeGames[client.room].activePlayer.alias});	//enviar siguiente actividad
 				}
 			});
 
@@ -177,13 +181,14 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				
 			});
 
+			//e agrega una subactividad a la actividad que está en curso en ese momento, que se ejecutará cuando se resuelva la actividad en curso
 			client.on('add activity', function (data){
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				self.activeGames[client.room].currentLocation.currentActivity.addSubActivity(new_act);
 			});
 
-			client.on('resolve activity', function (){
-				
+			//Se resuleve una actividad
+			client.on('resolve activity', function (){		
 				self.activeGames[client.room].resolveActivity(client);
 			});
 

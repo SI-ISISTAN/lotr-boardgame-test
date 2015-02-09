@@ -81,7 +81,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				}
 			}
 
-
 			data['given'] = given;
 			game.io.to(player.room).emit('update game', data);	//enviar siguiente actividad
 
@@ -111,63 +110,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			game.io.to(player.room).emit('update game', {'action' : 'RollDie', 'value' : game.rollDie(), 'player': player.alias});	
 		},
 		draw : function(client, data){
-			var div = $("<div style = 'display : none'>  </div>")
-			var popup = new Popup({title: "Tirar dado", id:"die-div", text: "El jugador "+data.player+" lanza el dado y obtiene...", buttons : [] , visibility : "all"});
-			var action = null;
-			switch (data.value){
-				case 1:
-					div.append($('<img src="./assets/img/ripped/die0.png" alt="Dado de amenaza" class="img-responsive token-img"><br>'));
-					div.append($("<p> No hay consecuencias.</p>"));
-				break;
-				case 2:
-
-					div.append($('<img src="./assets/img/ripped/die1.png" alt="Dado de amenaza" class="img-responsive token-img"><br><br>'));
-					div.append($("<p> Battión se mueve un espacio hacia los aventureros. </p>"));
-					action = {'action' : 'MoveSauron', 'amount' : 1};
-
-				break;
-				case 3:
-
-					div.append($('<img src="./assets/img/ripped/die2.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
-					div.append($("<p> Debe moverse un espacio en la línea de corrupción. </p>"));
-
-					action = {'action' : 'MovePlayer', 'alias' : data.player, 'amount' : 1};
-					
-				break;
-				case 4:
-
-					div.append($('<img src="./assets/img/ripped/die3.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
-					div.append($("<p> Debe moverse dos espacios en la línea de corrupción. </p>"));
-					action = {'action' : 'MovePlayer', 'alias' : data.player, 'amount' : 2 };
-					
-				break;
-				case 5:
-
-					div.append($('<img src="./assets/img/ripped/die4.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
-					div.append($("<p> Debe moverse tres espacios en la línea de corrupción. </p>"));
-					action = {'action' : 'MovePlayer', 'alias' : data.player, 'amount' : 3};
-				break;
-				case 6:
-					div.append($('<img src="./assets/img/ripped/die5.png" alt="Dado de amenaza" class="img-responsive token-img" ><br><br>'));
-					div.append($("<p> Debe descartar dos cartas. </p>"));
-					action = {'action' : 'ForceDiscard', 'alias' : data.player, 'amount' : 2, 'card' : null, 'to':null };
-				break;
-			}
-			popup.append(div);
-			popup.draw(client);
-				
-				div.fadeIn(4000, function(){
-					if (client.isActivePlayer()){
-						if (action!= null){
-							client.socket.emit('add activity', action);
-						}
-						client.socket.emit('resolve activity');
-					}
-					
-					popup.close();
-				});
-			
-			
+			client.rollDie(data);			
 		}
 		
 	},
@@ -197,7 +140,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
-			console.log("alias: "+data.alias);
 			var discarded = [];
 			//Elijo el titulo segun la cantidad y tipo de cartas que deba descartar
 			var texto = "";
@@ -245,7 +187,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				$(".player-card-img").off('click');
 				//Si el "to" es null las cartas se descartan, si no se las dan al compañero indicado
 				if (data.to==null){
-					console.log("cuchaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 					client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	
 					client.socket.emit('resolve activity');
 				}
@@ -274,6 +215,9 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	//Accion de juego de tirar el dado
 	'MovePlayer' :  {
 		apply : function(game, player,data){
+			if (data.alias=="RingBearer"){
+				data.alias = game.ringBearer.alias;
+			}
 			game.getPlayerByAlias(data.alias).move(data.amount);
 			game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se mueve "+data.amount+" lugares hacia el peligro!", 'mode':'danger'});
 			game.io.to(player.room).emit('update game', data);	
@@ -361,11 +305,30 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 	"AdvanceLocation" : {
 		apply : function(game, player,data){
 			game.advanceLocation();
-			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+			data['tracks'] = game.currentLocation.tracks;
+			data['isConflict'] = game.currentLocation.isConflict;
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			console.log("watch me expoooooooooooooole");
-			client.socket.emit('change location');	
+			if (data.isConflict){
+				if (data.tracks.Fighting != null){
+					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Fighting-chip" class="cone-chip" style="left: '+data.tracks.Fighting.startX+'px; top: '+data.tracks.Fighting.startY+'px;">');
+				}
+				if (data.tracks.Travelling != null){
+					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Travelling-chip" class="cone-chip" style="left: '+data.tracks.Travelling.startX+'px; top: '+data.tracks.Travelling.startY+'px;">');
+				}
+				if (data.tracks.Friendship != null){
+					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Friendship-chip" class="cone-chip" style="left: '+data.tracks.Friendship.startX+'px; top: '+data.tracks.Friendship.startY+'px;">');
+				}
+				if (data.tracks.Hiding != null){
+					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Hiding-chip" class="cone-chip" style="left: '+data.tracks.Hiding.startX+'px; top: '+data.tracks.Hiding.startY+'px;">');
+				}
+				$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -50px;">');
+
+			}
+			if (client.isActivePlayer()){
+				client.socket.emit('change location');	
+			}
 		}
 	},
 
@@ -400,6 +363,92 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 				client.socket.emit('resolve activity');
 			}
 		}
+	},
+
+	//Un jugador selecciona y da cartas a otro
+	"DrawTile" : {
+		apply : function(game, player,data){
+			game.drawTile(data);
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.drawTile(data);
+		}
+	},
+
+	//Accion de juego de tirar el dado
+	'MoveTrack' :  {
+		apply : function(game, player,data){
+			
+			if (game.currentLocation.tracks[data.trackName]!=null){
+				game.currentLocation.tracks[data.trackName].position++;
+				//claim reward
+				data['track'] = game.currentLocation.tracks[data.trackName];
+			}
+			//si no existo el track envio lso tracks que si existen, para la seleccion
+			else{
+				data['track'] = null;
+				data['valid'] = game.currentLocation.validTracks;
+			}
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+
+		},
+		draw : function(client, data){
+			console.log("U PAN CHO RO LA VIEJO");
+			//mover la ficha como corresponda
+			//si no es la min track se mueve la ficha de forma constante
+			if (data.track!=null){
+				if (!data.track.isMain){
+					$("#"+data.trackName+"-chip").animate({
+						'left' : "+="+31*data.amount+"px" //moves right
+					},800);
+				}
+				//es la main track, hay que moverlo de forma especial
+				else{
+					$("#"+data.trackName+"-chip").animate({
+						'left' : "+="+data.track.spaces[data.track.position-1].x+"px",
+						'top' : "+="+data.track.spaces[data.track.position-1].y+"px"
+					},800);
+				}
+			}
+			//Si el track no existe en el escenario, se le da al usuario la opcion de moverse en el track que quiera
+			if (client.isActivePlayer()){
+				if (data.track==null){
+					var popup = new Popup({title: "Avanzar en una pista", text: "Como la pista de la actividad que has sacado no existe, puedes elegir una en la cual avanzar un espacio.",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+						//pongo los elementos de reparto de cada carta
+						var div = $("<div>  </div>");
+
+						var el = $("<div id='advance-div'>  </div> ");
+
+						var listbox = $("<select class='advance-selector'> </select>");
+						
+						//Agrego los tracks por los que puedo avanzar
+						for (i in data.valid){
+							$(listbox).append("<option value='"+data.valid[i].name+"'> "+data.valid[i].text+"</option>");
+						}
+						
+						$(el).append($(listbox));
+
+						div.append(el);	
+
+						popup.append(div);
+
+						//cuando me dan ok envio cada carta al jugador correspondiente
+						popup.addListener("ok", function(){
+								$(".advance-selector").each(function(){
+									var to = $(this).val();
+									console.log($(this).val());
+									client.socket.emit('update game', {'action' : 'MoveTrack', 'trackName' : to , 'amount' : 1 });	//voy dando las cartas de a una
+								});
+						popup.close(); 
+						});
+
+					popup.draw(client);
+				}
+				client.socket.emit('resolve activity');
+			}
+		}
+		
 	},
 
 	//////////////// Actividades que se cargan en el juego ////////////////
@@ -455,7 +504,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 		
 	},
 
-		//Accion de juego Preparations
+	//Accion de juego Nazgul Appears
 	"Nazgul Appears" : {
 		apply : function(game,player,data){
 			var candidates = [];
@@ -592,6 +641,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Alert'], function
 							client.socket.emit('add activity', {'action' : "Fellowship", 'player' : client.players[i].alias});
 						}
 					}
+					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				}
 				client.socket.emit('resolve activity');
 				popup.close();

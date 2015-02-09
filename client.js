@@ -98,6 +98,7 @@ require(['./data/activities','./classes/client-side/Client','http://code.jquery.
 		        $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" class="cone-chip" style="left: 30px; top: 34px;">');
 		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 625px; top: 90px;">');
 
+
 		        if (client.player.turn){
 		        	socket.emit('change location');	//repetir el evento a los otros clientes
 		        }
@@ -129,8 +130,6 @@ require(['./data/activities','./classes/client-side/Client','http://code.jquery.
 	    });
 
 	    socket.on('toggle ready', function(res){
-	    	//var player = client.currentGame.getPlayerByID(res.player);
-
 			//cambios graficos
 	    	var alias = res.player.alias;
 			var text = "(Esperando)";
@@ -141,27 +140,41 @@ require(['./data/activities','./classes/client-side/Client','http://code.jquery.
 			$( ".client-list-name:contains('"+alias+"')" ).parent().find(".client-list-state").text(text);
 	    });
 
-	    socket.on('change location', function(res){
+	    //Pasar al siguiente escenario
+	    socket.on('next activity', function(res){
 	    	socket.emit('resolve activity');	//repetir el evento a los otros clientes
 	    });
 
+	    //Aplicar un update del lado de cliente
 	    socket.on('update game', function(res){
 	    		//getear el player que realizo la actualizacion
-	    		console.log("update game de cliente");
-	    		console.log(res);
 	    		if (activities[res.action] != null && typeof activities[res.action] != 'undefined'){
 	        		activities[res.action].draw(client, res);									//actualizar la interfaz     			
 	    		}
 	    		
 	    });
 
+	    //Resolver una actividad
 	    socket.on('resolve activity', function(res){
 	    	console.log("resolve act de cliente");
 	    	console.log(res);
-	    	//if (client.isActivePlayer()){
-	    		socket.emit('update game', res);	//repetir el evento a los otros clientes
-	    	//}
+	    	socket.emit('update game', res);	//repetir el evento a los otros clientes
 	    });
+
+	    //Turno siguiente
+	    socket.on('next turn', function(res){
+	    	//Turnar al client apropiado
+	    	console.log("Alis del turnado "+res.activePlayer);
+	    	if (client.alias == res.activePlayer){
+	    		client.turn=true;
+	    		$("#draw-tile-button").prop('disabled', false);
+	    	}
+	    	else{
+	    		client.turn=false;
+	    	}
+	    	
+	    });
+
 	}
 
     ////////////////////////////// MANEJO DE INPUT ////////////////////////////// 
@@ -190,15 +203,17 @@ require(['./data/activities','./classes/client-side/Client','http://code.jquery.
 
 			    //clicqueo el boton de listo
 			    $('#ready-button').on('click', function(){
-			    	console.log("Toggle ready");
 			    	socket.emit('toggle ready',{});
-			    })
-				
-
-			    //click en el boton ok de un popup
-			    $('#popup-ok-button').on('click', function(e){
-			    	
 			    });
+
+			    $("#draw-tile-button").on('click', function(){
+			    	$("#draw-tile-button").prop('disabled', true);
+			    	client.socket.emit('update game', {'action' : 'DrawTile', 'value': null, 'player':client.alias});
+
+			    });
+
+
+				
 	}
   
 	    

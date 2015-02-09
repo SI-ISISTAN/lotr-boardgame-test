@@ -10,6 +10,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.isActive = false;
 		this.ringBearer = null;
 		this.activePlayer = null;
+		this.turnPhase = null;
 		this.storyTiles = [];
 		this.hobbitCards = [];
 		this.locations = [];
@@ -96,6 +97,8 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 	}
 
+
+
 	//Chequeo si estan dadas las condiciones minimas para que arranque un juego
 	Game.prototype.canGameStart= function(){
 		var start = true;
@@ -155,18 +158,21 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.hobbitCards = this.shuffleArray(this.hobbitCards);
 
 		//Cargo escenarios
+		
 		this.locations.push(locations.BagEnd);
+		this.locations.push(locations.Moria);
 		this.locations.push(locations.Rivendell);
-
+		
 		//inicio en la 1º location
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
+		console.log(this.storyTiles);
 
 	}
 
 	Game.prototype.rollDie = function(){
 		//retorna n random entre 1 y 6
 		var n = Math.floor((Math.random() * 6) + 1);
-		return 2; 
+		return n; 
 	}
 
 	Game.prototype.moveSauron = function(amount){
@@ -189,6 +195,22 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	Game.prototype.advanceLocation = function(){
 		this.locationNumber++;
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
+
+	}
+
+	Game.prototype.startConflict = function(){
+
+	}
+
+	//Cuando finalizo un conflicto hago los chequeos y las acciones correspondientes
+	Game.prototype.endConflict = function(){
+
+	}
+
+	//Recibe el estado de juego ante algun cambio grande
+	Game.prototype.drawTile= function(data){
+		data.value = this.storyTiles[this.storyTiles.length-1];
+		this.storyTiles.splice(this.storyTiles.length-1,1);
 	}
 
 	//aplico una actualizacion al juego

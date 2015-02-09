@@ -26,6 +26,7 @@ define([], function () {
 				this.popup.append('<br>');
 				this.popup.append($('<button/>', {
 									'id':this.buttons[i].id,
+									'class' : "btn btn-default",
 									'html': this.buttons[i].name
 				}));
 				this.popup.append('<br>');
