@@ -1,12 +1,3 @@
 Hacer:
 
-- Arreglar el logueo en consola y de paso agregarle parametros (yaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)
-- LOS HOBBITS SE MUEVEN CUANDO SE LES CANTA LA PIJA
-- pasar menues a una clase especial???
-
-
-Proximo commit:
--Agregue el 3º actividad de Bag End
--Agregue chequeo de discard correcto para descartar ciertas cartas con metodo en clase Client
--Corregi la propiedad de popp para que se muestre al activo, a los demas, o a todos
--Corregido el sistema de botones de popup, ahora se identifican por id y nombre (revisar, aunque parece funcional)
+- Termianr los tiles metiendolos en el archivo events (salvo cuando haya que ejecutar eventos pq todavia es japa)

@@ -17,10 +17,6 @@ define(['../data/activities', '../data/eventTiles'], function (activities, event
 			this.draw = activities[this.name].draw;
 			this.apply = activities[this.name].apply;
 		}
-		if (eventTiles[this.name] != null){
-			this.draw = eventTiles[this.name].draw;
-			this.apply = eventTiles[this.name].apply;
-		}
 		if (parent!=null){
 			this.parent = parent;
 		}

@@ -193,6 +193,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				case "Sauron Will":
 					div.append($('<img src="./assets/img/ripped/T1T2.png" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Un jugador debe voluntariarse para avanzar dos espacio hacia Sauron, o éste avanza un espacio hacia los aventureros. </p>"));
+					action = {'action' : 'SauronWill'};
 				break;
 				case "Out of Options":
 					div.append($('<img src="./assets/img/ripped/T1T4.png" class="img-responsive token-img" ><br><br>'));
@@ -210,11 +211,12 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				div.fadeIn(3000, function(){
 					if (self.isActivePlayer()){
 						if (action!= null){
-							self.socket.emit('add activity', action);
-						};
-						$("#draw-tile-button").prop('disabled', false);				
+							self.socket.emit('add activity', action);	
+						}
+						$("#draw-tile-button").prop('disabled', false);
+						self.socket.emit('resolve activity');				
 					}
-					self.socket.emit('resolve activity');
+					
 					popup.close();
 				});
 	}
