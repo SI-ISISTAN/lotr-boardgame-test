@@ -66,21 +66,21 @@ define(['../classes/Activity'], function (Activity) {
 				startX : 230,
 				startY : 160,
 				isMain : true,
-				spaces :  [{x: 40, y:-15, reward : "Shield"}, {x: 45, y:12, reward : "Shield"}, {x: 45, y:12, reward : "Ring"}, {x: 45, y:12, reward : "Shield"}, {x: 45, y:15, reward : "Shield"}, {x: 45, y:-5, reward : "Ring"}, {x: 42, y:-10, reward : "Die"}, {x: 30, y:-40, reward : "Shield"}, {x: 20, y:-35, reward : "Die"}, {x: 10, y:-45, reward : "BigShield"} ]
+				spaces :  [{x: 40, y:-15, reward : "shield"}, {x: 45, y:12, reward : "shield"}, {x: 45, y:12, reward : "ring"}, {x: 45, y:12, reward : "shield"}, {x: 45, y:15, reward : "shield"}, {x: 45, y:-5, reward : "ring"}, {x: 42, y:-10, reward : "Die"}, {x: 30, y:-40, reward : "shield"}, {x: 20, y:-35, reward : "Die"}, {x: 10, y:-45, reward : "Bigshield"} ]
 			},
 			"Hiding" : {
 				position : 0,
 				startX : 145,
 				startY : 255,
 				isMain : false,
-				spaces :  [{reward : "Card"}, {reward : "Ring"}, {reward : "Heart"}, {reward : "Ring"}, {reward : "Heart"},{reward : "Ring"}, {reward : "Heart"} ]
+				spaces :  [{reward : "Card"}, {reward : "ring"}, {reward : "life"}, {reward : "ring"}, {reward : "life"},{reward : "ring"}, {reward : "life"} ]
 			},
 			"Travelling" : {
 				position : 0,
 				startX : 470,
 				startY : 255,
 				isMain : false,
-				spaces : [{reward : "Shield"}, {reward : "Shield"},{reward : "Sun"},{reward : "Shield"},{reward : "Sun"},{reward : "Shield"},{reward : "Sun"}]
+				spaces : [{reward : "shield"}, {reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"}]
 			},
 			"Friendship" : null
 		},

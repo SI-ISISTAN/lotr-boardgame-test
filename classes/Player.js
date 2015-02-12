@@ -3,11 +3,6 @@ define([], function () {
 	
 
 	function Player (client, number){
-		this.CARD_STATE ={
-			PLAY : "Play",
-			DISCARD: "Discard",
-			NONE : "None"
-		}
 
 		this.id = client.id;
 		this.alias = client.alias;
@@ -22,7 +17,6 @@ define([], function () {
 		this.shields = 0;
 		this.hand = [];
 		this.corruption = 0;
-		this.cardState = this.CARD_STATE.NONE;
 	};
 
 	//Buscar una carta en la mano del jugador
@@ -80,6 +74,68 @@ define([], function () {
 			this.hand.splice(this.findCardByID(discard[i].id),1);
 		}
 	}
+	//Descartar cartas basada en el primer match encontrado
+	Player.prototype.discardFirstMatch= function(card){
+			var t = 0;
+			var found = false;
+			var disc = null;
+			while (t<this.hand.length && !found){
+				if ( ( (card.symbol==null ||  card.symbol== this.hand[t].symbol ) && (card.color==null ||  card.color==this.hand[t].color )) ||  this.hand[t].symbol == "Joker"){
+					found = true;
+					disc = this.hand[t];
+					this.hand.splice(t,1);
+				}
+				else {
+					t++;
+				}
+			}
+			return disc;	
+	}
+
+	Player.prototype.addToken= function(token, amount){
+		switch (token){
+			case 'ring':
+				this.ringTokens+=amount;
+			break;
+			case 'life':
+				this.lifeTokens+=amount;
+			break;
+			case 'sun':
+				this.sunTokens+=amount;
+			break;
+			case 'shield':
+				this.shields+=amount;
+			break;
+		}
+	};
+
+	//Chequea si el jugador tiene la cantidad indicada de determinado token
+	Player.prototype.hasTokens= function(token, amount){
+		var has = false;
+		switch (token){
+			case 'ring':
+				if (this.ringTokens >= amount){
+					has=true;
+				}
+			break;
+			case 'life':
+				if (this.lifeTokens >= amount){
+					has=true;
+				}
+			break;
+			case 'sun':
+				if (this.sunTokens >= amount){
+					has=true;
+				}
+			break;
+			case 'shield':
+				if (this.shields >= amount){
+					has=true;
+				}
+			break;
+		}
+		return has;
+	};
 
 	//Dar cartas a otro jugador
 	Player.prototype.giveCards= function(discard, to){

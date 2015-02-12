@@ -165,6 +165,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						else if (data.cards[i].symbol=="Friendship") texto+="de símbolo Amistad"
 						else texto+="de Comodín"
 					}
+					if (data.cards[i].color==null && data.cards[i].symbol==null){
+						texto+= "cualquiera"
+					}
 					if (i<data.cards.length-1){
 						texto+=", "
 					}
@@ -288,7 +291,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 					$(".card-to-selector").each(function(){
 						var to = $(this).val();
 						client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});	//voy dando las cartas de a una
-					})
+					});
+				$(".card-to-selector").remove();
 				popup.close(); 
 				if (client.isActivePlayer()){
 					client.socket.emit('resolve activity');
@@ -381,7 +385,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			
 			if (game.currentLocation.tracks[data.trackName]!=null){
 				game.currentLocation.tracks[data.trackName].position++;
-				//claim reward
+				console.log("Poisicon: "+game.currentLocation.tracks[data.trackName].position+" en el track: "+data.trackName);
+				data['reward'] = game.currentLocation.tracks[data.trackName].spaces[game.currentLocation.tracks[data.trackName].position-1].reward;
 				data['track'] = game.currentLocation.tracks[data.trackName];
 			}
 			//si no existo el track envio lso tracks que si existen, para la seleccion
@@ -416,7 +421,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						//pongo los elementos de reparto de cada carta
 						var div = $("<div>  </div>");
 						var el = $("<div id='advance-div'>  </div> ");
-						var listbox = $("<select class='advance-selector'> </select>");
+						var listbox = $("<select id='move-track-selector'> </select>");
 						//Agrego los tracks por los que puedo avanzar
 						for (i in data.valid){
 							$(listbox).append("<option value='"+data.valid[i].name+"'> "+data.valid[i].text+"</option>");
@@ -426,57 +431,123 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						popup.append(div);
 						//cuando me dan ok envio cada carta al jugador correspondiente
 						popup.addListener("ok", function(){
-								$(".advance-selector").each(function(){
+								$("#move-track-selector").each(function(){
 									var to = $(this).val();
 									console.log($(this).val());
 									client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to , 'amount' : 1 });
-
+									client.socket.emit('resolve activity');
 								});
-						client.socket.emit('resolve activity');
+						$("#move-track-selector").remove();
 						popup.close(); 
 						});
 
 					popup.draw(client);
 				}
-				
+				client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
+				client.socket.emit('resolve activity');
 			}
 		}
 		
 	},
 
-		//Accion de juego de tirar el dado
+	//Accion de juego de tirar el dado
 	'CommonDiscard' :  {
 		apply : function(game, player,data){
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-				var popup = new Popup({title: "Avanzar en una pista", text: "Como la pista de la actividad que has sacado no existe, puedes elegir una en la cual avanzar un espacio.",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
-				//pongo los elementos de reparto de cada carta
-				var div = $("<div>  </div>");
-				var el = $("<div id='advance-div'>  </div> ");
-				var listbox = $("<select class='advance-selector'> </select>");
-				//Agrego los tracks por los que puedo avanzar
-				for (i in data.valid){
-						$(listbox).append("<option value='"+data.valid[i].name+"'> "+data.valid[i].text+"</option>");
-				}			
-				$(el).append($(listbox));
-				div.append(el);	
-				popup.append(div);
-				//cuando me dan ok envio cada carta al jugador correspondiente
-				popup.addListener("ok", function(){
-							$(".advance-selector").each(function(){
-								var to = $(this).val();
-								console.log($(this).val());
-								client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to , 'amount' : 1 });
-							});
-					client.socket.emit('resolve activity');
-					popup.close(); 
-				});
-
-				popup.draw(client);
-				
+			client.commonDiscard(data);
 		}
 		
+	},
+
+	//Accion de agregar o quitar tokens
+	'ChangeTokens' :  {
+		apply : function(game, player,data){
+			game.getPlayerByAlias(data.alias).addToken(data.token, data.amount);
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var span = $("#"+data.alias+"-state-div").find("#"+data.token+"-span");
+			var currentValue = parseInt(span.text());
+			span.text(currentValue+data.amount);
+			if (client.alias == data.alias){
+				client.socket.emit('resolve activity');
+			}
+		}
+		
+	},
+
+	//Chequear si el descarte es correcto; si no, ejecutar la accion por defecto pasada por parámetro
+	'CheckDiscard' :  {
+		apply : function(game, player,data){
+			var isValid = true;
+			var i = 0;
+			var discarded = [];
+			//voy borrando los elementos a medida que chequeo para chequear sobre un mismo usuario que tenga que hacer varios descartes
+			//ej: si quiero chequear que un mismo usuario descarte una carta y luego otra igual, tengo que removerla la primera vez
+			//para que ese chequeo sea real. al final, repongo lo que removi
+			while (i<data.discards.length && isValid){
+				if (data.discards[i].discard.element == 'card'){	//si debo descartar una carta
+					if (game.getPlayerByAlias(data.discards[i].alias).hasCards([data.discards[i].discard])){	//se chequea que el jugador indicado la tenga
+						discarded.push({'alias' : data.discards[i].alias, 'type': data.discards[i].discard.element,'element' : game.getPlayerByAlias(data.discards[i].alias).discardFirstMatch(data.discards[i].discard)});
+					}else{
+						isValid=false;
+					}
+				}
+				else if (data.discards[i].discard.element == 'token'){	//lo mismo pero con los tokens
+					if (game.getPlayerByAlias(data.discards[i].alias).hasTokens(data.discards[i].discard.token,data.discards[i].discard.amount)){
+						game.getPlayerByAlias(data.discards[i].alias).addToken(data.discards[i].discard.token, -data.discards[i].discard.amount);
+					}
+					else{
+						isValid=false;
+					}
+				}
+				i++;
+			};
+			//Repongo lo que descarte
+			for (j in discarded){
+				if (discarded[j].type == 'card'){
+					game.getPlayerByAlias(discarded[j].alias).hand.push(discarded[j].element);
+				}
+				else if (discarded[j].type == 'token'){
+					game.getPlayerByAlias(discarded[j].alias).addToken(discarded[j].element.token, discarded[j].element.amount);
+				}
+			}
+			data['isValid'] = isValid;
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador			
+		},
+		draw : function(client, data){
+			//si todos los descartes fueron validos
+			if (data.isValid){
+				for (i in data.discards){
+					if (data.discards[i].discard.element == 'card'){
+						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : data.discards[i].alias, 'cards': [data.discards[i].discard], 'to':null});
+					}
+					else if (data.discards[i].discard.element == 'token'){
+						client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :data.discards[i].alias, 'token':data.discards[i].discard.token, 'amount':data.discards[i].discard.amount});
+					}
+				}
+			}	
+			else{
+				client.socket.emit('add activity', data.defaultAction);
+			}
+			client.socket.emit('resolve activity');
+		}
+		
+	},
+
+	//Reclamar la recompensa por haber avanzado
+	"ClaimReward" : {
+		apply : function(game, player,data){
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			if (data.reward == 'life' || data.reward == 'sun' ||data.reward == 'ring' ||data.reward == 'shield'){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': data.reward, 'amount':1});
+			}
+		client.socket.emit('resolve activity');
+		}
 	}
 
 	};

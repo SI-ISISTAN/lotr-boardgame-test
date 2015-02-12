@@ -1,9 +1,9 @@
-define([], function () {
+define(['./Track'], function (Track) {
 
 	function Location(location){
 		this.name = location.name;
 		this.image = location.image;
-		this.tracks=location.tracks;
+		this.tracks={};
 		this.events=location.events;
 		this.isConflict = location.isConflict;
 		this.activities = location.activities;
@@ -15,6 +15,15 @@ define([], function () {
 		}
 		for (i in location.validTracks){
 			this.validTracks.push(location.validTracks[i]);
+		}
+		//Cargar los event tiles
+		for (var key in location.tracks) {
+			if (location.tracks[key] != null){
+	 	 		this.tracks[key] = new Track(location.tracks[key]);
+			}
+			else{
+				this.tracks[key] = null; 
+			}
 		}
 	}
 

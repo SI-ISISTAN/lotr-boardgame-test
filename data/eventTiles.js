@@ -25,7 +25,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						popup.addListener("advance", function(){
 								$(".player-selector").each(function(){
 									var to = $(this).val();
-									client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : to, 'amount' : 1});
+									client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : to, 'amount' : 2});
 								});
 								client.socket.emit('resolve activity');
 								popup.close(); 
@@ -40,6 +40,28 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		}
 		
 	},
+
+	'OutOfOptions' :  {
+		apply : function(game, player,data){
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null},{element : 'card', symbol: null, color:null},{element : 'card', symbol: null, color:null}]});
+			client.socket.emit('resolve activity');
+		}
+		
+	},
+
+	'LosingGround' :  {
+		apply : function(game, player,data){
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null},{element : 'token', token: 'life', amount: 1},{element : 'token', token: 'shield', amount: 1}]});
+			client.socket.emit('resolve activity');
+		}
+		
+	}
 
 
 	};

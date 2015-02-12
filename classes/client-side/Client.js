@@ -20,6 +20,26 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		}
 	}
 
+	//Metodo auxiliar. encuentra la carta en un array y devuelve su posicion
+	Client.prototype.findCardInArray = function(card, array){
+		var t=0;
+		var found=false;
+		while (t<array.length && !found){
+				if ( ( (card.symbol==null ||  card.symbol== array[t].symbol ) && (card.color==null ||  card.color==array[t].color )) ||  array[t].symbol == "Joker"){
+					found = true;
+				}
+				else {
+					t++;
+				}
+		}
+		if (found){
+			return t;
+		}
+		else{
+			return -1; //no esta
+		}	
+	}
+
 	//método para descartar cualquier carta hasta cierto numero
 	Client.prototype.discardAny = function(data, popup){
 		var discarded = 0;
@@ -195,13 +215,15 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 					div.append($("<p> Un jugador debe voluntariarse para avanzar dos espacio hacia Sauron, o éste avanza un espacio hacia los aventureros. </p>"));
 					action = {'action' : 'SauronWill'};
 				break;
-				case "Out of Options":
+				case "Out Of Options":
 					div.append($('<img src="./assets/img/ripped/T1T4.png" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Los jugadores deben descartar 3 cartas entre todos, o ejecutar el próximo Evento. </p>"));
+					action = {'action' : 'OutOfOptions'};
 				break;
 				case "Losing Ground":
 					div.append($('<img src="./assets/img/ripped/T1T5.png" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Los jugadores deben descartar 1 carta, 1 ficha de Vida y 1 Escudo entre todos, o ejecutar el próximo Evento. </p>"));
+					action = {'action' : 'LosingGround'};
 				break;
 
 			}
@@ -219,6 +241,58 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 					
 					popup.close();
 				});
+	}
+
+	Client.prototype.commonDiscard = function(data){
+		var self = this;
+		console.log(data.elements);
+		var popup = new Popup({
+					title: "Descarte común", 
+					text: "Debes elegir a los jugadores que harán los descartes.", 
+					buttons : [ {name : "Descartar", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
+				});
+
+				var div = $("<div>  </div>");
+				for (i in data.elements){
+					var el = $("<div id='deal-card-div'>  </div> ");
+
+					//aca instanciar segun el contenido
+					el.append("<p> Una carta cualquiera </p>");
+
+					var listbox = $("<select class='discard-selector'> </select>");
+					listbox.data("element", data.elements[i]);
+					for (j in self.players){
+						var sel = $("<option id='option-"+self.players[j].alias+"' value='"+self.players[j].alias+"'> "+self.players[j].alias+"</option>");
+						sel.data("element", data.elements[i]);			
+						$(listbox).append(sel);
+					}
+					el.append($(listbox));
+
+					div.append(el);	
+				}
+
+				popup.append(div);
+
+				popup.addListener("discard", function(){
+					var discards = [];
+					$(".discard-selector").each(function(){
+						var name = $(this).val();
+						discards.push({'alias' : name, 'discard' : $(this).data("element")});
+						console.log($(this).data("element"));
+					});
+					self.socket.emit('add activity', {'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : {'action' : 'MoveSauron', 'amount' : 1}});	//voy dando las cartas de a una
+					self.socket.emit('resolve activity');
+					$(".discard-selector").remove();	
+					popup.close();	
+				});
+				popup.addListener("dont-discard", function(){
+					//hay que ejecutar el siguiente evento. pajita
+					self.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 1});	//
+					self.socket.emit('resolve activity');	
+					popup.close();	
+				});
+
+				popup.draw(self);
 	}
 
 	return Client;
