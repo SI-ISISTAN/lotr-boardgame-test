@@ -95,7 +95,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 		        $("#player-cards-container").append('<img src="./assets/img/ripped/'+client.player.character.image +'.jpg"  class="player-hobbit-img img-responsive" title="'+client.player.character.name+'">');
 		        
-		        $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" class="cone-chip" style="left: 30px; top: 34px;">');
+		        $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id="world-chip" class="cone-chip" style="left: 30px; top: 34px;">');
 		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 625px; top: 90px;">');
 
 
@@ -210,7 +210,6 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	client.socket.emit('update game', {'action' : 'DrawTile', 'value': null, 'player':client.alias});
 
 			    });
-
 
 				
 	}

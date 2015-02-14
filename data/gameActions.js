@@ -16,7 +16,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						var card = game.hobbitCards[game.hobbitCards.length-1];
 						game.getPlayerByID(game.players[j].id).hand.push(card);
 						game.hobbitCards.splice(game.hobbitCards.length-1);
-						given.push({'card' : card, 'player' : game.players[j].alias});	
+						given.push({'card' : card, 'player' : game.players[j].alias, 'number' : game.getPlayerByID(game.players[j].id).hand.length-1});	
 					}
 					
 				}
@@ -54,6 +54,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				client.socket.emit('resolve activity');
 			}
 
+
 		}
 	},
 
@@ -71,7 +72,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				var card = game.currentLocation.featureCards[game.currentLocation.featureCards.length-1];
 				game.players[turn].hand.push(card);
 				game.currentLocation.featureCards.splice(game.currentLocation.featureCards.length-1,1);
-				given.push({'card' : card, 'player' : game.players[turn].alias});
+				given.push({'card' : card, 'player' : game.players[turn].alias, 'number' : game.players[turn].hand.length-1});
 				if (turn < game.players.length-1){
 					turn++;
 				}
@@ -97,8 +98,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				span.text(currentValue+1);
 			}
 
-			if (client.isActivePlayer())
+			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
+			}
 
 		}
 	},
@@ -117,7 +119,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	//Un jugador se descarta
 	"PlayerDiscard" : {
 		apply : function(game, player,data){
-			game.getPlayerByAlias(data.player).discard(data.discard);
+			game.getPlayerByAlias(data.player).discardByIndex(data.discard);
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -182,9 +184,13 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				//ordenar el descarte
 				//getear el numero de cartas seleccionadas
 				var discard = [];
+				var to_give = [];
 				var hand = $(".player-card-img");
-				$(".highlighted-image").each(function(){
-					discard.push($(this).data("card"));	//pushear el id de la carta
+				$(".player-card-img").each(function(){
+					if ($(this).hasClass("highlighted-image")){
+						discard.push($(this).index()-1);
+						to_give.push($(this).data("card"));
+					}
 				});
 				$(".player-card-img").off('click');
 				//Si el "to" es null las cartas se descartan, si no se las dan al compañero indicado
@@ -193,7 +199,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 					client.socket.emit('resolve activity');
 				}
 				else{
-					client.socket.emit('add activity', {'action' : 'PlayerGiveCards', 'from' : client.alias, 'to':data.to, 'cards' : discard});	
+					client.socket.emit('add activity', {'action' : 'PlayerGiveCards', 'from' : client.alias, 'to':data.to, 'cards' : to_give});	
 					client.socket.emit('resolve activity');
 				}
 				
@@ -520,14 +526,33 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		draw : function(client, data){
 			//si todos los descartes fueron validos
 			if (data.isValid){
-				for (i in data.discards){
-					if (data.discards[i].discard.element == 'card'){
-						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : data.discards[i].alias, 'cards': [data.discards[i].discard], 'to':null});
-					}
-					else if (data.discards[i].discard.element == 'token'){
-						client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :data.discards[i].alias, 'token':data.discards[i].discard.token, 'amount':data.discards[i].discard.amount});
+				//agrupo los descartes por usuario. primero construyo la lista de usuarios
+				var names = [];
+				for (l in data.discards){
+					if ( $.inArray(data.discards[l].alias, names)){
+						names.push(data.discards[l].alias);
 					}
 				}
+				for (j in names){
+						//agrupo por usuario
+						var name = names[j];
+						var cards = [];
+						for (i in data.discards){
+							if (name == data.discards[i].alias){
+								if (data.discards[i].discard.element == 'card'){
+									cards.push(data.discards[i].discard);		
+								}
+								else if (data.discards[i].discard.element == 'token'){
+									client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :data.discards[i].alias, 'token':data.discards[i].discard.token, 'amount':data.discards[i].discard.amount});
+									data.discards.splice(i,1);
+								}
+						}
+					}
+					if (cards.length>0){
+						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : cards.length, 'alias' : name, 'cards': cards, 'to':null});
+					}
+				}
+	
 			}	
 			else{
 				client.socket.emit('add activity', data.defaultAction);
@@ -545,6 +570,12 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		draw : function(client, data){
 			if (data.reward == 'life' || data.reward == 'sun' ||data.reward == 'ring' ||data.reward == 'shield'){
 				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': data.reward, 'amount':1});
+			}
+			else if (data.reward == 'die'){
+				client.socket.emit('add activity', {'action' : 'RollDie'});
+			}
+			else if (data.reward == 'big-shield'){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': 'shield', 'amount':3});
 			}
 		client.socket.emit('resolve activity');
 		}

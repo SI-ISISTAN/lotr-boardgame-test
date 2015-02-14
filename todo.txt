@@ -1,3 +1,6 @@
 Hacer:
 
 - Termianr los tiles metiendolos en el archivo events (salvo cuando haya que ejecutar eventos pq todavia es japa)
+
+Porximo commit:
+-Reformulado el discard que traia errores

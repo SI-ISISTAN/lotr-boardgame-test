@@ -45,14 +45,14 @@ define(['../classes/Activity'], function (Activity) {
 		});
 
 	//Cargar las feature cards
-	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "White", amount : 2, image:"fight_card_white"});
-	exports.Rivendell.featureCards.push({symbol : "Friendship", color : "White", amount : 2, image:"fight_card_white"});
-	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 2, image:"fight_card_white"});
-	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_white"});
-	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_white"});
-	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"fight_card_white"});
-	exports.Rivendell.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"fight_card_white"});
-	exports.Rivendell.featureCards.push({name: "Gollum", symbol : "Joker", color : "White", amount : 3, image:"fight_card_white"});
+	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "White", amount : 2, image:"hiding_card_white_2"});
+	exports.Rivendell.featureCards.push({symbol : "Friendship", color : "White", amount : 2, image:"friend_card_white_2"});
+	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 2, image:"joker_card_2"});
+	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
+	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
+	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
+	exports.Rivendell.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"joker_card_2"});
+	exports.Rivendell.featureCards.push({name: "Gollum", symbol : "Joker", color : "White", amount : 3, image:"gollum_card"});
 
 
 	/////////////////////////////////////////////////////// Moria //////////////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ define(['../classes/Activity'], function (Activity) {
 				startX : 230,
 				startY : 160,
 				isMain : true,
-				spaces :  [{x: 40, y:-15, reward : "shield"}, {x: 45, y:12, reward : "shield"}, {x: 45, y:12, reward : "ring"}, {x: 45, y:12, reward : "shield"}, {x: 45, y:15, reward : "shield"}, {x: 45, y:-5, reward : "ring"}, {x: 42, y:-10, reward : "Die"}, {x: 30, y:-40, reward : "shield"}, {x: 20, y:-35, reward : "Die"}, {x: 10, y:-45, reward : "Bigshield"} ]
+				spaces :  [{x: 40, y:-15, reward : "shield"}, {x: 45, y:12, reward : "shield"}, {x: 45, y:12, reward : "ring"}, {x: 45, y:12, reward : "shield"}, {x: 45, y:15, reward : "shield"}, {x: 45, y:-5, reward : "ring"}, {x: 42, y:-10, reward : "die"}, {x: 30, y:-40, reward : "shield"}, {x: 20, y:-35, reward : "die"}, {x: 10, y:-45, reward : "big-shield"} ]
 			},
 			"Hiding" : {
 				position : 0,

@@ -69,11 +69,24 @@ define([], function () {
 	}
 
 	//Descartar cartas basadas en su ID
-	Player.prototype.discard= function(discard){
+	Player.prototype.discardByID= function(discard){
 		for (i in discard){
 			this.hand.splice(this.findCardByID(discard[i].id),1);
 		}
 	}
+
+	//Descartar cartas basadas en su index en la mano
+	Player.prototype.discardByIndex= function(discard){
+		for (i in discard){
+			this.hand.splice(discard[i],1);
+			for (j in discard){
+				if (discard[j] > discard[i]){
+					discard[j]--;
+				}
+			}
+		}
+	}
+
 	//Descartar cartas basada en el primer match encontrado
 	Player.prototype.discardFirstMatch= function(card){
 			var t = 0;

@@ -178,6 +178,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 							client.socket.emit('add activity', {'action' : "Fellowship", 'player' : client.players[i].alias});	
 						}
 					}
+				client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				}
 				client.socket.emit('resolve activity');
 				popup.close();
@@ -193,6 +194,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				}
 				client.socket.emit('resolve activity');
+
 				popup.close();
 			});
 			popup.draw(client);

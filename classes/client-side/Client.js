@@ -90,10 +90,17 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 								$(this).addClass("highlighted-image");
 								$(this).data("selected", true);
 								$(this).data("number", $(this).index()-1);
-								discarded+= $(this).data("card").amount;
+								if ((discarded + $(this).data("card").amount) > data.amount){
+									$(this).data("put", (data.amount - discarded));
+									discarded= data.amount;
+								}
+								else{
+									discarded+= $(this).data("card").amount;
+									$(this).data("put", ($(this).data("card").amount));
+								}
 							}
 							else{
-
+								console.log("Carta invalida");
 							}
 						}					
 						else{								//si esta estaba seleccionada, deselecciono
@@ -101,7 +108,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 								$(this).data("selected", false);
 								cards.push($(this).data("discarded"));
 								$(this).data("discarded", null);
-								discarded-= $(this).data("card").amount;
+								discarded-= $(this).data("put");
 
 						}
 						if (discarded != data.amount){
@@ -256,9 +263,36 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				for (i in data.elements){
 					var el = $("<div id='deal-card-div'>  </div> ");
 
+					var texto = "";
 					//aca instanciar segun el contenido
-					el.append("<p> Una carta cualquiera </p>");
+					if (data.elements[i].element == 'card'){
+							texto+="Una carta ";
+							if (data.elements[i].color!=null){
+							if (data.elements[i].color=="White") texto+="blanca "
+							else texto+="gris "
+						}
+						if (data.elements[i].symbol!=null){
+							if (data.elements[i].symbol=="Fighting") texto+="de símbolo Luchar"
+							else if (data.elements[i].symbol=="Hiding") texto+="de símbolo Esconderse"
+							else if (data.elements[i].symbol=="Travelling") texto+="de símbolo Viajar"
+							else if (data.elements[i].symbol=="Friendship") texto+="de símbolo Amistad"
+							else texto+="de Comodín"
+						}
+						if (data.elements[i].color==null && data.elements[i].symbol==null){
+							texto+= "cualquiera"
+						}
+					}
+					else if (data.elements[i].element == 'token'){
+						texto+="Una ficha ";
+						if (data.elements[i].token == 'life') texto+="de Vida";
+						else if (data.elements[i].token == 'ring') texto+="de Anillo";
+						else if (data.elements[i].token == 'shield') texto+="de Escudo";
+						else if (data.elements[i].token == 'sun') texto+="de Sol";
 
+					}
+
+					//Fin de la instanciacion or contenido
+					el.append("<p>"+texto+"</p>");
 					var listbox = $("<select class='discard-selector'> </select>");
 					listbox.data("element", data.elements[i]);
 					for (j in self.players){

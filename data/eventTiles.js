@@ -46,7 +46,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null},{element : 'card', symbol: null, color:null},{element : 'card', symbol: null, color:null}]});
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null, amount: 1},{element : 'card', symbol: null, color:null, amount: 1},{element : 'card', symbol: null, color:null, amount: 1}]});
 			client.socket.emit('resolve activity');
 		}
 		
@@ -57,7 +57,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null},{element : 'token', token: 'life', amount: 1},{element : 'token', token: 'shield', amount: 1}]});
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null, amount: 1},{element : 'token', token: 'life', amount: 1},{element : 'token', token: 'shield', amount: 1}]});
 			client.socket.emit('resolve activity');
 		}
 		

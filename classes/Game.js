@@ -160,8 +160,11 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		//Cargo escenarios
 		
 		this.locations.push(locations.BagEnd);
-		this.locations.push(locations.Moria);
+		
 		this.locations.push(locations.Rivendell);
+		this.locations.push(locations.Moria);
+		
+		
 		
 		
 		//inicio en la 1º location
