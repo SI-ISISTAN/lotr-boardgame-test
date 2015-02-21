@@ -211,6 +211,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				case "Next Event":
 					div.append($('<img src="./assets/img/ripped/T1T3.png" class="img-responsive token-img" ><br><br>'));
 					div.append($("<p> Debe ejecutarse el siguiente evento. </p>"));
+					action = {'action' : 'NextEvent'};
 				break;
 				case "Ring Influence":
 					div.append($('<img src="./assets/img/ripped/T1T1.png" class="img-responsive token-img" ><br><br>'));
@@ -240,7 +241,11 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				div.fadeIn(3000, function(){
 					if (self.isActivePlayer()){
 						if (action!= null){
-							self.socket.emit('add activity', action);	
+							self.socket.emit('add activity', action);
+							if (data.value=="Friendship" || data.value=="Fighting" || data.value=="Travelling" || data.value=="Hiding"){
+
+								self.socket.emit('add activity', {'action' : "NextPhase"});
+							}	
 						}
 						$("#draw-tile-button").prop('disabled', false);
 						self.socket.emit('resolve activity');				
@@ -314,14 +319,15 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						discards.push({'alias' : name, 'discard' : $(this).data("element")});
 						console.log($(this).data("element"));
 					});
-					self.socket.emit('add activity', {'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : {'action' : 'MoveSauron', 'amount' : 1}});	//voy dando las cartas de a una
+					
+					self.socket.emit('add activity', {'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : data.defaultAction});	//voy dando las cartas de a una
 					self.socket.emit('resolve activity');
 					$(".discard-selector").remove();	
 					popup.close();	
 				});
 				popup.addListener("dont-discard", function(){
 					//hay que ejecutar el siguiente evento. pajita
-					self.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 1});	//
+					self.socket.emit('add activity', data.defaultAction);	//
 					self.socket.emit('resolve activity');	
 					popup.close();	
 				});

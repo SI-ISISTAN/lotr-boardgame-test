@@ -42,8 +42,12 @@ define([], function () {
 	//Me fijo si el jugador posee una o varias carrtas de un tipo o tipso determinados
 	Player.prototype.hasCards= function(cards){
 		var aux = []; //creo una mano auxiliar para ver si puedo hacer el descarte
-		for (j in this.hand){
-			aux.push(this.hand[j]);
+		var j=0;
+
+		while (j < this.hand.length){
+			var carr = this.hand[j];
+			aux.push(carr);
+			j++;
 		}
 		var amount = 0;
 		for (i in cards){
@@ -71,20 +75,32 @@ define([], function () {
 	//Descartar cartas basadas en su ID
 	Player.prototype.discardByID= function(discard){
 		for (i in discard){
+			console.log("descarto: "+discard[i].id);
 			this.hand.splice(this.findCardByID(discard[i].id),1);
 		}
 	}
 
 	//Descartar cartas basadas en su index en la mano
 	Player.prototype.discardByIndex= function(discard){
-		for (i in discard){
-			this.hand.splice(discard[i],1);
-			for (j in discard){
-				if (discard[j] > discard[i]){
-					discard[j]--;
+		console.log("MANO");
+		console.log(this.hand);
+		console.log("QUIERO DESCARTAR ");
+		console.log(discard);
+		var newhand=[];
+		var l=0;
+		while (l < this.hand.length){
+			var out = false;
+			for (v in discard){
+				if (discard[v] == l){
+					out = true;
 				}
 			}
+			if (!out){
+				newhand.push(this.hand[l]);
+			}
+			l++;
 		}
+		this.hand = newhand;
 	}
 
 	//Descartar cartas basada en el primer match encontrado
@@ -122,6 +138,15 @@ define([], function () {
 		}
 	};
 
+	Player.prototype.replenishCard = function(card){
+		this.hand.push(card);
+	}
+
+	Player.prototype.addCard = function(card){
+		card["id"] = this.hand.length;
+		this.hand.push(card);
+	}
+
 	//Chequea si el jugador tiene la cantidad indicada de determinado token
 	Player.prototype.hasTokens= function(token, amount){
 		var has = false;
@@ -155,8 +180,7 @@ define([], function () {
 		for (i in discard){
 			var card = this.hand[this.findCardByID(discard[i].id)];
 			this.hand.splice(card.id,1);
-			to.hand.push(card);
-
+			to.addCard(card);
 		}
 	}
 

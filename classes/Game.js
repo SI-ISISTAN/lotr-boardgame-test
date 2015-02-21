@@ -160,9 +160,10 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		//Cargo escenarios
 		
 		this.locations.push(locations.BagEnd);
-		
 		this.locations.push(locations.Rivendell);
 		this.locations.push(locations.Moria);
+		
+		
 		
 		
 		
@@ -196,10 +197,19 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	}
 
 	//Paso a la location siguiente
-	Game.prototype.advanceLocation = function(){
+	Game.prototype.advanceLocation = function(data){
 		this.locationNumber++;
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
+		data['mov']=gameData.worldPositions[this.locationNumber-1];
+		this.turnPhase = 'drawTiles';
 
+	}
+
+	//Paso a la location siguiente
+	Game.prototype.nextPhase = function(data){
+		if (this.turnPhase=="drawTiles"){
+			this.turnPhase="playCards";
+		}
 	}
 
 	Game.prototype.startConflict = function(){

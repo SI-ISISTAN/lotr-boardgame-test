@@ -39,6 +39,8 @@ define([], function () {
 			image: "fatty",
 			//aca tendria que ir su habilidad especial
 		}];
+		
+	exports.worldPositions=[{x:126, y:0},{x:116, y:-44},{x:60, y:0},{x:60, y:0},{x:60, y:0}];
 
 	exports.storyTiles = ["Hiding","Hiding","Hiding","Friendship","Friendship","Friendship","Travelling","Travelling","Travelling","Fighting","Fighting","Fighting","Next Event","Next Event","Next Event","Next Event","Next Event","Next Event","Ring Influence","Ring Influence","Sauron Will","Out Of Options","Losing Ground"];
 

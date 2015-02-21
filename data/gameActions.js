@@ -14,7 +14,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				if (data.player == null){			//si me pasan nulo le reparto a todos
 					for (j in game.players){
 						var card = game.hobbitCards[game.hobbitCards.length-1];
-						game.getPlayerByID(game.players[j].id).hand.push(card);
+						game.getPlayerByID(game.players[j].id).addCard(card);
 						game.hobbitCards.splice(game.hobbitCards.length-1);
 						given.push({'card' : card, 'player' : game.players[j].alias, 'number' : game.getPlayerByID(game.players[j].id).hand.length-1});	
 					}
@@ -22,7 +22,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				}
 				else{
 					var card = game.hobbitCards[game.hobbitCards.length-1];
-					game.getPlayerByAlias(data.player).hand.push(card);
+					game.getPlayerByAlias(data.player).addCard(card);
 					game.hobbitCards.splice(game.hobbitCards.length-1);
 					given.push({'card' : card, 'player' : data.player});
 					game.io.to(player.room).emit('log message', {'msg' : "Se reparten "+data.amount+" cartas a  "+data.player+".", 'mode':'info'});
@@ -70,7 +70,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				console.log("len de feature: "+game.currentLocation.featureCards.length);
 				console.log("Give card to: "+game.players[turn].alias);
 				var card = game.currentLocation.featureCards[game.currentLocation.featureCards.length-1];
-				game.players[turn].hand.push(card);
+				game.players[turn].addCard(card);
 				game.currentLocation.featureCards.splice(game.currentLocation.featureCards.length-1,1);
 				given.push({'card' : card, 'player' : game.players[turn].alias, 'number' : game.players[turn].hand.length-1});
 				if (turn < game.players.length-1){
@@ -108,7 +108,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	//Accion de juego de tirar el dado
 	"RollDie" :  {
 		apply : function(game,player,data){
-			game.io.to(player.room).emit('update game', {'action' : 'RollDie', 'value' : game.rollDie(), 'player': player.alias});	
+			if (typeof data.player == 'undefined'){
+				data.player = player.alias;
+			}
+			game.io.to(player.room).emit('update game', {'action' : 'RollDie', 'value' : game.rollDie(), 'player': data.player});	
 		},
 		draw : function(client, data){
 			client.rollDie(data);			
@@ -119,7 +122,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	//Un jugador se descarta
 	"PlayerDiscard" : {
 		apply : function(game, player,data){
-			game.getPlayerByAlias(data.player).discardByIndex(data.discard);
+			game.getPlayerByAlias(data.player).discardByID(data.discard);
+			console.log("MANO AFTER!!!!!!");
+			console.log(game.getPlayerByAlias(data.player).hand);
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -146,14 +151,14 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			var texto = "";
 			if (data.cards == null){
 				if (data.to==null){
-					texto = "Debes descartar "+data.amount+" cartas cualesquiera de tu mano.";
+					texto = "Debes descartar cartas de tu mano, por un valor total de "+data.amount+" símbolos cualesquiera.";
 				}
 				else{
 					texto = "Escoge "+data.amount+" cartas para dar a otro jugador.";
 				}
 			}
 			else{
-				texto = "Debes descartar las siguientes cartas: ";
+				texto = "Debes descartar cartas de tu mano, por un valor equivalente a los siguientes símbolos: ";
 				for (i in data.cards){
 					texto+= "una carta "
 					if (data.cards[i].color!=null){
@@ -168,7 +173,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						else texto+="de Comodín"
 					}
 					if (data.cards[i].color==null && data.cards[i].symbol==null){
-						texto+= "cualquiera"
+						texto+= "de cualquier símbolo"
 					}
 					if (i<data.cards.length-1){
 						texto+=", "
@@ -188,7 +193,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				var hand = $(".player-card-img");
 				$(".player-card-img").each(function(){
 					if ($(this).hasClass("highlighted-image")){
-						discard.push($(this).index()-1);
+						console.log("CARTA:");
+						console.log($(this).data("card"));
+						discard.push($(this).data("card"));
 						to_give.push($(this).data("card"));
 					}
 				});
@@ -313,9 +320,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	//Se pasa a la siguiente locacion
 	"AdvanceLocation" : {
 		apply : function(game, player,data){
-			game.advanceLocation();
+			game.advanceLocation(data);
 			data['tracks'] = game.currentLocation.tracks;
 			data['isConflict'] = game.currentLocation.isConflict;
+			game.io.to(player.room).emit('log message', {'msg' : "¡Los aventureros avanzan hacia la siguiente locación! ", 'mode':'good'});
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -332,9 +340,13 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				if (data.tracks.Hiding != null){
 					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Hiding-chip" class="cone-chip" style="left: '+data.tracks.Hiding.startX+'px; top: '+data.tracks.Hiding.startY+'px;">');
 				}
-				$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -50px;">');
+				$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -45px;">');
 
 			}
+			$("#world-chip").animate({
+						'left' : "+="+data.mov.x+"px",
+						'top' : "+="+data.mov.y+"px",
+					},1300);
 			if (client.isActivePlayer()){
 				client.socket.emit('change location');	
 			}
@@ -391,7 +403,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			
 			if (game.currentLocation.tracks[data.trackName]!=null){
 				game.currentLocation.tracks[data.trackName].position++;
-				console.log("Poisicon: "+game.currentLocation.tracks[data.trackName].position+" en el track: "+data.trackName);
 				data['reward'] = game.currentLocation.tracks[data.trackName].spaces[game.currentLocation.tracks[data.trackName].position-1].reward;
 				data['track'] = game.currentLocation.tracks[data.trackName];
 			}
@@ -514,13 +525,16 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			//Repongo lo que descarte
 			for (j in discarded){
 				if (discarded[j].type == 'card'){
-					game.getPlayerByAlias(discarded[j].alias).hand.push(discarded[j].element);
+					game.getPlayerByAlias(discarded[j].alias).replenishCard(discarded[j].element);
 				}
 				else if (discarded[j].type == 'token'){
 					game.getPlayerByAlias(discarded[j].alias).addToken(discarded[j].element.token, discarded[j].element.amount);
 				}
 			}
 			data['isValid'] = isValid;
+			if (!isValid){
+				game.io.to(player.room).emit('log message', {'msg' : "¡El descarte elegido es inválido!", 'mode':'danger'});
+			}
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador			
 		},
 		draw : function(client, data){
@@ -529,7 +543,15 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				//agrupo los descartes por usuario. primero construyo la lista de usuarios
 				var names = [];
 				for (l in data.discards){
-					if ( $.inArray(data.discards[l].alias, names)){
+					var already = false;
+					var f=0;
+					while (f<names.length){
+						if (names[f] == data.discards[l].alias){
+							already=true;
+						}
+						f++;
+					}
+					if (already==false){
 						names.push(data.discards[l].alias);
 					}
 				}
@@ -549,6 +571,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						}
 					}
 					if (cards.length>0){
+						console.log("UN FORCE DISCAR PUTOSSSSSS");
+						console.log(names);
 						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : cards.length, 'alias' : name, 'cards': cards, 'to':null});
 					}
 				}
@@ -579,7 +603,39 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			}
 		client.socket.emit('resolve activity');
 		}
-	}
+	},
+
+	//Pasar a la siguiente fase del turno
+	"NextPhase" : {
+		apply : function(game, player,data){
+			game.nextPhase();
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			if (client.isActivePlayer()){
+					//$("#draw-tile-button").prop('disabled', true);
+			}
+		}
+	},
+
+	//Pasar a la siguiente fase del turno
+	"NextEvent" : {
+		apply : function(game, player,data){
+			if (game.currentLocation.currentEvent < game.currentLocation.events.length){
+				data['newEvent'] = game.currentLocation.events[game.currentLocation.currentEvent];
+				game.currentLocation.currentEvent++;
+				game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+			}
+		},
+		draw : function(client, data){
+			$("#Event-chip").animate({
+				'top' : "+="+50+"px"
+			},1000);	
+			client.socket.emit('add activity', {'action' : data.newEvent.name});
+			client.socket.emit('resolve activity');
+		}
+	},
+
 
 	};
 

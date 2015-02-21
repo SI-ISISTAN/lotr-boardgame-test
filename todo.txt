@@ -1,6 +1,7 @@
 Hacer:
 
-- Termianr los tiles metiendolos en el archivo events (salvo cuando haya que ejecutar eventos pq todavia es japa)
+-	el discard en player se hace como el orto, se reordenan los elementos. ni idea porque. investigar
+- el check no se si esta bien tambien. considerar solucion recursiva
 
 Porximo commit:
 -Reformulado el discard que traia errores

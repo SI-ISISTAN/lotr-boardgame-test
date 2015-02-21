@@ -19,7 +19,7 @@ define([], function () {
 		this.buttons = data.buttons;
 		this.popup = $('<div/>', {
 						    'id':this.id,
-						    'title':'Actividad: '+this.title,
+						    'title':this.title,
 							'html': '<div id= "main-popup-div"> <p>'+data.text+'</p> </div>'
 						});
 		for (i in this.buttons){

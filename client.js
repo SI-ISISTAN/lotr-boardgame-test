@@ -123,6 +123,9 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    	else if (res.mode=='danger'){
 	    		$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #FE9A2E;"> '+ res.msg+' </b> </p>');
 	    	}
+	    	else if (res.mode=='good'){
+	    		$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #D8F781;"> '+ res.msg+' </b> </p>');
+	    	}
 	    	else if (res.mode=='tip'){
 	    		$("#chat-msg-div").append('<p style= "color: #58D3F7" class="chat-message"> '+ res.msg+' </p>');
 	    	}
@@ -210,7 +213,6 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	client.socket.emit('update game', {'action' : 'DrawTile', 'value': null, 'player':client.alias});
 
 			    });
-
 				
 	}
   

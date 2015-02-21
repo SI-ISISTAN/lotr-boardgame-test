@@ -4,10 +4,11 @@ define(['./Track'], function (Track) {
 		this.name = location.name;
 		this.image = location.image;
 		this.tracks={};
-		this.events=location.events;
+		this.events=[];
 		this.isConflict = location.isConflict;
 		this.activities = location.activities;
 		this.currentActivity = location.activities[0];
+		this.currentEvent = 0;
 		this.featureCards = [];
 		this.validTracks = [];
 		for (i in location.featureCards){
@@ -24,6 +25,18 @@ define(['./Track'], function (Track) {
 			else{
 				this.tracks[key] = null; 
 			}
+		}
+		for (i in location.events){
+			this.events.push(location.events[i]);
+		}
+	}
+
+	Location.prototype.isTrackComplete = function(track){
+		if (this.tracks[track].position == this.tracks[track].spaces.length-1){
+			return true;
+		}
+		else{
+			return false;
 		}
 	}
 

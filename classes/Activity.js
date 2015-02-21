@@ -1,4 +1,4 @@
-define(['../data/activities', '../data/eventTiles'], function (activities, eventTiles) {
+define(['../data/activities'], function (activities) {
 
 	function Activity(data, subactivities, parent){
 
