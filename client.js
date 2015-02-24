@@ -213,6 +213,8 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	client.socket.emit('update game', {'action' : 'DrawTile', 'value': null, 'player':client.alias});
 
 			    });
+
+
 				
 	}
   
@@ -225,6 +227,8 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
         	message_listen();
         	input_listen();
 	       
+		   
+
 	    
 	    });
   });

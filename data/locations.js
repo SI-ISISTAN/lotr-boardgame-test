@@ -47,12 +47,16 @@ define(['../classes/Activity'], function (Activity) {
 	//Cargar las feature cards
 	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "White", amount : 2, image:"hiding_card_white_2"});
 	exports.Rivendell.featureCards.push({symbol : "Friendship", color : "White", amount : 2, image:"friend_card_white_2"});
-	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 2, image:"joker_card_2"});
+	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"friend_card_white_2"})
+	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
 	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
-	exports.Rivendell.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"joker_card_2"});
-	exports.Rivendell.featureCards.push({name: "Gollum", symbol : "Joker", color : "White", amount : 3, image:"gollum_card"});
+	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "White", amount : 2, image:"travel_card_gray_2"});
+	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
+	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"gollum_card"});
+	exports.Rivendell.featureCards.push({name:'Miruvor', symbol : "None", color : "Yellow", amount : 1, image:"no_card"});
+	exports.Rivendell.featureCards.push({name: 'Staff',symbol : "None", color : "Yellow", amount : 3, image:"no_card"});
 
 
 	/////////////////////////////////////////////////////// Moria //////////////////////////////////////////////////////////////////////////////
@@ -90,6 +94,35 @@ define(['../classes/Activity'], function (Activity) {
 		"activities" : [],
 		"featureCards" : []
 	};
+
+	exports.Lothlorien = {
+		"name" : "Lothlorien",
+		"image" : null,
+		"tracks" : null,
+		"events" : null,
+		"isConflict" : false,
+		"validTracks" : [],
+		"activities" : [],
+		"featureCards" : []
+	};
+
+	//Actividad principal que contiene a las demás
+	exports.Lothlorien.activities.push({
+		name: 'Lothlorien',
+		draw : null,
+		subactivities : [ {'action' : "Galardiel"}, {'action' : "Recovery", 'player': 'RingBearer'}, {'action': "GalardielTest", 'player': 'RingBearer'}]
+		});
+
+	//Cargar las feature cards
+	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"no_card"});
+	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"no_card"});
+	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 1, image:"no_card"});
+	exports.Lothlorien.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"no_card"});
+	exports.Lothlorien.featureCards.push({symbol : "Friendship", color : "Gray", amount : 1, image:"friend_card_gray"});
+	exports.Lothlorien.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
+	exports.Lothlorien.featureCards.push({symbol : "Travelling", color : "Gray", amount : 1, image:"travel_card_gray"});
+	exports.Lothlorien.featureCards.push({symbol : "Fighting", color : "Gray", amount : 1, image:"fight_card_gray"});
+
 
 	return exports;
 

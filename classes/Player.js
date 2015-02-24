@@ -75,17 +75,12 @@ define([], function () {
 	//Descartar cartas basadas en su ID
 	Player.prototype.discardByID= function(discard){
 		for (i in discard){
-			console.log("descarto: "+discard[i].id);
 			this.hand.splice(this.findCardByID(discard[i].id),1);
 		}
 	}
 
 	//Descartar cartas basadas en su index en la mano
 	Player.prototype.discardByIndex= function(discard){
-		console.log("MANO");
-		console.log(this.hand);
-		console.log("QUIERO DESCARTAR ");
-		console.log(discard);
 		var newhand=[];
 		var l=0;
 		while (l < this.hand.length){
@@ -143,7 +138,9 @@ define([], function () {
 	}
 
 	Player.prototype.addCard = function(card){
-		card["id"] = this.hand.length;
+		if (card.id==null){
+			card["id"] = Math.random().toString(36).substring(7);	//Nombre random
+		}
 		this.hand.push(card);
 	}
 

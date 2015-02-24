@@ -1,5 +1,7 @@
 define(['../classes/client-side/Popup'], function (Popup) { 
 	
+
+
 	var exports = {
 	//////////////// Actividades que se cargan en el juego ////////////////
 
@@ -173,8 +175,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 	"Elrond" : {
 		apply: function(game,player,data){
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Elorond.", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "Las cartas de locación de Rivendell se reparten entre los jugadores.", 'mode':'info'});
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: 'Ayuda'.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Las cartas de locación de Rivaldeira se reparten entre los jugadores.", 'mode':'info'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -301,7 +303,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	'WaterWatcher' :  {
 		apply : function(game, player,data){
 			if (typeof data.player == 'undefined'){
-				data['player']=game.players[0].alias;
+				data['player']=game.activePlayer.alias;
+				data['playerNumber']=game.activePlayer.number;
 				game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver el evento: 'Vigilante en el Agua'", 'mode':'alert'});
 				game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, uno a la vez, debe elegir entre descartar un símbolo de Esconderse (o un Comodín) o, de no poder o querer hacerlo, tirar el Dado.", 'mode':'info'});
 			}
@@ -318,25 +321,13 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			var popup = new Popup({title: "Evento: Vigilante en el Agua", text: "Cada jugador, uno a la vez, debe elegir entre descartar un símbolo de Esconderse (o un Comodín) o, de no poder o querer hacerlo, tirar el Dado.", buttons : [{name : "Descartar", id:"discard"},  {name : "Tirar el Dado", id:"rolldie"}] , visibility : data.player});
 			popup.addListener("discard", function(){
 				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': [{color:null, symbol:"Hiding"}], 'to': null});
-				if (client.isActivePlayer()){
-					for (var i=1; i < client.players.length; i++){
-						if (i<client.players.length){
-							client.socket.emit('add activity', {'action' : "WaterWatcher", 'player' : client.players[i].alias});	
-						}
-					}
-				}
+				client.roundTransmission({'action' : "WaterWatcher"}, data.playerNumber);	
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("rolldie", function(){
 				client.socket.emit('add activity',{'action' : 'RollDie'});
-				if (client.isActivePlayer()){
-					for (var i=1; i < client.players.length; i++){
-						if (i<client.players.length){
-							client.socket.emit('add activity', {'action' : "WaterWatcher", 'player' : client.players[i].alias});	
-						}
-					}
-				} 
+				client.roundTransmission({'action' : "WaterWatcher"}, data.playerNumber);	
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
@@ -471,7 +462,130 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			popup.draw(client);
 		}
 		
+	},
+
+	/////////////////////////////////////////////////// ACCIONES DE LOTHLORIEN ////////////////////////////////////////////////////
+
+	"Galardiel" : {
+		apply: function(game,player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: 'Visita de la Dama'.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Las cartas de locación de Lornabeu se reparten entre los jugadores.", 'mode':'info'});
+			game.io.to(player.room).emit('update game', data);	
+		},
+		draw : function(client, data){
+
+			var popup = new Popup({title: "Visita de la Dama", text: "Se reparten las cartas de locación entre los jugadores.", buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+			popup.addListener("ok", function(){
+				popup.close();
+				client.socket.emit('add activity', {'action' : 'DealFeatureCards'});	
+				client.socket.emit('resolve activity');
+			});
+
+			popup.draw(client);
+			
+		}
+	},
+
+	"Recovery" : {
+		apply: function(game,player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: 'Recuperación'.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador, puede descartar dos escudos. Si desea hacerlo, entonces puede elegir entre sacar dos cartas del mazo o alejarse del peligro 1 paso en la Línea de Corrupción.", 'mode':'info'});
+			if (data.player == "RingBearer"){
+				data.player = game.ringBearer.alias;
+				data['playerNumber'] = 	game.ringBearer.number;
+			}
+			if (game.getPlayerByAlias(data.player).shields >=2){
+				data['canDiscard'] = true;
+			}
+			else{
+				data['canDiscard'] = false;
+			}
+
+			if (game.getPlayerByAlias(data.player).corruption > 0){
+				data['canHeal'] = true;
+			}
+			else{
+				data['canHeal'] = false;
+			}
+			game.io.to(game.getPlayerByAlias(data.player).id).emit('update game', data);	
+			
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Recuperación", text: "Cada jugador, comenzando por el Portador, puede descartar dos escudos. Si desea hacerlo, entonces puede elegir entre sacar dos cartas del mazo o 'curarse' (alejarse del peligro 1 paso en la Línea de Corrupción).", buttons : [{name : "Dejar 2 escudos y sacar cartas", id:"draw"},{name : "Dejar 2 escudos y curarme", id:"heal"},{name : "No descartar escudos", id:"dont"}], visibility : data.player});
+			
+			popup.addListener("draw", function(){
+				popup.close();
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});
+				client.roundTransmission({'action' : "Recovery"}, data.playerNumber);			
+				client.socket.emit('resolve activity');
+			});
+			popup.addListener("heal", function(){
+				popup.close();
+				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				client.roundTransmission({'action' : "Recovery"}, data.playerNumber);	
+				client.socket.emit('resolve activity');
+			});
+			popup.addListener("dont", function(){
+				popup.close();
+				client.roundTransmission({'action' : "Recovery"}, data.playerNumber);	
+				client.socket.emit('resolve activity');
+			});
+
+			popup.draw(client);
+
+			if (!data.canDiscard){
+				popup.disableButton("heal", true);
+				popup.disableButton("draw", true);
+			}
+
+			if (!data.canHeal){
+				popup.disableButton("heal", true);
+			}
+			
+		}
+	},
+
+	"GalardielTest" : {
+		apply: function(game,player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: 'La Prueba'.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador, debe descartar un símbolo de Comodín. De no querer o no poder, debe lanzar el Dado.", 'mode':'info'});
+			if (data.player == "RingBearer"){
+				data.player = game.ringBearer.alias;
+				data['playerNumber'] = 	game.ringBearer.number;
+			}
+			if (game.getPlayerByAlias(data.player).hasCards([{color:null, symbol:"Joker"}])){
+				data['canDiscard'] = true;
+			}
+			else{
+				data['canDiscard'] = false;
+			}
+			game.io.to(game.getPlayerByAlias(data.player).id).emit('update game', data);	
+			
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Recuperación", text: "Cada jugador, comenzando por el Portador, debe descartar un símbolo de Comodín. De no querer o no poder, debe lanzar el Dado.", buttons : [{name : "Descartar", id:"discard"},{name : "Lanzar el dado", id:"dont"}], visibility : data.player});
+			
+			popup.addListener("discard", function(){
+				popup.close();
+				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': [{color:null, symbol:"Joker"}], 'to': null});
+				client.roundTransmission({'action' : "GalardielTest"}, data.playerNumber);	
+				client.socket.emit('resolve activity');
+			});
+			popup.addListener("dont", function(){
+				popup.close();
+				client.socket.emit('add activity', {'action' : 'RollDie'});	
+				client.roundTransmission({'action' : "GalardielTest"}, data.playerNumber);	
+				client.socket.emit('resolve activity');
+			});
+
+			popup.draw(client);
+
+			if (!data.canDiscard){
+				popup.disableButton("discard", true);
+			}	
+		}
 	}
+
 
 	};
 

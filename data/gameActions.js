@@ -1,4 +1,4 @@
-define(['../classes/client-side/Popup'], function (Popup) { 
+define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card) { 
 	
 	var exports = {
 	//////////////// Actividades genéricas ////////////////
@@ -8,7 +8,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		apply : function (game, player, data){
 			//llevo un registro interno de que cartas le doy a cada uno para poder dibujarlo en "draw"
 			var given = [];
-
+			var em = false;
 			var i=0;
 			while (i<data.amount){
 				if (data.player == null){			//si me pasan nulo le reparto a todos
@@ -25,9 +25,12 @@ define(['../classes/client-side/Popup'], function (Popup) {
 					game.getPlayerByAlias(data.player).addCard(card);
 					game.hobbitCards.splice(game.hobbitCards.length-1);
 					given.push({'card' : card, 'player' : data.player});
-					game.io.to(player.room).emit('log message', {'msg' : "Se reparten "+data.amount+" cartas a  "+data.player+".", 'mode':'info'});
+					em=true;
 				}
 				i++;
+			}
+			if (em){
+				game.io.to(player.room).emit('log message', {'msg' : "Se reparten "+data.amount+" cartas a  "+data.player+".", 'mode':'info'});
 			}
 			data['given'] = given;
 			if (data.player == null){
@@ -67,8 +70,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			var turn=0;
 			var len=game.currentLocation.featureCards.length;
 			for (var j=0; j<len;j++){
-				console.log("len de feature: "+game.currentLocation.featureCards.length);
-				console.log("Give card to: "+game.players[turn].alias);
 				var card = game.currentLocation.featureCards[game.currentLocation.featureCards.length-1];
 				game.players[turn].addCard(card);
 				game.currentLocation.featureCards.splice(game.currentLocation.featureCards.length-1,1);
@@ -123,8 +124,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	"PlayerDiscard" : {
 		apply : function(game, player,data){
 			game.getPlayerByAlias(data.player).discardByID(data.discard);
-			console.log("MANO AFTER!!!!!!");
-			console.log(game.getPlayerByAlias(data.player).hand);
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -193,8 +192,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				var hand = $(".player-card-img");
 				$(".player-card-img").each(function(){
 					if ($(this).hasClass("highlighted-image")){
-						console.log("CARTA:");
-						console.log($(this).data("card"));
 						discard.push($(this).data("card"));
 						to_give.push($(this).data("card"));
 					}
@@ -234,7 +231,12 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				data.alias = game.ringBearer.alias;
 			}
 			game.getPlayerByAlias(data.alias).move(data.amount);
-			game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se mueve "+data.amount+" lugares hacia el peligro!", 'mode':'danger'});
+			if (data.amount>0){
+				game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se mueve "+data.amount+" lugares hacia el peligro!", 'mode':'danger'});
+			}
+			else{
+				game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se aleja "+data.amount+" espacios del peligro!", 'mode':'danger'});
+			}
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -281,7 +283,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			//pongo los elementos de reparto de cada carta
 			var div = $("<div>  </div>");
 
-			console.log(data.cards);
 
 			for (i in data.cards){
 				var el = $("<div id='deal-card-div'>  </div> ");
@@ -323,10 +324,13 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			game.advanceLocation(data);
 			data['tracks'] = game.currentLocation.tracks;
 			data['isConflict'] = game.currentLocation.isConflict;
+			data['image'] = game.currentLocation.image;
 			game.io.to(player.room).emit('log message', {'msg' : "¡Los aventureros avanzan hacia la siguiente locación! ", 'mode':'good'});
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
+			$("#location-board-img-container").children().remove();
+			$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img" title="Tablero de locación">');
 			if (data.isConflict){
 				if (data.tracks.Fighting != null){
 					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Fighting-chip" class="cone-chip" style="left: '+data.tracks.Fighting.startX+'px; top: '+data.tracks.Fighting.startY+'px;">');
@@ -402,9 +406,25 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		apply : function(game, player,data){
 			
 			if (game.currentLocation.tracks[data.trackName]!=null){
-				game.currentLocation.tracks[data.trackName].position++;
-				data['reward'] = game.currentLocation.tracks[data.trackName].spaces[game.currentLocation.tracks[data.trackName].position-1].reward;
-				data['track'] = game.currentLocation.tracks[data.trackName];
+					
+					data['track'] = game.currentLocation.tracks[data.trackName];
+					if (game.currentLocation.tracks[data.trackName].position < game.currentLocation.tracks[data.trackName].spaces.length){
+						game.currentLocation.tracks[data.trackName].position++;
+						data['reward'] = game.currentLocation.tracks[data.trackName].spaces[game.currentLocation.tracks[data.trackName].position-1].reward;
+						if (game.currentLocation.tracks[data.trackName].position == game.currentLocation.tracks[data.trackName].spaces.length){
+							if (game.currentLocation.tracks[data.trackName].isMain){	
+								data['endScenario'] = true;
+							}
+							else{
+								data['endScenario'] = false;
+							}
+						}
+						data['isFinished']=false;
+					}
+					else{
+						data['isFinished']=true;
+					}
+
 			}
 			//si no existo el track envio lso tracks que si existen, para la seleccion
 			else{
@@ -417,7 +437,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		draw : function(client, data){
 			//mover la ficha como corresponda
 			//si no es la min track se mueve la ficha de forma constante
-			if (data.track!=null){
+
+			if (data.track!=null && !data.isFinished){
 				if (!data.track.isMain){
 					$("#"+data.trackName+"-chip").animate({
 						'left' : "+="+31*data.amount+"px" //moves right
@@ -429,6 +450,11 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						'left' : "+="+data.track.spaces[data.track.position-1].x+"px",
 						'top' : "+="+data.track.spaces[data.track.position-1].y+"px"
 					},800);
+				}
+
+				//si es el ultimo espacio de la main track cambio de escenario
+				if (data.endScenario){
+					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				}
 			}
 			//Si el track no existe en el escenario, se le da al usuario la opcion de moverse en el track que quiera
@@ -460,8 +486,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 					popup.draw(client);
 				}
-				client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
-				client.socket.emit('resolve activity');
+				else{
+					client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
+					client.socket.emit('resolve activity');
+				}
 			}
 		}
 		
@@ -571,7 +599,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						}
 					}
 					if (cards.length>0){
-						console.log("UN FORCE DISCAR PUTOSSSSSS");
 						console.log(names);
 						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : cards.length, 'alias' : name, 'cards': cards, 'to':null});
 					}
@@ -608,31 +635,189 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	//Pasar a la siguiente fase del turno
 	"NextPhase" : {
 		apply : function(game, player,data){
-			game.nextPhase();
+			game.nextPhase(data);
+			data['phase'] = game.turnPhase;
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
 			if (client.isActivePlayer()){
-					//$("#draw-tile-button").prop('disabled', true);
+					if (data.phase == 'playCards'){
+						$("#draw-tile-button").prop('disabled', true);
+						console.log("MITO UN CARDS PHASE");
+						client.socket.emit('add activity', {'action' : 'CardsPhase'});
+						client.socket.emit('add activity', {'action' : 'NextTurn'});
+					}
+					client.socket.emit('resolve activity');
 			}
 		}
 	},
 
 	//Pasar a la siguiente fase del turno
+	"NextTurn" : {
+		apply : function(game, player,data){
+			game.nextTurn(data);
+			game.io.to(player.room).emit('log message', {'msg' : "Es el turno de " +game.activePlayer.alias+". ", 'mode':'alert'});
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.players = data.players;
+			$(".is-active").removeClass("is-active");
+			$("#"+data.activePlayer.alias+"-state-div").addClass("is-active");
+			if (client.alias == data.activePlayer.alias){
+				client.player.turn=true;
+				$("#draw-tile-button").prop('disabled', false);
+			}
+			else{
+				client.player.turn=false;
+			}
+		}
+	},
+
+	//Habilitar el boton de draw tile
+	"EnableTile" : {
+		apply : function(game, player,data){
+			game.io.to(game.activePlayer.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+				$("#draw-tile-button").prop('disabled', false);
+				client.socket.emit('resolve activity');
+			}
+		},
+
+	//Ejecutar el siguiente evento de un conflicto
 	"NextEvent" : {
 		apply : function(game, player,data){
 			if (game.currentLocation.currentEvent < game.currentLocation.events.length){
+				data['isNext'] = true;
 				data['newEvent'] = game.currentLocation.events[game.currentLocation.currentEvent];
 				game.currentLocation.currentEvent++;
-				game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 			}
+			else{
+				data['isNext'] = false;
+			}
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			$("#Event-chip").animate({
-				'top' : "+="+50+"px"
-			},1000);	
-			client.socket.emit('add activity', {'action' : data.newEvent.name});
-			client.socket.emit('resolve activity');
+			if (data.isNext){
+				$("#Event-chip").animate({
+					'top' : "+="+50+"px"
+				},1000);
+			}
+			if (client.isActivePlayer()){
+				if (data.isNext){
+					client.socket.emit('add activity', {'action' : data.newEvent.name});
+				}
+				client.socket.emit('resolve activity');
+			}
+		}
+	},
+
+	//Pasar a la siguiente fase del turno
+	"CardsPhase" : {
+		apply : function(game, player,data){
+			//puede curarse?
+			if (game.getPlayerByAlias(player.alias).corruption > 0){
+				data['canHeal'] = true;
+			}
+			else{
+				data['canHeal'] = false;
+			}
+			//puede jugar?
+			if (game.getPlayerByAlias(player.alias).hand.length > 0){
+				data['canPlay'] = true;
+			}
+			else{
+				data['canPlay'] = false;
+			}
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Jugar cartas", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
+			popup.addListener("playcards", function(){
+				client.socket.emit('add activity', {'action' : 'PlayCards'});
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+			popup.addListener("heal", function(){
+				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+			popup.addListener("draw", function(){
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});	
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+
+			popup.draw(client);
+
+			if (!data.canPlay){
+				popup.disableButton("playcards", true);
+			}
+
+			if (!data.canHeal){
+				popup.disableButton("heal", true);
+			}
+		}
+	},
+
+	//Elegir cartas para jugar
+	"PlayCards" : {
+		apply : function(game, player,data){
+			
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Jugar cartas", text: "Puedes jugar hasta 2 cartas, como máximo una blanca y una gris (los comodines no cuentan hacia este límite).",buttons : [{name : "Listo", id:"ok"}], visibility : "active"});
+			
+			popup.addListener("ok", function(){
+				$(".player-card-img").off('click');
+				var played = [];
+				$(".player-card-img").each(function(){
+					if ($(this).hasClass("playing-card")){
+						played.push($(this).data("card"));
+					}
+				});
+				var i=0;
+				while (i < played.length){
+					client.socket.emit('add activity',{'action': 'PlayCard', 'played': played[i]});		
+					i++;
+				}
+				//client.socket.emit('add activity',{'action': 'NextPhase'});	
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+
+			popup.draw(client);
+			popup.disableButton("ok", true);
+
+			client.playCards(popup);
+
+		}
+	},
+
+	//Elegir cartas para jugar
+	"PlayCard" : {
+		apply : function(game, player,data){
+			data['card'] = game.getPlayerByAlias(player.alias).hand[game.getPlayerByAlias(player.alias).findCardByID(data.played.id)];
+			data.card.apply(game, player,data);
+			game.getPlayerByAlias(player.alias).discardByID([data.card]);
+			data['alias'] = player.alias;
+			game.io.to(player.room).emit('log message', {'msg' : game.activePlayer.alias+" ha jugado una carta de "+data.card.getGameName()+", de "+data.card.amount+" símbolos.", 'mode':'info'});
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		
+		},
+		draw : function(client, data){
+			if (client.isActivePlayer()){
+				var card = new Card(data.card);
+				card.draw(client,data);
+				$(".playing-card").remove();
+			}
+			var span = $("#"+data.alias+"-state-div").find("#cards-span");
+			var currentValue = parseInt(span.text());
+			span.text(currentValue-1);
 		}
 	},
 

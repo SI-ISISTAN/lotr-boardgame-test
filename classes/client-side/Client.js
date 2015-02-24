@@ -239,16 +239,19 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			popup.draw(this);
 				
 				div.fadeIn(3000, function(){
+					var next=false;
 					if (self.isActivePlayer()){
 						if (action!= null){
 							self.socket.emit('add activity', action);
 							if (data.value=="Friendship" || data.value=="Fighting" || data.value=="Travelling" || data.value=="Hiding"){
-
 								self.socket.emit('add activity', {'action' : "NextPhase"});
+							}
+							else{
+								self.socket.emit('add activity', {'action' : "EnableTile"});
 							}	
 						}
-						$("#draw-tile-button").prop('disabled', false);
-						self.socket.emit('resolve activity');				
+						
+						self.socket.emit('resolve activity');			
 					}
 					
 					popup.close();
@@ -334,6 +337,82 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 
 				popup.draw(self);
 	}
+
+	//Metodo auxuliar para determinar si ya se jugo una carta con ese color
+	Client.prototype.arrayHasColoredCard = function(array, color){
+		var found=false;
+		var i=0;
+		if (color!="None"){
+			while (i<array.length && !found){
+				if (array[i].color == color){
+					found=true;
+				}
+				else{
+					i++;
+				}
+			}
+		}
+		if (found){
+			return true;
+		}
+		else return false;
+	}
+
+	Client.prototype.playCards = function(popup){
+		var played = [];
+		var self=this;
+		$(".player-card-img").on('click', function(){
+				if (! $(this).data("selected")){	//si no estaba seleccionada
+					if (!self.arrayHasColoredCard(played, $(this).data("card").color)){		
+						$(this).addClass("playing-card");
+						$(this).data("selected", true);
+						$(this).data("order", played.length);
+						$(this).data("number", $(this).index()-1);
+						played.push($(this).data("card"));
+					}
+					else{
+						console.log("ya hay una de este color puto");
+					}
+				}					
+				else{								//si esta estaba seleccionada, deselecciono
+					
+					$(this).removeClass("playing-card");
+					$(this).data("selected", false);
+					played.splice($(this).data("order"),1);
+					$(this).data("order", null);
+
+				}
+				if (played.length>0 && played.length<3){
+					popup.disableButton("ok", false);
+				}
+				else{
+					popup.disableButton("ok", true);
+				}
+					
+		});
+	}
+
+		//Retransmitir un evento en ronda desde el jugador activo hacia los demas
+	Client.prototype.roundTransmission = function(action, playerNumber){
+		var act = action;
+		if (this.isActivePlayer()){
+					//envio la tarea a todos los players
+					var i=0;
+					if (playerNumber<this.players.length-1){
+						i = playerNumber+1;
+					}
+					while (this.players[i].alias != this.alias){
+						action['player'] = this.players[i].alias;
+						this.socket.emit('add activity', action);
+						if (i<this.players.length-1){
+							i++;
+						}
+						else{
+							i=0;
+						}
+					}
+			}
+	};
 
 	return Client;
 

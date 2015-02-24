@@ -10,6 +10,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.isActive = false;
 		this.ringBearer = null;
 		this.activePlayer = null;
+		this.turnedPlayer=null;
 		this.turnPhase = null;
 		this.storyTiles = [];
 		this.hobbitCards = [];
@@ -140,7 +141,8 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		for (var i = 0; i < this.players.length; i++) {
 			this.players[i].character = gameData.characters[i];
 		};
-		this.ringBearer = this.players[0];
+		this.turnedPlayer=0;
+		this.ringBearer = this.players[this.turnedPlayer];
 		this.activePlayer = this.ringBearer;
 		this.ringBearer.turn = true;
 
@@ -162,9 +164,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.locations.push(locations.BagEnd);
 		this.locations.push(locations.Rivendell);
 		this.locations.push(locations.Moria);
-		
-		
-		
+		this.locations.push(locations.Lothlorien);
 		
 		
 		
@@ -210,6 +210,22 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		if (this.turnPhase=="drawTiles"){
 			this.turnPhase="playCards";
 		}
+
+	}
+
+	Game.prototype.nextTurn = function(data){
+		this.activePlayer.turn=false;
+			if (this.turnedPlayer < this.players.length-1){
+				this.turnedPlayer++;
+			}
+			else{
+				this.turnedPlayer=0;
+			}
+			this.activePlayer=this.players[this.turnedPlayer];
+			this.activePlayer.turn=true;
+			data['players'] = this.players;
+			data['activePlayer'] = this.activePlayer;
+			this.turnPhase="drawTiles";
 	}
 
 	Game.prototype.startConflict = function(){

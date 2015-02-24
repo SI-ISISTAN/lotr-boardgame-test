@@ -1,4 +1,4 @@
-define(['./gameActions', './gameEvents'], function (gameActions, gameEvents) {
+define(['./gameActions', './gameEvents', './cards'], function (gameActions, gameEvents, cards) {
 	
 	var exports = {};
 
@@ -10,6 +10,11 @@ define(['./gameActions', './gameEvents'], function (gameActions, gameEvents) {
 	//Cargar las actividades de Safe Havens y eventos de los conflictos, y event tiles
 	for (var key in gameEvents) {
  	 exports[key] = gameEvents[key];
+	}
+
+	//Cargar las cartas
+	for (var key in cards) {
+ 	 exports[key] = cards[key];
 	}
 
 	return exports;
