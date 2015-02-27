@@ -56,7 +56,7 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"gollum_card"});
 	exports.Rivendell.featureCards.push({name:'Miruvor', symbol : "None", color : "Yellow", amount : 1, image:"no_card"});
-	exports.Rivendell.featureCards.push({name: 'Staff',symbol : "None", color : "Yellow", amount : 3, image:"no_card"});
+	exports.Rivendell.featureCards.push({name: 'Staff',symbol : "None", color : "Yellow", amount : 1, image:"no_card"});
 
 
 	/////////////////////////////////////////////////////// Moria //////////////////////////////////////////////////////////////////////////////
@@ -114,14 +114,54 @@ define(['../classes/Activity'], function (Activity) {
 		});
 
 	//Cargar las feature cards
-	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"no_card"});
-	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"no_card"});
-	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 1, image:"no_card"});
-	exports.Lothlorien.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"no_card"});
+	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"joker_card_2_gray"});
+	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"joker_card_2_gray"});
+	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 1, image:"joker_card_gray"});
+	exports.Lothlorien.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"joker_card_gray_2"});
 	exports.Lothlorien.featureCards.push({symbol : "Friendship", color : "Gray", amount : 1, image:"friend_card_gray"});
 	exports.Lothlorien.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
 	exports.Lothlorien.featureCards.push({symbol : "Travelling", color : "Gray", amount : 1, image:"travel_card_gray"});
 	exports.Lothlorien.featureCards.push({symbol : "Fighting", color : "Gray", amount : 1, image:"fight_card_gray"});
+
+	exports.Helm = {
+
+		"name" : "Helms Deep",
+		"image" : "HelmsDeepBoard",
+		"tracks" : {
+			"Fighting" : {
+				position : 0,
+				startX : 166,
+				startY : 32,
+				isMain : true,
+				spaces :  [{x: 30, y:20, reward : "shield"}, {x: 35, y:22, reward : "shield"}, {x: 40, y:20, reward : "ring"}, {x: 40, y:15, reward : "shield"}, {x: 38, y:15, reward : "shield"}, {x: 45, y:15, reward : "ring"}, {x: 40, y:5, reward : "shield"}, {x: 40, y:5, reward : "shield"}, {x: 40, y:5, reward : "shield"}, {x: 40, y:0, reward : "big-shield"} ]
+			},
+			"Friendship" : {
+				position : 0,
+				startX : 110,
+				startY : 255,
+				isMain : false,
+				spaces :  [{reward : "Card", name:"Theoden"}, {reward : "Card", name:"Shadowfax"}, {reward : "ring"}, {reward : "Card", name:"Eomer"}, {reward : "ring"},{reward : "Card", name:"RohanRiders"}, {reward : "ring"} ]
+			},
+			"Travelling" : {
+				position : 0,
+				startX : 379,
+				startY : 255,
+				isMain : false,
+				spaces : [{reward : "shield"}, {reward : "life"},{reward : "life"},{reward : "life"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"}]
+			},
+			"Hiding" : null
+		},
+		"validTracks" : [{name : "Fighting", text: "Luchar"},{name: "Travelling", text:"Viajar"},{name: "Friendship", text:"Amistad"}],
+		"events" : [{'name' : "Wormtongue"},{'name' : "RohanMen"},{'name' : "OrcsGate"},{'name' : "OrthancFire"},{'name' : "StormForward"},{'name' : "OrcsConquer"}],
+		"isConflict" : true,
+		"activities" : [],
+		"featureCards" : []
+	};
+
+	exports.Helm.featureCards.push({name: 'Theoden',symbol : "Friendship", color : "White", amount : 2, image:"friend_card_white_2"});
+	exports.Helm.featureCards.push({name: 'Shadowfax',symbol : "Travelling", color : "White", amount : 2, image:"travel_card_white_2"});
+	exports.Helm.featureCards.push({name: 'Eomer',symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
+	exports.Helm.featureCards.push({name: 'RohanRiders',symbol : "Joker", color : "White", amount : 2, image:"joker_card_3_white"});
 
 
 	return exports;

@@ -7,14 +7,20 @@ define(['../data/cards'], function (cards) {
 		else{
 			this.name="Generic";
 		}
+		if (typeof card.type != 'undefined'){
+			this.type = card.type;
+		}
+		else{
+			this.type="Generic";
+		}
 		this.color = card.color;
 		this.symbol = card.symbol;
 		this.amount = card.amount;
 		this.image = card.image;
 		this.id = null;
-		if (cards[this.name] != null){
-			this.draw = cards[this.name].draw;
-			this.apply = cards[this.name].apply;
+		if (cards[this.type] != null){
+			this.draw = cards[this.type].draw;
+			this.apply = cards[this.type].apply;
 		}
 	}
 

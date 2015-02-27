@@ -9,6 +9,8 @@ define(['../data/activities'], function (activities) {
 		this.draw = null;
 		this.apply = null;
 		this.currentSubActivity = 0;
+		this.description=null;
+		this.title = null;
 		for (i in subactivities){
 			this.subactivities.push(new Activity (subactivities[i], subactivities[i].subactivities, this));
 		}
@@ -16,10 +18,17 @@ define(['../data/activities'], function (activities) {
 		if (activities[this.name] != null){
 			this.draw = activities[this.name].draw;
 			this.apply = activities[this.name].apply;
+			if (typeof activities[this.name].description != 'undefined'){
+				this.description = activities[this.name].description;
+			}
+			if (typeof activities[this.name].title != 'undefined'){
+				this.title = activities[this.name].title;
+			}
 		}
 		if (parent!=null){
 			this.parent = parent;
 		}
+
 	}
 
 	//agregar parámetros
@@ -65,6 +74,11 @@ define(['../data/activities'], function (activities) {
 
 	Activity.prototype.newActivity = function(data, subactivities, parent){	//"contructor" ayuda para evitar dependencias circulares
 		return new Activity(data, subactivities, parent);
+	}
+
+	Activity.prototype.logEventInfo = function(game,player){
+		game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver el evento: '"+this.title+"'.", 'mode':'alert'});
+		game.io.to(player.room).emit('log message', {'msg' : this.description, 'mode':'info'});
 	}
 
 	return Activity;

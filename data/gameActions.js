@@ -329,9 +329,10 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
+			
+			if (data.isConflict){
 			$("#location-board-img-container").children().remove();
 			$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img" title="Tablero de locación">');
-			if (data.isConflict){
 				if (data.tracks.Fighting != null){
 					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Fighting-chip" class="cone-chip" style="left: '+data.tracks.Fighting.startX+'px; top: '+data.tracks.Fighting.startY+'px;">');
 				}
@@ -354,6 +355,8 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			if (client.isActivePlayer()){
 				client.socket.emit('change location');	
 			}
+
+
 		}
 	},
 
@@ -410,7 +413,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					data['track'] = game.currentLocation.tracks[data.trackName];
 					if (game.currentLocation.tracks[data.trackName].position < game.currentLocation.tracks[data.trackName].spaces.length){
 						game.currentLocation.tracks[data.trackName].position++;
-						data['reward'] = game.currentLocation.tracks[data.trackName].spaces[game.currentLocation.tracks[data.trackName].position-1].reward;
+						data['reward'] = game.currentLocation.tracks[data.trackName].spaces[game.currentLocation.tracks[data.trackName].position-1];
 						if (game.currentLocation.tracks[data.trackName].position == game.currentLocation.tracks[data.trackName].spaces.length){
 							if (game.currentLocation.tracks[data.trackName].isMain){	
 								data['endScenario'] = true;
@@ -457,6 +460,8 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				}
 			}
+
+
 			//Si el track no existe en el escenario, se le da al usuario la opcion de moverse en el track que quiera
 			if (client.isActivePlayer()){
 				if (data.track==null){
@@ -619,14 +624,23 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			if (data.reward == 'life' || data.reward == 'sun' ||data.reward == 'ring' ||data.reward == 'shield'){
-				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': data.reward, 'amount':1});
+			if (data.reward.reward == 'life' || data.reward.reward == 'sun' ||data.reward.reward == 'ring' ||data.reward.reward == 'shield'){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': data.reward.reward, 'amount':1});
 			}
-			else if (data.reward == 'die'){
+			else if (data.reward.reward == 'die'){
 				client.socket.emit('add activity', {'action' : 'RollDie'});
 			}
-			else if (data.reward == 'big-shield'){
+			else if (data.reward.reward == 'big-shield'){
 				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': 'shield', 'amount':3});
+			}
+			else if (data.reward.reward == 'Card'){
+				if (typeof data.reward.name != 'undefined'){
+					client.socket.emit('add activity', {'action' : 'DealFeatureCardByName', 'card' :data.reward.name, 'player' : client.alias});
+				}
+				else{
+					console.log("ENTRE AL LSE PORQUE LA REWATD ES UNDEFINSIF");
+				}
+					
 			}
 		client.socket.emit('resolve activity');
 		}
@@ -695,6 +709,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			else{
 				data['isNext'] = false;
 			}
+
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -821,6 +836,61 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		}
 	},
 
+		//Reparte cartas a uno/varios jugadores segun parámetros (cantidad y jugador/es a quien repartir)
+	"DealFeatureCardByName" : {
+		apply : function (game, player, data){
+			var found =false;
+			var i=0;
+			while (i<game.currentLocation.featureCards.length & !found){
+				if (data.card == game.currentLocation.featureCards[i].name){
+					found=true;
+				}
+				else{
+					i++;
+				}				
+			}
+			if (found){
+				console.log(game.currentLocation.featureCards[i]);
+				data['dealt'] = game.currentLocation.featureCards[i];
+				game.getPlayerByAlias(data.player).addCard(game.currentLocation.featureCards[i]);
+				game.currentLocation.featureCards.splice(i,1);
+			}
+			else{
+				data['dealt'] = null;
+			}
+			game.io.to(player.room).emit('log message', {'msg' : data.player+" recibe como recompensa una Carta Especial.", 'mode':'info'});
+			game.io.to(player.room).emit('update game', data);	//enviar siguiente actividad
+
+		},
+		draw : function(client, data){
+			if (data.dealt!=null){
+				if (data.player == client.player.alias){
+					$("<img src='./assets/img/ripped/"+data.dealt.image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.dealt).data("selected",false).appendTo("#player-cards-container").show('slow');
+				}
+
+				var span = $("#"+data.player+"-state-div").find("#cards-span");
+				var currentValue = parseInt(span.text());
+				span.text(currentValue+1);
+			}
+			if (data.player == client.player.alias){
+				client.socket.emit('resolve activity');
+			}
+
+		}
+	},
+
+	"DiscardFeatureCards" : {
+		apply : function (game, player, data){
+			game.currentLocation.featureCards=[];
+			game.io.to(player.room).emit('update game', data);	//enviar siguiente actividad
+
+		},
+		draw : function(client, data){
+			if (client.isActivePlayer()){
+				client.socket.emit('resolve activity');
+			}
+		}
+	}
 
 	};
 

@@ -34,7 +34,7 @@ define(['./Track','./Card'], function (Track, Card) {
 	}
 
 	Location.prototype.isTrackComplete = function(track){
-		if (this.tracks[track].position == this.tracks[track].spaces.length-1){
+		if (this.tracks[track].position == this.tracks[track].spaces.length){
 			return true;
 		}
 		else{

@@ -395,6 +395,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		//Retransmitir un evento en ronda desde el jugador activo hacia los demas
 	Client.prototype.roundTransmission = function(action, playerNumber){
 		var act = action;
+		
 		if (this.isActivePlayer()){
 					//envio la tarea a todos los players
 					var i=0;
@@ -402,6 +403,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						i = playerNumber+1;
 					}
 					while (this.players[i].alias != this.alias){
+						console.log("ROUND TRANSMISSION DEL EVENTO: "+act.action+" a " +this.players[i].alias);
 						action['player'] = this.players[i].alias;
 						this.socket.emit('add activity', action);
 						if (i<this.players.length-1){
