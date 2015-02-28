@@ -4,4 +4,4 @@ Hacer:
 - el check no se si esta bien tambien. considerar solucion recursiva
 
 Porximo commit:
--Reformulado el discard que traia errores
+- COMENTE UNA LINEA EN EL CHANGE DISCARD DE TOKENS. OJOTAAAAA

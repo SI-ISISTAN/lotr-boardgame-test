@@ -324,6 +324,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.advanceLocation(data);
 			data['tracks'] = game.currentLocation.tracks;
 			data['isConflict'] = game.currentLocation.isConflict;
+			data['events'] = game.currentLocation.events;
 			data['image'] = game.currentLocation.image;
 			game.io.to(player.room).emit('log message', {'msg' : "¡Los aventureros avanzan hacia la siguiente locación! ", 'mode':'good'});
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
@@ -332,7 +333,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			
 			if (data.isConflict){
 			$("#location-board-img-container").children().remove();
-			$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img" title="Tablero de locación">');
+
+			$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img">');
+			
 				if (data.tracks.Fighting != null){
 					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Fighting-chip" class="cone-chip" style="left: '+data.tracks.Fighting.startX+'px; top: '+data.tracks.Fighting.startY+'px;">');
 				}
@@ -592,23 +595,28 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						//agrupo por usuario
 						var name = names[j];
 						var cards = [];
-						for (i in data.discards){
+						var i=0;
+						while (i < data.discards.length){
 							if (name == data.discards[i].alias){
 								if (data.discards[i].discard.element == 'card'){
 									cards.push(data.discards[i].discard);		
 								}
 								else if (data.discards[i].discard.element == 'token'){
-									client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :data.discards[i].alias, 'token':data.discards[i].discard.token, 'amount':data.discards[i].discard.amount});
-									data.discards.splice(i,1);
+									client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :data.discards[i].alias, 'token':data.discards[i].discard.token, 'amount':-data.discards[i].discard.amount});
+									//data.discards.splice(i,1);
 								}
+							}
+						i++;
 						}
-					}
 					if (cards.length>0){
-						console.log(names);
 						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : cards.length, 'alias' : name, 'cards': cards, 'to':null});
 					}
 				}
-	
+				if (typeof data.discardActions != 'undefined'){
+					for (b in data.discardActions){
+						client.socket.emit('add activity', data.discardActions[b]);
+					}
+				}
 			}	
 			else{
 				client.socket.emit('add activity', data.defaultAction);

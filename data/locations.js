@@ -54,7 +54,7 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "White", amount : 2, image:"travel_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
-	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"gollum_card"});
+	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"joker_card_2_white"});
 	exports.Rivendell.featureCards.push({name:'Miruvor', symbol : "None", color : "Yellow", amount : 1, image:"no_card"});
 	exports.Rivendell.featureCards.push({name: 'Staff',symbol : "None", color : "Yellow", amount : 1, image:"no_card"});
 
@@ -140,11 +140,11 @@ define(['../classes/Activity'], function (Activity) {
 				startX : 110,
 				startY : 255,
 				isMain : false,
-				spaces :  [{reward : "Card", name:"Theoden"}, {reward : "Card", name:"Shadowfax"}, {reward : "ring"}, {reward : "Card", name:"Eomer"}, {reward : "ring"},{reward : "Card", name:"RohanRiders"}, {reward : "ring"} ]
+				spaces :  [{reward : "die"},{reward : "Card", name:"Theoden"}, {reward : "Card", name:"Shadowfax"}, {reward : "ring"}, {reward : "Card", name:"Eomer"}, {reward : "ring"},{reward : "Card", name:"RohanRiders"}, {reward : "ring"} ]
 			},
 			"Travelling" : {
 				position : 0,
-				startX : 379,
+				startX : 374,
 				startY : 255,
 				isMain : false,
 				spaces : [{reward : "shield"}, {reward : "life"},{reward : "life"},{reward : "life"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"}]
@@ -163,6 +163,42 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Helm.featureCards.push({name: 'Eomer',symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
 	exports.Helm.featureCards.push({name: 'RohanRiders',symbol : "Joker", color : "White", amount : 2, image:"joker_card_3_white"});
 
+	exports.Shelob = {
+
+		"name" : "Shelobs Lair",
+		"image" : "ShelobsLairBoard",
+		"tracks" : {
+			"Fighting" : {
+				position : 0,
+				startX : 190,
+				startY : 160,
+				isMain : true,
+				spaces :  [{x: 30, y:-30, reward : "shield"}, {x: 45, y:-15, reward : "shield"}, {x: 45, y:7, reward : "shield"}, {x: 40, y:15, reward : "shield"}, {x: 35, y:8, reward : "shield"}, {x: 45, y:15, reward : "die"}, {x: 40, y:15, reward : "die"}, {x: 40, y:0, reward : "big-shield"}, {x: 35, y:-15, reward : "ring"}, {x: 30, y:-40, reward : "ring"} ]
+			},
+			"Hiding" : {
+				position : 0,
+				startX : 110,
+				startY : 255,
+				isMain : false,
+				spaces :  [{reward : "Card", name: "Curtiss"}, {reward : "ring"}, {reward : "life"},{reward : "ring"},{reward : "life"}, {reward : "ring"},{reward : "life"}]
+			},
+			"Travelling" : {
+				position : 0,
+				startX : 379,
+				startY : 255,
+				isMain : false,
+				spaces : [{reward : "shield"}, {reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "heal"},{reward : "shield"},{reward : "sun"}]
+			},
+			"Friendship" : null
+		},
+		"validTracks" : [{name : "Fighting", text: "Luchar"},{name: "Travelling", text:"Viajar"},{name: "Hiding", text:"Esconderse"}],
+		"events" : [{'name' : "Gollum"},{'name' : "DeadFaces"},{'name' : "ForbiddenPool"},{'name' : "NazgulRing"},{'name' : "ShelobAppear"},{'name' : "ShelobAttack"}],
+		"isConflict" : true,
+		"activities" : [],
+		"featureCards" : []
+	};
+
+	exports.Shelob.featureCards.push({name: 'Gollum',symbol : "Joker", color : "White", amount : 3, image:"gollum_card"});
 
 	return exports;
 

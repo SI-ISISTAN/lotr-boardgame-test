@@ -14,7 +14,7 @@ define([], function () {
 		this.lifeTokens = 0;
 		this.sunTokens = 0;
 		this.ringTokens = 0;
-		this.shields = 0;
+		this.shields = 5;
 		this.hand = [];
 		this.corruption = 0;
 	};
@@ -54,6 +54,7 @@ define([], function () {
 			var t = 0;
 			var found = false;
 			while (t<aux.length && !found){
+
 				if ( ( (cards[i].symbol==null ||  cards[i].symbol== aux[t].symbol ) && (cards[i].color==null ||  cards[i].color==aux[t].color )) ||  aux[t].symbol == "Joker"){
 					found = true;
 					aux.splice(t,1);

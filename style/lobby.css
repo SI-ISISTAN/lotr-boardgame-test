@@ -264,3 +264,12 @@
 	border-width: 5px;
 	border-color: blue;
 }
+
+.invisible-event-div{
+	height:40px;
+	max-height: 40px;
+	width:100px;
+	max-width: 100px;
+	position : absolute;
+	opacity : 0.01;
+}

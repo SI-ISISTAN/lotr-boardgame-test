@@ -323,7 +323,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						console.log($(this).data("element"));
 					});
 					
-					self.socket.emit('add activity', {'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : data.defaultAction});	//voy dando las cartas de a una
+					self.socket.emit('add activity', {'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : data.defaultAction, 'discardActions' : data.discardActions});	//voy dando las cartas de a una
 					self.socket.emit('resolve activity');
 					$(".discard-selector").remove();	
 					popup.close();	
@@ -369,9 +369,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						$(this).data("order", played.length);
 						$(this).data("number", $(this).index()-1);
 						played.push($(this).data("card"));
-					}
-					else{
-						console.log("ya hay una de este color puto");
 					}
 				}					
 				else{								//si esta estaba seleccionada, deselecciono

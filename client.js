@@ -222,7 +222,8 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
         $(document).ready(function(){	
 
         	console.log("JQuery Init");
-
+        	//tooltip (title fachero)
+        	$(document).tooltip();
         	//MAIN LOOP DEL CLIENTE (no es un loop porque esta todo implementado con listeners)
         	message_listen();
         	input_listen();

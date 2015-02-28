@@ -276,13 +276,14 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	/////////////////////////////////////////////////// ACCIONES DE MORIA ////////////////////////////////////////////////////
 
 	'SpeakFriend' :  {
+		title: "Habla, Amigo",
+		description: "El grupo debe descartar un símbolo de Amistad y uno de Comodín. De no poder o no querer hacerlo, Battion se mueve un espacio hacia los aventureros.",
 		apply : function(game, player,data){
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver el evento: 'Habla, Amigo'", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "El grupo debe descartar un símbolo de Amistad y uno de Comodín. De no poder o no querer hacerlo, Battion se mueve un espacio hacia los aventureros.", 'mode':'info'});
+			this.logEventInfo(game,player);
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Evento: La Entrada", text: "El grupo debe descartar un símbolo de Amistad y uno de Comodín. De no poder o no querer hacerlo, Battion se mueve un espacio hacia los aventureros.", buttons : [{name : "Descartar", id:"discard"},  {name : "No descartar", id:"rolldie"}] , visibility : data.player});
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [{name : "Descartar", id:"discard"},  {name : "No descartar", id:"rolldie"}] , visibility : data.player});
 
 			popup.addListener("discard", function(){
 				client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: "Friendship", color:null, amount: 1},{element : 'card', symbol: "Joker", color:null, amount: 1}], 'defaultAction' : {'action' : 'MoveSauron', 'amount' : 1}});
@@ -301,12 +302,13 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	},
 
 	'WaterWatcher' :  {
+		title: "Vigilante en el Agua",
+		description: "Cada jugador, uno a la vez, debe elegir entre descartar un símbolo de Esconderse (o un Comodín) o, de no poder o querer hacerlo, tirar el Dado.",
 		apply : function(game, player,data){
 			if (typeof data.player == 'undefined'){
 				data['player']=game.activePlayer.alias;
 				data['playerNumber']=game.activePlayer.number;
-				game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver el evento: 'Vigilante en el Agua'", 'mode':'alert'});
-				game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, uno a la vez, debe elegir entre descartar un símbolo de Esconderse (o un Comodín) o, de no poder o querer hacerlo, tirar el Dado.", 'mode':'info'});
+				this.logEventInfo(game,player);
 			}
 			if (game.getPlayerByAlias(data.player).hasCards([{color:null, symbol:"Hiding"}])){
 				data['canDiscard']=true;
@@ -318,7 +320,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 		draw : function(client, data){
 
-			var popup = new Popup({title: "Evento: Vigilante en el Agua", text: "Cada jugador, uno a la vez, debe elegir entre descartar un símbolo de Esconderse (o un Comodín) o, de no poder o querer hacerlo, tirar el Dado.", buttons : [{name : "Descartar", id:"discard"},  {name : "Tirar el Dado", id:"rolldie"}] , visibility : data.player});
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [{name : "Descartar", id:"discard"},  {name : "Tirar el Dado", id:"rolldie"}] , visibility : data.player});
 			popup.addListener("discard", function(){
 				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': [{color:null, symbol:"Hiding"}], 'to': null});
 				client.roundTransmission({'action' : "WaterWatcher"}, data.playerNumber);	
@@ -342,6 +344,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	},
 
 	'WellStone' :  {
+		title: "Piedra del Pozo",
+		description: "El jugador activo debe sacar una carta del mazo y descartar dos símbolos coincidentes con el de la carta que saca (o Comodines).",
 		apply : function(game, player,data){
 			data['card'] = {color: null, symbol: game.hobbitCards[game.hobbitCards.length-1].symbol, image:game.hobbitCards[game.hobbitCards.length-1].image};
 			game.hobbitCards.splice(game.hobbitCards.length-1);
@@ -351,12 +355,12 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			else{
 				data['canDiscard']=false;
 			}
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver el evento: 'Piedra del Pozo'", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe sacar una carta del mazo y descartar dos símbolos coincidentes con el de la carta que saca (o Comodines).", 'mode':'info'});
+
+			this.logEventInfo(game,player);
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Evento: Vigilante en el Agua", text: "El jugador activo debe sacar una carta del mazo y descartar dos símbolos coincidentes con el de la carta que saca (o Comodines).", buttons : [{name : "Descartar", id:"discard"},  {name : "No descartar", id:"dont-discard"}] });
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [{name : "Descartar", id:"discard"},  {name : "No descartar", id:"dont-discard"}] });
 
 			var div = $("<div>  </div>");
 			div.append($("<p> La carta sacada es: </p>"));
@@ -385,6 +389,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	},
 
 	'Trapped' :  {
+		title: "Atrapados",
+		description: "Si las pistas de Esconderse y Viajar del escenario no han sido completas, Battion se mueve dos espacios hacia los aventureros y el Portador del Anillo debe lanzar el dado.",
 		apply : function(game, player,data){
 			if (game.currentLocation.isTrackComplete("Travelling") && game.currentLocation.isTrackComplete("Hiding")){
 				data['complete'] = true;
@@ -392,8 +398,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			else{
 				data['complete']=false;
 			}
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver el evento: 'Atrapados'", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "Si las pistas de Esconderse y Viajar del escenario no han sido completas, Battion se mueve dos espacios hacia los aventureros y el Portador del Anillo debe lanzar el dado.", 'mode':'info'});
+
+			this.logEventInfo(game,player);
 			game.io.to(game.ringBearer.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -407,13 +413,14 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	},
 
 	'OrcsAttack' :  {
+		title: "¡Al Ataque!",
+		description: "El grupo debe descartar 5 símbolos de Lucha. De no poder o no querer hacerlo, Battion se mueve dos espacios hacia los aventureros.",
 		apply : function(game, player,data){
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver el evento: '¡Al Ataque!'", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "El grupo debe descartar 5 símbolos de Lucha. De no poder o no querer hacerlo, Battion se mueve dos espacios hacia los aventureros.", 'mode':'info'});
+			this.logEventInfo(game,player);
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Evento: '¡Al Ataque!'", text: "El grupo debe descartar 5 símbolos de Lucha. De no poder o no querer hacerlo, Battion se mueve dos espacios hacia los aventureros.", buttons : [{name : "Descartar", id:"discard"},  {name : "No descartar", id:"move-sauron"}] , visibility : data.player});
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [{name : "Descartar", id:"discard"},  {name : "No descartar", id:"move-sauron"}] , visibility : data.player});
 
 			popup.addListener("discard", function(){
 				client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1}], 'defaultAction' : {'action' : 'MoveSauron', 'amount' : 2}});
@@ -432,13 +439,14 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	},
 
 	'FlyFools' :  {
+		title: '¡Huyan, tontos!',
+			description: "El grupo debe seleccionar a un jugador para adelantarse 3 espacios hacia el peligro. De no querer o no ponerse de acuerdo, cada uno, en orden, debe tirar el Dado y hacerse cargo de las consecuencias.",
 		apply : function(game, player,data){
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver el evento: '¡Huyan, tontos!'", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "El grupo debe seleccionar a un jugador para adelantarse 3 espacios hacia el peligro. De no querer o no ponerse de acuerdo, cada uno, en orden, debe tirar el Dado y hacerse cargo de las consecuencias.", 'mode':'info'});
+			this.logEventInfo(game,player);
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Evento: '¡Huyan, tontos!'", text: "El grupo debe seleccionar a un jugador para adelantarse 3 espacios hacia el peligro. De no querer o no ponerse de acuerdo, cada uno, en orden, debe tirar el Dado y hacerse cargo de las consecuencias.", buttons : [{name : "Este jugador avanzará", id:"advance"},  {name : "Lanzar el dado", id:"rolldie"}] , visibility : data.player});
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [{name : "Este jugador avanzará", id:"advance"},  {name : "Lanzar el dado", id:"rolldie"}] , visibility : data.player});
 			
 			var listbox = $("<select class='advance-selector'> </select>");
 			for (j in client.players){
@@ -636,61 +644,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		
 	},
 
-	//Este era de Shelob, la concha de mi madre puta. bue queda aca para su psoterior uso. tal vez me olvide de ti tal vez me olvide de jaime pero del combo loco... no-o
-	"DeadFaces" : {
-		'title' : "Las caras de los Muertos",
-		'description' : "Cada jugador, en ronda desde el activo, deben descartar un comodín o tres escudos. De no poder hacer ninguna de las dos cosas, el jugador pierde y su aventurero es eliminado del juego.",
-		apply : function(game,player,data){
-			if (typeof data.player == 'undefined'){
-				data.player = game.activePlayer.alias;
-				data['playerNumber'] = 	game.activePlayer.number;
-			}
-			if (game.getPlayerByAlias(data.player).hasTokens('shield',3)){
-				data['hasShields']=true;
-			}
-			else data['hasShields']=false;
-
-			if (game.getPlayerByAlias(data.player).hasCards([{symbol: 'Joker', color: null}])){
-				data['hasJoker']=true;
-			}
-			else data['hasJoker']=false;
-
-			this.logEventInfo(game,player);
-			game.io.to(game.getPlayerByAlias(data.player).id).emit('update game', data);	
-		},
-
-		draw : function(client, data){
-			var popup = new Popup({title: "Evento: 'Caras de los Muertos'", text: this.description, buttons : [ {name : "Descartar comodín", id:"discard"}, {name : "Descartar 3 escudos", id:"discard-shield"}, {name : "No puedo descartar", id:"lose"}], visibility : data.player});
-			popup.addListener("discard", function(){
-				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': [{symbol: 'Joker', color: null}], 'to':null});
-				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
-				client.socket.emit('resolve activity');
-				popup.close();	
-			});
-			popup.addListener("discard-shield", function(){
-				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-3});
-				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
-				client.socket.emit('resolve activity');
-				popup.close();	
-			});
-			popup.addListener("lose", function(){
-				//por ahora no hago anda porque no esta decidido que pasa cuando pierde 1 hobbit
-				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
-				client.socket.emit('resolve activity');
-				popup.close();	
-			});
-
-			popup.draw(client);
-
-			if (!data.hasJoker){
-				popup.disableButton("discard", true);
-			}
-			if (!data.hasShields){
-				popup.disableButton("discard-shield", true);
-			}
-		}
-		
-	},
+	
 
 	"RohanMen" : {
 		'title': "¡Tiranos, temblad!",
@@ -818,7 +772,214 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		
 	},
 
-	
+	/////////////////////////////////////////////////// ACCIONES DE SHELOB LAIR ////////////////////////////////////////////////////
+	'Gollum' :  {
+		'title': "Sin Defensa",
+		'description' : "Los jugadores deben descartar, entre todos, 7 fichas de escudo. De hacerlo, el jugador activo recibe una carta Especial y todos reciben una carta del Mazo. De no hacerlo, la carta Especial es eliminada.",
+		apply : function(game, player,data){
+			this.logEventInfo(game,player);
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1}], 'defaultAction' : {'action' : 'DiscardFeatureCards'}, 'discardActions': [{'action' : 'DealFeatureCardByName', 'card' :"Gollum", 'player' : client.alias}, {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null}]});
+			client.socket.emit('resolve activity');
+
+		}
+		
+	},
+
+	//Este era de Shelob, la concha de mi madre puta. bue queda aca para su psoterior uso. tal vez me olvide de ti tal vez me olvide de jaime pero del combo loco... no-o
+	"DeadFaces" : {
+		'title' : "Las caras de los Muertos",
+		'description' : "Cada jugador, en ronda desde el activo, deben descartar un comodín o tres escudos. De no poder hacer ninguna de las dos cosas, el jugador pierde y su aventurero es eliminado del juego.",
+		apply : function(game,player,data){
+			if (typeof data.player == 'undefined'){
+				data.player = game.activePlayer.alias;
+				data['playerNumber'] = 	game.activePlayer.number;
+			}
+			if (game.getPlayerByAlias(data.player).hasTokens('shield',3)){
+				data['hasShields']=true;
+			}
+			else data['hasShields']=false;
+
+			if (game.getPlayerByAlias(data.player).hasCards([{symbol: 'Joker', color: null}])){
+				data['hasJoker']=true;
+			}
+			else data['hasJoker']=false;
+
+			this.logEventInfo(game,player);
+			game.io.to(game.getPlayerByAlias(data.player).id).emit('update game', data);	
+		},
+
+		draw : function(client, data){
+			var popup = new Popup({title: "Evento: 'Caras de los Muertos'", text: this.description, buttons : [ {name : "Descartar comodín", id:"discard"}, {name : "Descartar 3 escudos", id:"discard-shield"}, {name : "No puedo descartar", id:"lose"}], visibility : data.player});
+			popup.addListener("discard", function(){
+				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': [{symbol: 'Joker', color: null}], 'to':null});
+				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("discard-shield", function(){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-3});
+				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("lose", function(){
+				//por ahora no hago anda porque no esta decidido que pasa cuando pierde 1 hobbit
+				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+
+			popup.draw(client);
+
+			if (!data.hasJoker){
+				popup.disableButton("discard", true);
+			}
+			if (!data.hasShields){
+				popup.disableButton("discard-shield", true);
+			}
+		}
+		
+	},
+
+	//Accion de juego Nazgul Appears
+	"ForbiddenPool" : {
+		title: 'Prueba de lo Prohibido',
+		description: "Se debe elegir a un jugador para que descarte 5 escudos. De hacerlo, cada jugador recibe una carta del Mazo. De no poder ninguno, o no ponerse de acuerdo, el Malvado avanza dos espacios hacia los aventureros.",
+		apply : function(game,player,data){
+			var candidates = [];
+			for (v in game.players){
+				if (game.players[v].hasTokens('shield',5)){
+					candidates.push(game.players[v].alias);
+				}
+			}
+			data['candidates'] = candidates;
+
+			this.logEventInfo(game,player);
+			game.io.to(player.room).emit('update game', data);	
+		},
+
+		draw : function(client, data){
+			var popup = new Popup({
+				title: this.title, 
+				text: this.description, 
+				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
+			});
+			popup.addListener("discard", function(){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :$(".discard-to-selector").val(), 'token':'shield', 'amount':-5});
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null});	
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("dont-discard", function(){
+				client.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 2});
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+
+			var listbox = $("<select class='discard-to-selector'> </select>");
+			for (j in data.candidates){
+				$(listbox).append("<option value='"+data.candidates[j]+"'> "+data.candidates[j]+"</option>");
+			}
+			popup.append($(listbox));
+			popup.draw(client);
+			if (data.candidates.length == 0){
+				popup.disableButton("discard", true);
+			}
+		}
+		
+	},
+
+	'NazgulRing' :  {
+		'title': "Un Esbirro Busca el Anillo",
+		'description' : "El Portador revela la carta superior del Mazo. Si puede descartar cartas con 3 símbolos coincidentes al de la carta (o comodines), se aleja un espacio del Malvado en la Línea de Corrupción. De no poder hacerlo, todos los jugadores deben lanzar el Dado.",
+		apply : function(game, player,data){
+			data['card'] = {color: null, symbol: game.hobbitCards[game.hobbitCards.length-1].symbol, image:game.hobbitCards[game.hobbitCards.length-1].image};
+			game.hobbitCards.splice(game.hobbitCards.length-1);
+			if (game.getPlayerByAlias(game.ringBearer.alias).hasCards([data.card,data.card,data.card])){
+				data['canDiscard']=true;
+			}
+			else{
+				data['canDiscard']=false;
+			}
+			this.logEventInfo(game,player);
+			game.io.to(game.ringBearer.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [{name : "Descartar", id:"discard"},  {name : "No descartar", id:"dont-discard"}], visibility:client.alias });
+
+			var div = $("<div>  </div>");
+			div.append($("<p> La carta sacada es: </p>"));
+			div.append($("<img src='./assets/img/ripped/"+data.card.image+".png' class='player-card-img img-responsive'>"));
+
+
+			popup.addListener("discard", function(){
+				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 3, 'alias' : client.alias, 'cards': [data.card, data.card,data.card], 'to': null});
+				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+			popup.addListener("dont-discard", function(){
+				client.socket.emit('add activity', {'action' : 'RollDie'});	
+				client.roundTransmission({'action' : 'RollDie'}, client.player.number);
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+			
+			popup.append(div);
+			popup.draw(client);
+
+			if (!data.canDiscard){
+				popup.disableButton("discard",true);
+			}
+		}
+		
+	},
+
+	'ShelobAppear' :  {
+		'title': "Aparece el Monstruo",
+		'description' : "El jugador activo debe tirar el Dado 2 veces seguidas. De decidir no hacerlo, el Malvado se mueve 2 espacios hacia los aventureros.",
+		apply : function(game, player,data){
+			this.logEventInfo(game,player);
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [{name : "Lanzar el dado", id:"roll"},  {name : "No lanzar el dado", id:"dont"}], visibility:client.alias });
+
+			popup.addListener("roll", function(){
+				client.socket.emit('add activity', {'action' : 'RollDie'});	
+				client.socket.emit('add activity', {'action' : 'RollDie'});	
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+			popup.addListener("dont", function(){
+				client.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 2});
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+			
+			popup.draw(client);
+
+		}
+		
+	},
+
+	'ShelobAttack' :  {
+		'title': "El Monstruo Ataca",
+		'description' : "Los jugadores deben descartar, entre todos, cartas con un valor total de 7 símbolos de Lucha (cuentan los Comodines). De no poder hacerlo el Malvado se mueve 3 espacios hacia los aventureros.",
+		apply : function(game, player,data){
+			this.logEventInfo(game,player);
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1},{element : 'card', symbol: "Fighting", color:null, amount: 1}], 'defaultAction' : {'action' : 'MoveSauron', 'amount' : 3}});
+			client.socket.emit('resolve activity');
+
+		}
+		
+	},
 
 	};
 
