@@ -5,3 +5,8 @@ Hacer:
 
 Porximo commit:
 - COMENTE UNA LINEA EN EL CHANGE DISCARD DE TOKENS. OJOTAAAAA
+
+ojota:
+estoy cambiando el sistema de descarte
+-le agrege un metodo hascards2 a player
+-agregue budling en checkdiscard, sin cambiar el resto del sistema

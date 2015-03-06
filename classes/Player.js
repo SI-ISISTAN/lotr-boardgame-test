@@ -14,9 +14,10 @@ define([], function () {
 		this.lifeTokens = 0;
 		this.sunTokens = 0;
 		this.ringTokens = 0;
-		this.shields = 5;
+		this.shields = 0;
 		this.hand = [];
 		this.corruption = 0;
+		this.dead= false;
 	};
 
 	//Buscar una carta en la mano del jugador
@@ -39,6 +40,52 @@ define([], function () {
 		}
 	}
 
+	Player.prototype.resetTokens = function(){
+		this.lifeTokens=0;
+		this.sunTokens=0;
+		this.ringTokens=0;
+	}
+
+	//Segunda version que arma bundles de cartas iguales
+	Player.prototype.hasCards2= function(cards){
+		var aux = []; //creo una mano auxiliar para ver si puedo hacer el descarte
+		var j=0;
+		var objetivo = 0;
+		for (t in cards){
+			objetivo+=cards[t].amount;
+		}
+
+		while (j < this.hand.length){
+			var carr = this.hand[j];
+			aux.push(carr);
+			j++;
+		}
+		var amount = 0;
+		for (i in cards){
+			var t = 0;
+			var found = 0;
+			while (t<aux.length && found<cards[i].amount){
+
+				if ( ( (cards[i].symbol==null ||  cards[i].symbol== aux[t].symbol ) && (cards[i].color==null ||  cards[i].color==aux[t].color )) ||  aux[t].symbol == "Joker"){
+					var am = aux[t].amount;
+					found+=am;
+					aux.splice(t,1);
+					amount+=am;
+				}
+				else {
+					t++;
+				}
+
+			}
+		}
+		if (amount >= objetivo){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
 	//Me fijo si el jugador posee una o varias carrtas de un tipo o tipso determinados
 	Player.prototype.hasCards= function(cards){
 		var aux = []; //creo una mano auxiliar para ver si puedo hacer el descarte
@@ -56,16 +103,17 @@ define([], function () {
 			while (t<aux.length && !found){
 
 				if ( ( (cards[i].symbol==null ||  cards[i].symbol== aux[t].symbol ) && (cards[i].color==null ||  cards[i].color==aux[t].color )) ||  aux[t].symbol == "Joker"){
+					var am = aux[t].amount;
 					found = true;
 					aux.splice(t,1);
-					amount++;
+					amount+=am;
 				}
 				else {
 					t++;
 				}
 			}	
 		}
-		if (amount == cards.length){
+		if (amount >= cards.length){
 			return true;
 		}
 		else{

@@ -89,7 +89,7 @@ define(['../classes/Activity'], function (Activity) {
 			"Friendship" : null
 		},
 		"validTracks" : [{name : "Fighting", text: "Luchar"},{name: "Travelling", text:"Viajar"},{name: "Hiding", text:"Esconderse"}],
-		"events" : [{'name' : "SpeakFriend"}, {'name' : "WaterWatcher"},{'name' : "WellStone"},{'name' : "Trapped"},{'name' : "OrcsAttack"},{'name' : "FlyFools"}],
+		"events" : [{'name' : "SpeakFriend"}],
 		"isConflict" : true,
 		"activities" : [],
 		"featureCards" : []
@@ -192,13 +192,55 @@ define(['../classes/Activity'], function (Activity) {
 			"Friendship" : null
 		},
 		"validTracks" : [{name : "Fighting", text: "Luchar"},{name: "Travelling", text:"Viajar"},{name: "Hiding", text:"Esconderse"}],
-		"events" : [{'name' : "Gollum"},{'name' : "DeadFaces"},{'name' : "ForbiddenPool"},{'name' : "NazgulRing"},{'name' : "ShelobAppear"},{'name' : "ShelobAttack"}],
+		"events" : [{'name' : "Gollum"},{'name' : "ShelobAttack"},{'name' : "DeadFaces"},{'name' : "ForbiddenPool"},{'name' : "NazgulRing"},{'name' : "ShelobAppear"}],
 		"isConflict" : true,
 		"activities" : [],
 		"featureCards" : []
 	};
 
+	exports.Shelob.featureCards.push({name: 'Curtiss',symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
 	exports.Shelob.featureCards.push({name: 'Gollum',symbol : "Joker", color : "White", amount : 3, image:"gollum_card"});
+
+	exports.Mordor = {
+
+		"name" : "Mordor",
+		"image" : "MordorBoard",
+		"tracks" : {
+			"Fighting" : {
+				position : 0,
+				startX : 100,
+				startY : 255,
+				isMain : false,
+				spaces :  [{reward : "shield"},{reward : "life"},{reward : "shield"},{reward : "life"},{reward : "shield"},{reward : "life"},{reward : "heal"}]
+			},
+			"Hiding" : {
+				position : 0,
+				startX : 462,
+				startY : 255,
+				isMain : false,
+				spaces :  [{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "heal"}]
+			},
+			"Travelling" : {
+				position : 0,
+				startX : 158,
+				startY : 140,
+				isMain : true,
+				spaces : [{x: 40, y:-15, reward : "shield"},{x: 35, y:-10, reward : "shield"},{x: 40, y:0, reward : "shield"},{x: 40, y:10, reward : "shield"},{x: 40, y:5, reward : "shield"},{x: 40, y:10, reward : "die"},{x: 40, y:10, reward : "shield"},{x: 40, y:10, reward : "shield"},{x: 40, y:0, reward : "shield"},{x: 40, y:-10, reward : "shield"},{x: 30, y:-20, reward : "die"},{x: 5, y:-40, reward : "shield"},{x: -30, y:-20, reward : "die"},{x: -110, y:-90, reward : "die"}]
+			},
+			"Friendship" : {
+				position : 0,
+				startX : 140,
+				startY : 0,
+				isMain : false,
+				spaces : [{reward : "shield"}, {reward : "Card", name:"Asylum"}, {reward : "shield"},{reward : "Card", name:"Wollys"},{reward : "shield"}, {reward : "Card", name:"DyerMaker"},{reward : "heal"}]
+			}
+		},
+		"validTracks" : [{name : "Fighting", text: "Luchar"},{name: "Travelling", text:"Viajar"},{name: "Hiding", text:"Esconderse"},{name: "Friendship", text:"Amistad"}],
+		"events" : [{name : 'SamSaveFrodo'}, {name: 'LordAttack'},{name: 'PelennorFields'},{name: 'SauronMouth'},{name: 'Sorrounded'},{name: "RingIsMine"}],
+		"isConflict" : true,
+		"activities" : [],
+		"featureCards" : []
+	};
 
 	return exports;
 

@@ -150,7 +150,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			var texto = "";
 			if (data.cards == null){
 				if (data.to==null){
-					texto = "Debes descartar cartas de tu mano, por un valor total de "+data.amount+" símbolos cualesquiera.";
+					texto = "Debes descartar un total de "+data.amount+" cartas de tu mano, con símbolos cualesquiera.";
 				}
 				else{
 					texto = "Escoge "+data.amount+" cartas para dar a otro jugador.";
@@ -159,29 +159,47 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			else{
 				texto = "Debes descartar cartas de tu mano, por un valor equivalente a los siguientes símbolos: ";
 				for (i in data.cards){
-					texto+= "una carta "
-					if (data.cards[i].color!=null){
-						if (data.cards[i].color=="White") texto+="blanca "
-						else texto+="gris "
-					}
-					if (data.cards[i].symbol!=null){
-						if (data.cards[i].symbol=="Fighting") texto+="de símbolo Luchar"
-						else if (data.cards[i].symbol=="Hiding") texto+="de símbolo Esconderse"
-						else if (data.cards[i].symbol=="Travelling") texto+="de símbolo Viajar"
-						else if (data.cards[i].symbol=="Friendship") texto+="de símbolo Amistad"
-						else texto+="de Comodín"
-					}
-					if (data.cards[i].color==null && data.cards[i].symbol==null){
-						texto+= "de cualquier símbolo"
-					}
-					if (i<data.cards.length-1){
-						texto+=", "
-					}
-					else{
-						texto+=". ";
-					}
+						if (data.cards[i].amount<=1 || typeof(data.cards[i].amount) == 'undefined'){
+							texto+= "una carta "
+						}
+						else{
+							texto+= data.cards[i].amount+ " cartas "
+						}
+						if (data.cards[i].color!=null){
+							if (data.cards[i].color=="White") texto+="blanca "
+							else texto+="gris "
+						}
+						if (data.cards[i].symbol!=null){
+							if (data.cards[i].symbol=="Fighting") texto+="de símbolo Luchar"
+							else if (data.cards[i].symbol=="Hiding") texto+="de símbolo Esconderse"
+							else if (data.cards[i].symbol=="Travelling") texto+="de símbolo Viajar"
+							else if (data.cards[i].symbol=="Friendship") texto+="de símbolo Amistad"
+							else texto+="de Comodín"
+						}
+						if (data.cards[i].color==null && data.cards[i].symbol==null){
+							texto+= "de cualquier símbolo"
+						}
+						if (i<data.cards.length-1){
+							texto+=", "
+						}
+						else{
+							texto+=". ";
+						}
+					
 				}
 			}
+			//calculo la verdadera cantidad de cartas a descartar
+			var original_amount = data.amount;
+			var aux_am = 0;
+			for (l in data.cards){
+				if (typeof(data.cards[i].amount) == 'undefined'){
+					aux_am+=1;
+				}
+				else{
+					aux_am+=data.cards[l].amount;
+				}
+			}
+			data.amount = aux_am;
 			//Dibujo una alerta indicandome
 			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias});
 			popup.addListener("ok", function(){
@@ -214,7 +232,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 			if (client.alias == data.alias){
 				if (data.cards == null){
-					client.discardAny(data, popup);	//chequeo que el descarte sea correcto
+					client.discardAny(data,original_amount, popup);	//chequeo que el descarte sea correcto
 				}
 				else{
 					client.discard(data, popup);	//chequeo que el descarte sea correcto
@@ -235,7 +253,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se mueve "+data.amount+" lugares hacia el peligro!", 'mode':'danger'});
 			}
 			else{
-				game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se aleja "+data.amount+" espacios del peligro!", 'mode':'danger'});
+				game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se aleja "+(-data.amount)+" espacios del peligro!", 'mode':'danger'});
 			}
 			game.io.to(player.room).emit('update game', data);	
 		},
@@ -330,7 +348,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			
 			if (data.isConflict){
 			$("#location-board-img-container").children().remove();
 
@@ -400,6 +417,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	"DrawTile" : {
 		apply : function(game, player,data){
 			game.drawTile(data);
+			data['phase'] = game.turnPhase;
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -443,24 +461,36 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			//mover la ficha como corresponda
 			//si no es la min track se mueve la ficha de forma constante
-
 			if (data.track!=null && !data.isFinished){
 				if (!data.track.isMain){
 					$("#"+data.trackName+"-chip").animate({
 						'left' : "+="+31*data.amount+"px" //moves right
-					},800);
+					},800, function(){
+						//si es el ultimo espacio de la main track cambio de escenario
+						if (client.isActivePlayer()){
+							client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
+							if (data.endScenario){	
+								client.socket.emit('add activity', {'action' : 'EndScenario'});				
+							}
+							client.socket.emit('resolve activity');
+						}
+					});
 				}
 				//es la main track, hay que moverlo de forma especial
 				else{
 					$("#"+data.trackName+"-chip").animate({
 						'left' : "+="+data.track.spaces[data.track.position-1].x+"px",
 						'top' : "+="+data.track.spaces[data.track.position-1].y+"px"
-					},800);
-				}
-
-				//si es el ultimo espacio de la main track cambio de escenario
-				if (data.endScenario){
-					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
+					},800, function(){
+						//si es el ultimo espacio de la main track cambio de escenario
+						if (client.isActivePlayer()){
+							client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
+							if (data.endScenario){	
+								client.socket.emit('add activity', {'action' : 'EndScenario'});				
+							}
+							client.socket.emit('resolve activity');
+						}
+					});
 				}
 			}
 
@@ -493,10 +523,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						});
 
 					popup.draw(client);
-				}
-				else{
-					client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
-					client.socket.emit('resolve activity');
 				}
 			}
 		}
@@ -537,12 +563,54 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			var isValid = true;
 			var i = 0;
 			var discarded = [];
+			//armar "paquetes" con discards
+			var bundles = [];
+			var out = 0;
+			for (o in data.discards){
+				data.discards[o]['out'] = false;
+			}
+			while (out < data.discards.length){
+				var f=0;
+				while (f < data.discards.length){
+					if (data.discards[f].out == false){
+						data.discards[f].out=true;
+						out++;
+						for (temp in data.discards){
+							if (data.discards[temp].alias == data.discards[f].alias && data.discards[temp].discard.element == data.discards[f].discard.element){
+								if (data.discards[temp].discard.element  == 'card'){
+									if (data.discards[temp].discard.symbol == data.discards[f].discard.symbol && data.discards[temp].discard.color == data.discards[f].discard.color){
+										if (!data.discards[temp].out){
+											data.discards[f].discard.amount++;
+											data.discards[temp].out=true;
+											out++;
+										}
+									}
+								}
+								else if (data.discards[temp].discard.element  == 'token'){
+									if (data.discards[temp].discard.token == data.discards[f].discard.token){
+										if (!data.discards[temp].out){
+											data.discards[f].discard.amount++;
+											data.discards[temp].out=true;
+											out++;
+										}
+									}
+								}
+							}
+						}
+						bundles.push(data.discards[f]);
+					}
+					f++;
+				}
+			}
+			console.log("los bundles q arme: ");
+			console.log(bundles);
+			data.discards = bundles;
 			//voy borrando los elementos a medida que chequeo para chequear sobre un mismo usuario que tenga que hacer varios descartes
 			//ej: si quiero chequear que un mismo usuario descarte una carta y luego otra igual, tengo que removerla la primera vez
 			//para que ese chequeo sea real. al final, repongo lo que removi
 			while (i<data.discards.length && isValid){
 				if (data.discards[i].discard.element == 'card'){	//si debo descartar una carta
-					if (game.getPlayerByAlias(data.discards[i].alias).hasCards([data.discards[i].discard])){	//se chequea que el jugador indicado la tenga
+					if (game.getPlayerByAlias(data.discards[i].alias).hasCards2([data.discards[i].discard])){	//se chequea que el jugador indicado la tenga
 						discarded.push({'alias' : data.discards[i].alias, 'type': data.discards[i].discard.element,'element' : game.getPlayerByAlias(data.discards[i].alias).discardFirstMatch(data.discards[i].discard)});
 					}else{
 						isValid=false;
@@ -632,23 +700,25 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			if (data.reward.reward == 'life' || data.reward.reward == 'sun' ||data.reward.reward == 'ring' ||data.reward.reward == 'shield'){
-				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': data.reward.reward, 'amount':1});
-			}
-			else if (data.reward.reward == 'die'){
-				client.socket.emit('add activity', {'action' : 'RollDie'});
-			}
-			else if (data.reward.reward == 'big-shield'){
-				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': 'shield', 'amount':3});
-			}
-			else if (data.reward.reward == 'Card'){
-				if (typeof data.reward.name != 'undefined'){
-					client.socket.emit('add activity', {'action' : 'DealFeatureCardByName', 'card' :data.reward.name, 'player' : client.alias});
+			if (typeof data.reward != 'undefined'){
+				if (data.reward.reward == 'life' || data.reward.reward == 'sun' ||data.reward.reward == 'ring' ||data.reward.reward == 'shield'){
+					client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': data.reward.reward, 'amount':1});
 				}
-				else{
-					console.log("ENTRE AL LSE PORQUE LA REWATD ES UNDEFINSIF");
+				else if (data.reward.reward == 'die'){
+					client.socket.emit('add activity', {'action' : 'RollDie'});
 				}
-					
+				else if (data.reward.reward == 'big-shield'){
+					client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': 'shield', 'amount':5});
+				}
+				else if (data.reward.reward == 'heal'){
+					client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				}
+				else if (data.reward.reward == 'Card'){
+					if (typeof data.reward.name != 'undefined'){
+						client.socket.emit('add activity', {'action' : 'DealFeatureCardByName', 'card' :data.reward.name, 'player' : client.alias});
+					}
+						
+				}
 			}
 		client.socket.emit('resolve activity');
 		}
@@ -658,6 +728,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	"NextPhase" : {
 		apply : function(game, player,data){
 			game.nextPhase(data);
+			console.log(game.turnPhase);
 			data['phase'] = game.turnPhase;
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
@@ -665,7 +736,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			if (client.isActivePlayer()){
 					if (data.phase == 'playCards'){
 						$("#draw-tile-button").prop('disabled', true);
-						console.log("MITO UN CARDS PHASE");
 						client.socket.emit('add activity', {'action' : 'CardsPhase'});
 						client.socket.emit('add activity', {'action' : 'NextTurn'});
 					}
@@ -710,28 +780,30 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	"NextEvent" : {
 		apply : function(game, player,data){
 			if (game.currentLocation.currentEvent < game.currentLocation.events.length){
-				data['isNext'] = true;
 				data['newEvent'] = game.currentLocation.events[game.currentLocation.currentEvent];
 				game.currentLocation.currentEvent++;
-			}
-			else{
-				data['isNext'] = false;
+				if (game.currentLocation.currentEvent == game.currentLocation.events.length){
+					data['end'] = true;
+				}
+				else{
+					data['end'] = false;
+				}
 			}
 
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			if (data.isNext){
 				$("#Event-chip").animate({
 					'top' : "+="+50+"px"
-				},1000);
-			}
-			if (client.isActivePlayer()){
-				if (data.isNext){
-					client.socket.emit('add activity', {'action' : data.newEvent.name});
-				}
-				client.socket.emit('resolve activity');
-			}
+				},1000, function(){
+					if (client.isActivePlayer()){
+						client.socket.emit('add activity', {'action' : data.newEvent.name});
+						if (data.end){
+							client.socket.emit('add activity', {'action' : 'EndScenario'});		
+						}
+						client.socket.emit('resolve activity');
+					}
+				});	
 		}
 	},
 
@@ -898,7 +970,113 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				client.socket.emit('resolve activity');
 			}
 		}
-	}
+	},
+
+	//Un jugador selecciona y da cartas a otro
+	"EndScenario" : {
+		apply : function(game, player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "¡Se ha completado el escenario!", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Se evaluará que cada jugador tenga los tokens correspondientes. Luego se eligirá al nuevo Portador (aquel que mas tokens de Vida tenga o, de haber empate, el jugador que sigue al Portador actual en la lista) y el nuevo Portador recibe 2 cartas del mazo.", 'mode':'info'});
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			//chequeo tokens faltantes y aplico las sanciones correspondientes
+			client.socket.emit('add activity',{'action' : 'ChangeRingBearer'});
+			client.socket.emit('add activity',{'action' : 'TokenCheck'});
+			client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
+			client.socket.emit('resolve activity');
+		}
+	},
+
+	"TokenCheck" : {
+		apply : function(game, player,data){
+			var people = game.getAlivePlayers();
+			data['moves'] = [];
+			for (i in people){
+				var actual = people[i];
+				var am=0;
+				var text = "¡El jugador "+actual.alias+" no tiene suficientes fichas de: ";
+				if (actual.lifeTokens < 1){
+					text+="Vida"
+					am++;
+				}
+				if (actual.sunTokens < 1){
+					if (am>0){
+						text+=", "
+					}
+					text+="Sol"
+					am++;	
+				}
+				if (actual.ringTokens < 1){
+					if (am>0){
+						text+=", y "
+					}
+					text+="Anillo"
+					am++;
+				}
+				if (am>0){
+					text+="! Por lo tanto, deberá avanzar "+am+" espacios hacia el Malvado."
+					game.io.to(player.room).emit('log message', {'msg' : text, 'mode':'info'});
+				}
+					
+				data.moves.push({'alias' : actual.alias, 'amount': am})
+				
+			}
+			
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			for (i in data.moves){	
+
+				if (client.alias == data.moves[i].alias){
+					if (data.moves[i].amount>0){
+						client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : data.moves[i].amount});
+					}
+					if (client.isActivePlayer()){
+						client.socket.emit('resolve activity');
+					}
+				}
+			}	
+			
+		}
+	},
+
+	//Se selecciona un nuevo Portador y se resetean los tokens de cada jugador
+	"ChangeRingBearer" : {
+		apply : function(game, player,data){
+			game.ringBearer = game.changeRingBearer();
+			data['ringBearer'] = game.ringBearer.alias;
+
+			//Reset tokens
+			var people = game.getAlivePlayers();
+			for (i in people){
+				game.getPlayerByAlias(people[i].alias).resetTokens();
+			}
+			data['players'] = game.players;
+
+			game.io.to(player.room).emit('log message', {'msg' : "¡El nuevo Portador es: "+game.ringBearer.alias+"!", 'mode':'alert'});
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.players = data.players;
+			console.log(client.players);
+			for (i in client.players){
+				var span = $("#"+client.players[i].alias+"-state-div").find("#life-span");
+				span.text("0");
+				var span = $("#"+client.players[i].alias+"-state-div").find("#sun-span");
+				span.text("0");
+				var span = $("#"+client.players[i].alias+"-state-div").find("#ring-span");
+				span.text("0");	
+			}
+
+			$(".ring-bearer-img").remove();
+			$("#"+data.ringBearer+"-state-div").append("<img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img ring-bearer-img'>");
+			if (client.isActivePlayer()){
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : data.ringBearer});	
+				client.socket.emit('resolve activity');
+			}
+		}
+	},
 
 	};
 

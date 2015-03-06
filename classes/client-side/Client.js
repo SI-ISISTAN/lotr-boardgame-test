@@ -41,7 +41,8 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	}
 
 	//método para descartar cualquier carta hasta cierto numero
-	Client.prototype.discardAny = function(data, popup){
+	Client.prototype.discardAny = function(data, original_amount, popup){
+		data.amount = original_amount;
 		var discarded = 0;
 		$(".player-card-img").on('click', function(){
 				if (! $(this).data("selected")){	//si no estaba seleccionada		
@@ -69,46 +70,64 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	// cuando intento descartar, este método asegura que el descarte sea válido
 	Client.prototype.discard = function(data, popup){
 				var discarded = 0;
-				$(".player-card-img").on('click', function(){
-						var cards = data.cards;
-						if (! $(this).data("selected")){	//si no estaba seleccionada
-							var valid = false;				//validar si la carta que se intenta descartar es valida segun lo que se exije descartar
-							var j=0;
-							while (j<cards.length && !valid){
-								if ( ( (cards[j].symbol==null ||  cards[j].symbol== ($(this).data("card").symbol) ) && (cards[j].color==null ||  cards[j].color==($(this).data("card").color) )) ||  ($(this).data("card").symbol) == "Joker")
-								{
-									valid = true;
-									$(this).data("discarded", cards[j]);
-									console.log("Me estoy deshaciendo de la carta: ");
-									console.log(cards[j]);
-									cards.splice(j,1);
+				console.log("cantidad a descartar: "+data.amount);
 
-								}
-								else j++;
-							}			
-							if (valid){											
-								$(this).addClass("highlighted-image");
-								$(this).data("selected", true);
-								$(this).data("number", $(this).index()-1);
-								if ((discarded + $(this).data("card").amount) > data.amount){
-									$(this).data("put", (data.amount - discarded));
-									discarded= data.amount;
-								}
-								else{
-									discarded+= $(this).data("card").amount;
-									$(this).data("put", ($(this).data("card").amount));
-								}
+				var cards = data.cards;
+				
+				//deshago los bundles
+				for (p in cards){
+					if (cards[p].amount > 1){
+						var amo = cards[p].amount;
+						var y = 0;
+						while (y<amo){
+							var car = cards[p];
+							car.amount=1;
+							cards.push(car);
+							y++;
+						}
+						cards.splice(p,1);
+					}
+				}
+
+				$(".player-card-img").on('click', function(){
+						
+					if (! $(this).data("selected")){ //si no estaba seleccionada
+						var valid = false; //validar si la carta que se intenta descartar es valida segun lo que se exije descartar
+						var j=0;
+						while (j<cards.length && !valid){
+							if ( ( (cards[j].symbol==null || cards[j].symbol== ($(this).data("card").symbol) ) && (cards[j].color==null || cards[j].color==($(this).data("card").color) )) || ($(this).data("card").symbol) == "Joker")
+							{
+								valid = true;
+								$(this).data("discarded", cards[j]);
+								console.log("Me estoy deshaciendo de la carta: ");
+								console.log(cards[j]);
+								cards.splice(j,1);
+							}
+							else j++;
+						}
+						if (valid){
+							$(this).addClass("highlighted-image");
+							$(this).data("selected", true);
+							$(this).data("number", $(this).index()-1);
+							if ((discarded + $(this).data("card").amount) > data.amount){
+								$(this).data("put", (data.amount - discarded));
+								discarded= data.amount;
 							}
 							else{
-								console.log("Carta invalida");
+								discarded+= $(this).data("card").amount;
+								$(this).data("put", ($(this).data("card").amount));
 							}
-						}					
-						else{								//si esta estaba seleccionada, deselecciono
-								$(this).removeClass("highlighted-image");
-								$(this).data("selected", false);
-								cards.push($(this).data("discarded"));
-								$(this).data("discarded", null);
-								discarded-= $(this).data("put");
+						}
+						else{
+							console.log("Carta invalida");
+							}
+						} 			
+					else{								//si esta estaba seleccionada, deselecciono
+							$(this).removeClass("highlighted-image");
+							$(this).data("selected", false);
+							cards.push($(this).data("discarded"));
+							$(this).data("discarded", null);
+							discarded-= $(this).data("put");
 
 						}
 						if (discarded != data.amount){
@@ -239,8 +258,12 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			popup.draw(this);
 				
 				div.fadeIn(3000, function(){
+
 					var next=false;
 					if (self.isActivePlayer()){
+						if (data.phase == "drawTiles"){
+							self.socket.emit('add activity', {'action' : "NextPhase"});
+						}
 						if (action!= null){
 							self.socket.emit('add activity', action);
 							if (data.value=="Friendship" || data.value=="Fighting" || data.value=="Travelling" || data.value=="Hiding"){
@@ -268,6 +291,23 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				});
 
 				var div = $("<div>  </div>");
+
+				//"desarmo" paquetes de descarte para convertirlos en descartes individuales
+				for (p in data.elements){
+					if (data.elements[p].amount > 1){
+						var amo = data.elements[p].amount;
+						var y = 0;
+						while (y<amo){
+							var car = data.elements[p];
+							car.amount=1;
+							data.elements.push(car);
+							y++;
+						}
+						data.elements.splice(p,1);
+					}
+				}
+
+
 				for (i in data.elements){
 					var el = $("<div id='deal-card-div'>  </div> ");
 

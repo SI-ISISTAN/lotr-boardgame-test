@@ -781,7 +781,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1},{element : 'token', token: 'shield', amount: 1}], 'defaultAction' : {'action' : 'DiscardFeatureCards'}, 'discardActions': [{'action' : 'DealFeatureCardByName', 'card' :"Gollum", 'player' : client.alias}, {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null}]});
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'token', token: 'shield', amount: 7}], 'defaultAction' : {'action' : 'DiscardFeatureCards'}, 'discardActions': [{'action' : 'DealFeatureCardByName', 'card' :"Gollum", 'player' : client.alias}, {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null}]});
 			client.socket.emit('resolve activity');
 
 		}
@@ -980,6 +980,211 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		}
 		
 	},
+
+	/////////////////////////////////////////////////// ACCIONES DE MORDOR ////////////////////////////////////////////////////
+
+	'SamSaveFrodo' :  {
+		'title': "Salvación",
+		'description' : "Cada jugador, yendo en ronda, tiene la opción de descartar 3 escudos. Si lo hace puede elegir entre sacar dos cartas del mazo o 'curarse', retrocediendo un paso en la Línea de Corrupción.",
+		apply : function(game, player,data){
+			
+			if (typeof data.player == 'undefined'){
+				data.player = game.activePlayer.alias;
+				data['playerNumber'] = 	game.activePlayer.number;
+			}
+			if (game.getPlayerByAlias(data.player).shields >= 3){
+				data['canDiscard'] = true;
+			}
+			else data['canDiscard'] = false;
+			this.logEventInfo(game,player);
+			game.io.to(game.getPlayerByAlias(data.player).id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [ {name : "Descartar 3 escudos y sacar cartas", id:"draw"}, {name : "Descartar 3 escudos y curarse", id:"heal"}, {name : "No descartar", id:"dont"}], visibility : data.player});
+			popup.addListener("draw", function(){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-3});
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});	
+				client.roundTransmission({'action' : "SamSaveFrodo"}, data.playerNumber);	
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("heal", function(){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-3});
+				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				client.roundTransmission({'action' : "SamSaveFrodo"}, data.playerNumber);		
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("dont", function(){
+				client.roundTransmission({'action' : "SamSaveFrodo"}, data.playerNumber);		
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+
+			popup.draw(client);
+
+			if (!data.canDiscard){
+				popup.disableButton("draw",true);
+				popup.disableButton("heal",true);
+			}
+		}
+		
+	},
+
+	'LordAttack' :  {
+		'title': "La Carga del Enemigo",
+		'description' : "Un jugador debe descartar 3 cartas, y, como resultado, cada jugador (incluso quien descarta) recibe una carta del Mazo. Si ninguno puede o desea hacerlo, todos los jugadores deben lanzar el Dado.",
+		apply : function(game, player,data){
+			var candidates = [];
+			var cards = [{symbol: null, color: null}, {symbol: null, color: null},{symbol: null, color: null}]; //son dos cartas de Esconderse
+			for (v in game.players){
+				if (game.players[v].hasCards(cards)){
+					candidates.push(game.players[v].alias);
+				}
+			}
+			data['candidates'] = candidates;
+
+			this.logEventInfo(game,player);
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [ {name : "Este jugador descartará", id:"draw"}, {name : "No descartar", id:"dont"}], visibility : "active"});
+			popup.addListener("draw", function(){
+				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'alias' : $(".discard-to-selector").val(), 'amount' : 3, 'card' : null, 'to':null });
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null});	
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("dont", function(){
+				client.socket.emit('add activity', {'action' : 'RollDie'});
+				client.roundTransmission({'action' : "RollDie"}, data.playerNumber);		
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+
+			var listbox = $("<select class='discard-to-selector'> </select>");
+			for (j in data.candidates){
+				$(listbox).append("<option value='"+data.candidates[j]+"'> "+data.candidates[j]+"</option>");
+			}
+			popup.append($(listbox));
+			popup.draw(client);
+			if (data.candidates.length == 0){
+				popup.disableButton("draw", true);
+			}
+		}
+		
+	},
+
+	'PelennorFields' :  {
+		'title': "Batalla del Fin del Mundo",
+		'description' : "Cada jugador, yendo en ronda, debe descartar 1 ficha de Salud. Si no puede o no desea hacerlo, debe lanzar el Dado y luego (independientemente del resultado de la tirada) descartar 2 cartas.",
+		apply : function(game, player,data){
+			
+			if (typeof data.player == 'undefined'){
+				data.player = game.activePlayer.alias;
+			}
+			if (game.getPlayerByAlias(data.player).lifeTokens >= 1){
+				data['canDiscard'] = true;
+			}
+			else data['canDiscard'] = false;
+			this.logEventInfo(game,player);
+			game.io.to(game.getPlayerByAlias(data.player).id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [ {name : "Sacrificar 1 ficha de corazón", id:"discard"}, {name : "No sacrificar", id:"dont"}], visibility : data.player});
+			popup.addListener("discard", function(){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'life', 'amount':-1});
+				client.roundTransmission({'action' : "PelennorFields"}, client.player.number);	
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("dont", function(){
+				client.socket.emit('add activity', {'action' : 'RollDie'});
+				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'alias' : client.alias, 'amount' : 2, 'card' : null, 'to':null });
+				client.roundTransmission({'action' : "PelennorFields"}, client.player.number);		
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+
+			popup.draw(client);
+
+			if (!data.canDiscard){
+				popup.disableButton("discard",true);
+			}
+		}
+		
+	},
+
+	'SauronMouth' :  {
+		'title': "La Entrada Oscura",
+		'description' : "Cada jugador, yendo en ronda, debe descartar 1 ficha de Sol. Si no puede o no desea hacerlo, debe lanzar el Dado y luego (independientemente del resultado de la tirada) descartar 2 cartas.",
+		apply : function(game, player,data){
+			
+			if (typeof data.player == 'undefined'){
+				data.player = game.activePlayer.alias;
+			}
+			if (game.getPlayerByAlias(data.player).sunTokens >= 1){
+				data['canDiscard'] = true;
+			}
+			else data['canDiscard'] = false;
+			this.logEventInfo(game,player);
+			game.io.to(game.getPlayerByAlias(data.player).id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [ {name : "Sacrificar 1 ficha de Sol", id:"discard"}, {name : "No sacrificar", id:"dont"}], visibility : data.player});
+			popup.addListener("discard", function(){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'sun', 'amount':-1});
+				client.roundTransmission({'action' : "SauronMouth"}, client.player.number);	
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+			popup.addListener("dont", function(){
+				client.socket.emit('add activity', {'action' : 'RollDie'});
+				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'alias' : client.alias, 'amount' : 2, 'card' : null, 'to':null });
+				client.roundTransmission({'action' : "SauronMouth"}, client.player.number);		
+				client.socket.emit('resolve activity');
+				popup.close();	
+			});
+
+			popup.draw(client);
+
+			if (!data.canDiscard){
+				popup.disableButton("discard",true);
+			}
+		}
+		
+	},
+
+	'Sorrounded' :  {
+		'title': "Acorralados",
+		'description' : "Los jugadores deben descartar, entre todos, 7 cartas. De no poder hacerlo el Malvado se mueve 3 espacios hacia los aventureros.",
+		apply : function(game, player,data){
+			this.logEventInfo(game,player);
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null, amount: 7}]});
+			client.socket.emit('resolve activity');
+
+		}
+		
+	},
+
+	'RingIsMine' :  {
+		'title': "La Muerte",
+		'description' : "El juego termina con la derrota de los aventureros.",
+		apply : function(game, player,data){
+			this.logEventInfo(game,player);
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			//falta hacer la derrota
+			client.socket.emit('resolve activity');
+
+		}
+		
+	}
+
 
 	};
 

@@ -164,7 +164,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					io.to(client.id).emit('next activity');	//enviar siguiente actividad
 				}
 				else{
-					self.activeGames[client.room].startConflict();
 					io.to(client.room).emit('next turn', {activePlayer : self.activeGames[client.room].activePlayer.alias});	//enviar siguiente actividad
 				}
 			});
@@ -184,7 +183,14 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//e agrega una subactividad a la actividad que está en curso en ese momento, que se ejecutará cuando se resuelva la actividad en curso
 			client.on('add activity', function (data){
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
-				self.activeGames[client.room].currentLocation.currentActivity.addSubActivity(new_act);
+				if (typeof self.activeGames[client.room].currentLocation.currentActivity != 'undefined'){
+					self.activeGames[client.room].currentLocation.currentActivity.addSubActivity(new_act);
+				}
+			});
+
+			client.on('cancel scheduled', function (data){
+				self.activeGames[client.room].currentLocation.currentActivity.subactivities = [];
+				self.activeGames[client.room].currentLocation.currentActivity.currentSubactivity = 0;
 			});
 
 			//Se resuleve una actividad

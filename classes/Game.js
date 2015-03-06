@@ -141,7 +141,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		for (var i = 0; i < this.players.length; i++) {
 			this.players[i].character = gameData.characters[i];
 		};
-		this.turnedPlayer=0;
+		this.turnedPlayer=1;
 		this.ringBearer = this.players[this.turnedPlayer];
 		this.activePlayer = this.ringBearer;
 		this.ringBearer.turn = true;
@@ -162,6 +162,10 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		//Cargo escenarios
 		
 		this.locations.push(locations.BagEnd);
+		this.locations.push(locations.Moria);
+		this.locations.push(locations.Mordor);
+		
+		
 		this.locations.push(locations.Shelob);
 		this.locations.push(locations.Rivendell);
 		
@@ -186,13 +190,15 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	}
 
 	Game.prototype.resolveActivity = function(client){
-		var new_act = this.currentLocation.currentActivity.next();
-		if (new_act != null){
-				this.currentLocation.currentActivity = new_act;
-				this.io.to(client.id).emit('resolve activity', this.currentLocation.currentActivity.data);	//si no, emito que la termine
-		}
-		else{
-			console.log("No mas actividades!");
+		if (typeof(this.currentLocation.currentActivity)!='undefined'){
+			var new_act = this.currentLocation.currentActivity.next();
+			if (new_act != null){
+					this.currentLocation.currentActivity = new_act;
+					this.io.to(client.id).emit('resolve activity', this.currentLocation.currentActivity.data);	//si no, emito que la termine
+			}
+			else{
+				console.log("No mas actividades!");
+			}
 		}
 		
 	}
@@ -209,9 +215,49 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	//Paso a la location siguiente
 	Game.prototype.nextPhase = function(data){
 		if (this.turnPhase=="drawTiles"){
+			this.turnPhase="tileDrawn";
+		}
+		else if (this.turnPhase=="tileDrawn"){
 			this.turnPhase="playCards";
 		}
+	}
 
+	//Retorno los jugadores vivos
+	Game.prototype.getAlivePlayers = function(){
+		var alive = [];
+		for (i in this.players){
+			if (!this.players[i].dead){
+				alive.push(this.players[i]);
+			}
+		}
+		return alive;
+	}
+
+	//Elijo al nuevo ring bearer
+	Game.prototype.changeRingBearer = function(){
+		var most = -1;
+		var neu = null;
+		var candidates = this.getAlivePlayers();
+		var i=0;
+		var playerNumber = this.ringBearer.number;
+		if (playerNumber<candidates.length-1){
+					i = playerNumber+1;
+		}
+		while (candidates[i].alias != this.ringBearer.alias){
+				console.log("Evaluo al candidato "+candidates[i].alias+" que tiene "+candidates[i].lifeTokens+" tokens de vida");
+				if (candidates[i].lifeTokens > most){
+					most=candidates[i].lifeTokens;
+					neu = candidates[i];
+				}
+				if (i<candidates.length-1){
+					i++;
+				}
+				else{
+					i=0;
+				}
+		}
+
+		return neu;
 	}
 
 	Game.prototype.nextTurn = function(data){
@@ -229,14 +275,6 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 			this.turnPhase="drawTiles";
 	}
 
-	Game.prototype.startConflict = function(){
-
-	}
-
-	//Cuando finalizo un conflicto hago los chequeos y las acciones correspondientes
-	Game.prototype.endConflict = function(){
-
-	}
 
 	//Recibe el estado de juego ante algun cambio grande
 	Game.prototype.drawTile= function(data){
