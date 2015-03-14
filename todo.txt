@@ -1,12 +1,13 @@
 Hacer:
-
--	el discard en player se hace como el orto, se reordenan los elementos. ni idea porque. investigar
 - el check no se si esta bien tambien. considerar solucion recursiva
 
 Porximo commit:
 - COMENTE UNA LINEA EN EL CHANGE DISCARD DE TOKENS. OJOTAAAAA
 
+
 ojota:
 estoy cambiando el sistema de descarte
 -le agrege un metodo hascards2 a player
 -agregue budling en checkdiscard, sin cambiar el resto del sistema
+- Juntar toda la conducta de enables/disables de acuerdo a la phase en un sólo método. Idea: en cada switch de phase, llamar a un metodo de client que administre los
+enables y disables de acuerdo a los botones que hay.

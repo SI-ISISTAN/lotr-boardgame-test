@@ -112,12 +112,98 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			if (typeof data.player == 'undefined'){
 				data.player = player.alias;
 			}
-			game.io.to(player.room).emit('update game', {'action' : 'RollDie', 'value' : game.rollDie(), 'player': data.player});	
+			var val = 0;
+			if (typeof data.value != 'undefined'){
+				val = data.value;
+			}
+			else{
+				val = game.rollDie();
+			}
+			game.io.to(player.room).emit('update game', {'action' : 'RollDie', 'value' : val, 'player': data.player});	
 		},
 		draw : function(client, data){
 			client.rollDie(data);			
 		}
 		
+	},
+
+	//Accion de usar el anillo
+	"UseRing" : {
+		apply: function(game,player,data){
+			game.io.to(player.room).emit('log message', {'msg' : "¡"+player.alias+" usa el Anillo!", 'mode':'good'});
+			game.ringUsed = true;
+			data['value'] = game.rollDie();
+			data['amount'] = 0;
+			switch (data.value){
+				case 1:
+					data.amount =4;
+				break;
+				case 2:
+					data.amount =3;
+				break;
+				case 3:
+					data.amount =3;
+				break;
+				case 4:
+					data.amount =2;
+				break;
+				case 5:
+					data.amount =1;
+				break;
+				case 6:
+					data.amount =2;
+				break;
+			}
+			data['valid'] = game.currentLocation.validTracks;
+			game.io.to(player.id).emit('update game', data);	//enviar siguiente actividad
+		},
+		draw : function(client, data){
+			client.ringUsed=true;
+			//cierro los popus usados actualmente en el turno
+			if (client.turnPhase == "playCards"){
+				$("#play-cards-dialog").dialog('close');
+			}
+			else if (client.turnPhase == "cleanUp"){
+				$("#cleanup-dialog").dialog('close');
+			}
+			$("#use-ring-button").prop('disabled', true);
+			client.socket.emit('add activity', {'action' : 'RollDie', 'value' : data.value});
+			var popup = new Popup({title: "Avanzar en una pista", text: "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+							//pongo los elementos de reparto de cada carta
+							var div = $("<div>  </div>");
+							var el = $("<div id='advance-div'>  </div> ");
+							var listbox = $("<select id='move-track-selector'> </select>");
+							//Agrego los tracks por los que puedo avanzar
+							for (i in data.valid){
+								$(listbox).append("<option value='"+data.valid[i].name+"'> "+data.valid[i].text+"</option>");
+							}			
+							$(el).append($(listbox));
+							div.append(el);	
+							popup.append(div);
+							//cuando me dan ok envio cada carta al jugador correspondiente
+							popup.addListener("ok", function(){
+									$("#move-track-selector").each(function(){
+										var to = $(this).val();
+										var j=0;
+										while (j<data.amount){
+											client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to, 'amount' : 1 });
+
+											j++;
+										}
+										
+									});
+							
+							$("#move-track-selector").remove();
+							client.socket.emit('add activity', {'action' : 'ResumeTurn'});
+							client.socket.emit('resolve activity');
+							popup.close();
+							});
+
+				popup.draw(client);
+
+		}
+
+
 	},
 
 	//Un jugador se descarta
@@ -349,23 +435,37 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			if (data.isConflict){
-			$("#location-board-img-container").children().remove();
+				client.ringUsed=false;
+				$("#location-board-img-container").children().remove();
+				$("#ring-bearer-div").remove();
+				$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img">');
+				
+					if (data.tracks.Fighting != null){
+						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Fighting-chip" class="cone-chip" style="left: '+data.tracks.Fighting.startX+'px; top: '+data.tracks.Fighting.startY+'px;">');
+					}
+					if (data.tracks.Travelling != null){
+						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Travelling-chip" class="cone-chip" style="left: '+data.tracks.Travelling.startX+'px; top: '+data.tracks.Travelling.startY+'px;">');
+					}
+					if (data.tracks.Friendship != null){
+						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Friendship-chip" class="cone-chip" style="left: '+data.tracks.Friendship.startX+'px; top: '+data.tracks.Friendship.startY+'px;">');
+					}
+					if (data.tracks.Hiding != null){
+						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Hiding-chip" class="cone-chip" style="left: '+data.tracks.Hiding.startX+'px; top: '+data.tracks.Hiding.startY+'px;">');
+					}
+					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -45px;">');
 
-			$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img">');
-			
-				if (data.tracks.Fighting != null){
-					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Fighting-chip" class="cone-chip" style="left: '+data.tracks.Fighting.startX+'px; top: '+data.tracks.Fighting.startY+'px;">');
-				}
-				if (data.tracks.Travelling != null){
-					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Travelling-chip" class="cone-chip" style="left: '+data.tracks.Travelling.startX+'px; top: '+data.tracks.Travelling.startY+'px;">');
-				}
-				if (data.tracks.Friendship != null){
-					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Friendship-chip" class="cone-chip" style="left: '+data.tracks.Friendship.startX+'px; top: '+data.tracks.Friendship.startY+'px;">');
-				}
-				if (data.tracks.Hiding != null){
-					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Hiding-chip" class="cone-chip" style="left: '+data.tracks.Hiding.startX+'px; top: '+data.tracks.Hiding.startY+'px;">');
-				}
-				$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -45px;">');
+					//Agregar el div del anillo
+					if (client.isActivePlayer()){
+						client.turnPhase = "drawTiles";	
+						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Runas de mago"><button type="button" class="btn btn-success" id="use-ring-button">Usar el Anillo</button></div>').show('slow');
+			        	
+			        	//debo agregar el chobi este acá
+			        	$("#use-ring-button").on('click', function(){
+					    	
+					    	client.socket.emit('update game', {'action' : 'UseRing'});
+
+				    	});
+					}
 
 			}
 			$("#world-chip").animate({
@@ -428,7 +528,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	//Accion de juego de tirar el dado
 	'MoveTrack' :  {
 		apply : function(game, player,data){
-			
 			if (game.currentLocation.tracks[data.trackName]!=null){
 					
 					data['track'] = game.currentLocation.tracks[data.trackName];
@@ -514,8 +613,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						popup.addListener("ok", function(){
 								$("#move-track-selector").each(function(){
 									var to = $(this).val();
-									console.log($(this).val());
-									client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to , 'amount' : 1 });
+									client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to , 'amount' : data.amount });
 									client.socket.emit('resolve activity');
 								});
 						$("#move-track-selector").remove();
@@ -697,6 +795,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	//Reclamar la recompensa por haber avanzado
 	"ClaimReward" : {
 		apply : function(game, player,data){
+
+			//tengo que especificar que reward recibe
+
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -734,9 +835,17 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			if (client.isActivePlayer()){
+				console.log("La fase actual es: "+data.phase);
+				client.turnPhase = data.phase;
+				//activo y desactivo los botones de las cartas de acuerdo a en que fase del turno estoy
+				client.buttonCheck(data);
 					if (data.phase == 'playCards'){
 						$("#draw-tile-button").prop('disabled', true);
 						client.socket.emit('add activity', {'action' : 'CardsPhase'});
+						client.socket.emit('add activity', {'action' : 'NextPhase'});
+					}
+					else if (data.phase == 'cleanUp'){
+						client.socket.emit('add activity', {'action' : 'CleanUpPhase'});
 						client.socket.emit('add activity', {'action' : 'NextTurn'});
 					}
 					client.socket.emit('resolve activity');
@@ -748,7 +857,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	"NextTurn" : {
 		apply : function(game, player,data){
 			game.nextTurn(data);
-			game.io.to(player.room).emit('log message', {'msg' : "Es el turno de " +game.activePlayer.alias+". ", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "Es el turno de " +game.activePlayer.alias+". ", 'mode':'good'});
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -757,10 +866,33 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			$("#"+data.activePlayer.alias+"-state-div").addClass("is-active");
 			if (client.alias == data.activePlayer.alias){
 				client.player.turn=true;
+				client.turnPhase = "drawTiles";
+				if (!client.ringUsed){
+					$("#use-ring-button").prop('disabled', false);
+				}
 				$("#draw-tile-button").prop('disabled', false);
 			}
 			else{
 				client.player.turn=false;
+				client.turnPhase = "inactive";
+
+					$("#use-ring-button").prop('disabled', true);
+			}
+		}
+	},
+
+	//Retomar el flujo de turno despues de una interupcion
+	"ResumeTurn" : {
+		apply : function(game, player,data){
+			data['phase'] = game.turnPhase;
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			if (data.phase == "playCards"){
+				$("#play-cards-dialog").dialog();
+			}
+			else if (data.phase == "cleanUp"){
+				$("#cleanup-dialog").dialog();
 			}
 		}
 	},
@@ -828,18 +960,21 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Jugar cartas", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
+			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
 			popup.addListener("playcards", function(){
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				client.socket.emit('add activity', {'action' : 'PlayCards'});
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("heal", function(){
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("draw", function(){
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});	
 				popup.close();
 				client.socket.emit('resolve activity');
@@ -854,6 +989,25 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			if (!data.canHeal){
 				popup.disableButton("heal", true);
 			}
+		}
+	},
+
+	//Pasar a la siguiente fase del turno
+	"CleanUpPhase" : {
+		apply : function(game, player,data){
+			
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		
+		},
+		draw : function(client, data){
+			var popup = new Popup({title: "Fin del turno", id:"cleanup-dialog", text: "Es el fin del turno. Antes de darlo por terminado puedes jugar alguna carta especial válida, o, de ser el Portador, utilizar el Anillo.",buttons : [{name : "Terminar turno", id:"ok"}], visibility : "active"});
+
+			popup.addListener("ok", function(){	
+				popup.close();
+				client.socket.emit('resolve activity');
+			});
+
+			popup.draw(client);
 		}
 	},
 

@@ -28,7 +28,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 					client.socket.emit('resolve activity');
 				}
 				else if (this.symbol=="Joker"){
-					var popup = new Popup({title: "Avanzar en una pista", text: "La carta jugada es un comodín,por lo cual debes elegir una pista en la cual avanzar tantos espacios como símbolos haya en la carta.",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+					var popup = new Popup({title: "Avanzar en una pista", text: "La carta jugada es un comodín, por lo cual debes elegir una pista en la cual avanzar tantos espacios como símbolos haya en la carta.",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
 							//pongo los elementos de reparto de cada carta
 							var div = $("<div>  </div>");
 							var el = $("<div id='advance-div'>  </div> ");

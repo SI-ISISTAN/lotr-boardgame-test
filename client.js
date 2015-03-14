@@ -78,6 +78,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+res.game.players[i].character.image+'.jpg" id= "'+res.game.players[i].alias+'-chip" class="hobbit-chip" style="left: 18px; top: '+(140 + (i*8))+'px; z-index:'+(i+1)*1+';">');	
 		        }
 
+		        	
 		       for (i in res.game.players){
 		       		client.players.push({'id':res.game.players[i].id, 'alias': res.game.players[i].alias});
 		       } 
@@ -101,6 +102,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 
 		        if (client.player.turn){
+
 		        	socket.emit('change location');	//repetir el evento a los otros clientes
 		        }
 		        
@@ -211,9 +213,14 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 			    $("#draw-tile-button").on('click', function(){
 			    	$("#draw-tile-button").prop('disabled', true);
+			    	if (client.turnPhase == "drawTiles"){
+			    		client.socket.emit('update game', {'action' : "NextPhase"});
+			    	}
 			    	client.socket.emit('update game', {'action' : 'DrawTile', 'value': null, 'player':client.alias});
 
 			    });
+
+			    
 
 
 				

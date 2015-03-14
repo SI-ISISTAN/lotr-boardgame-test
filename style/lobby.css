@@ -137,6 +137,17 @@
 	padding-bottom:5px;
 }
 
+.actions-div{
+	border-style: inset;
+	border-width: 2px;
+	border-color: #6E33F7;
+	background-color : #272822;
+	padding-top:5px;
+	padding-bottom:5px;
+	width:700px;
+	max-width: 700px;
+}
+
 #player-list-div{
 	background-color: #000000;
 	margin-left:5px;

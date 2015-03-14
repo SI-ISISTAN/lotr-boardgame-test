@@ -89,7 +89,7 @@ define(['../classes/Activity'], function (Activity) {
 			"Friendship" : null
 		},
 		"validTracks" : [{name : "Fighting", text: "Luchar"},{name: "Travelling", text:"Viajar"},{name: "Hiding", text:"Esconderse"}],
-		"events" : [{'name' : "SpeakFriend"}],
+		"events" : [{'name' : "SpeakFriend"}, {'name' : "WaterWatcher"},{'name' : "WellStone"},{'name' : "Trapped"},{'name' : "OrcsAttack"},{'name' : "FlyFools"}],
 		"isConflict" : true,
 		"activities" : [],
 		"featureCards" : []

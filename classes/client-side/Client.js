@@ -9,6 +9,8 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		this.gameID = null,
 		this.socket = null
 		this.players = [];
+		this.ringUsed=false;
+		this.turnPhase = "inactive";
 	}
 
 	Client.prototype.isActivePlayer = function(){
@@ -200,12 +202,14 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				});
 	}
 
-	//Tirar el dado
+	//Sacar un tile
+	
 	Client.prototype.drawTile = function(data){
 			var self=this;
 			var div = $("<div style = 'display : none'>  </div>")
 			var popup = new Popup({title: "Ficha de evento", id:"die-div", text: "El jugador "+data.player+" saca el evento...", buttons : [] , visibility : "all"});
 			var action = null;
+
 			switch (data.value){
 				case "Hiding":
 					div.append($('<img src="./assets/img/ripped/T2T3.png" class="img-responsive token-img" ><br><br>'));
@@ -255,26 +259,27 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 
 			}
 			popup.append(div);
+			
 			popup.draw(this);
-				
+			
 				div.fadeIn(3000, function(){
 
 					var next=false;
 					if (self.isActivePlayer()){
-						if (data.phase == "drawTiles"){
-							self.socket.emit('add activity', {'action' : "NextPhase"});
-						}
+						
 						if (action!= null){
 							self.socket.emit('add activity', action);
 							if (data.value=="Friendship" || data.value=="Fighting" || data.value=="Travelling" || data.value=="Hiding"){
+								console.log("AGREGUE UN NEXT PHASE");
 								self.socket.emit('add activity', {'action' : "NextPhase"});
 							}
 							else{
 								self.socket.emit('add activity', {'action' : "EnableTile"});
-							}	
+							}
+							self.socket.emit('resolve activity');	
 						}
 						
-						self.socket.emit('resolve activity');			
+									
 					}
 					
 					popup.close();
@@ -429,7 +434,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		});
 	}
 
-		//Retransmitir un evento en ronda desde el jugador activo hacia los demas
+	//Retransmitir un evento en ronda desde el jugador activo hacia los demas
 	Client.prototype.roundTransmission = function(action, playerNumber){
 		var act = action;
 		
@@ -440,7 +445,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						i = playerNumber+1;
 					}
 					while (this.players[i].alias != this.alias){
-						console.log("ROUND TRANSMISSION DEL EVENTO: "+act.action+" a " +this.players[i].alias);
 						action['player'] = this.players[i].alias;
 						this.socket.emit('add activity', action);
 						if (i<this.players.length-1){
@@ -451,6 +455,24 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						}
 					}
 			}
+	};
+
+	//Activa y desactiva los botones y cartas adecuados de acuerdo a la phase de turno en la cual 
+	Client.prototype.buttonCheck = function(data){
+		//boton de usar el anillo (si está)
+		if (this.isActivePlayer()){
+			if (!this.ringUsed){
+				if (data.phase == "drawTile" || data.phase == "playCards" || data.phase=="cleanUp"){
+					$("#use-ring-button").prop('disabled', false);
+				}
+				else{
+					$("#use-ring-button").prop('disabled', true);
+				}
+			}
+		}
+		else{
+			$("#use-ring-button").prop('disabled', true);
+		}
 	};
 
 	return Client;

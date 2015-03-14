@@ -18,6 +18,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.currentLocation = null;
 		this.locationNumber = 0;
 		this.sauronPosition = 15;		//Cargar de un file
+		this.ringUsed = false;
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -209,7 +210,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
 		data['mov']=gameData.worldPositions[this.locationNumber-1];
 		this.turnPhase = 'drawTiles';
-
+		this.ringUsed = false;
 	}
 
 	//Paso a la location siguiente
@@ -219,6 +220,12 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		}
 		else if (this.turnPhase=="tileDrawn"){
 			this.turnPhase="playCards";
+		}
+		else if (this.turnPhase=="playCards"){
+			this.turnPhase="cardPlayed";
+		}
+		else if (this.turnPhase=="cardPlayed"){
+			this.turnPhase="cleanUp";
 		}
 	}
 
