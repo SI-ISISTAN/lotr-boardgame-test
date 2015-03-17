@@ -1,8 +1,5 @@
-Hacer:
-- el check no se si esta bien tambien. considerar solucion recursiva
-
 Porximo commit:
-- COMENTE UNA LINEA EN EL CHANGE DISCARD DE TOKENS. OJOTAAAAA
+- Arregle un bug en el uso del anillo cuando tenia que cerrar los popups (los estaba cerrando como el reverendo ojete)
 
 
 ojota:

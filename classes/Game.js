@@ -15,10 +15,12 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.storyTiles = [];
 		this.hobbitCards = [];
 		this.locations = [];
+		this.gandalfCards = [];
 		this.currentLocation = null;
 		this.locationNumber = 0;
 		this.sauronPosition = 15;		//Cargar de un file
 		this.ringUsed = false;
+		this.specialEvents=[];
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -142,7 +144,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		for (var i = 0; i < this.players.length; i++) {
 			this.players[i].character = gameData.characters[i];
 		};
-		this.turnedPlayer=1;
+		this.turnedPlayer=0;
 		this.ringBearer = this.players[this.turnedPlayer];
 		this.activePlayer = this.ringBearer;
 		this.ringBearer.turn = true;
@@ -160,23 +162,28 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		}
 		this.hobbitCards = this.shuffleArray(this.hobbitCards);
 
+		//Cargo cartas de Gandalf
+		for (i in gameData.gandalfCards){
+			this.gandalfCards.push(gameData.gandalfCards[i]); 
+		}
+
 		//Cargo escenarios
 		
 		this.locations.push(locations.BagEnd);
+		
 		this.locations.push(locations.Moria);
+		this.locations.push(locations.Rivendell);
 		this.locations.push(locations.Mordor);
 		
 		
 		this.locations.push(locations.Shelob);
-		this.locations.push(locations.Rivendell);
+		
 		
 		this.locations.push(locations.Lothlorien);
-		
-		
-		
+
 		//inicio en la 1º location
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
-		console.log(this.storyTiles);
+		
 
 	}
 
@@ -289,11 +296,41 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.storyTiles.splice(this.storyTiles.length-1,1);
 	}
 
+	//Chequeo un evento especial
+	Game.prototype.hasSpecialEvent= function(event){
+		var found = false;
+		var j=0;
+		while (!found && j < this.specialEvents.length){	
+			if (this.specialEvents[j] == event){ 
+				found = true;
+			}
+			else { 
+				j++;
+			}
+		}
+		return found;
+	}
+
+	Game.prototype.deleteSpecialEvent= function(event){
+		var found = false;
+		var j=0;
+		while (!found && j < this.specialEvents.length){	
+			if (this.specialEvents[j] == event){ 
+				found = true;
+			}
+			else { 
+				j++;
+			}
+		}
+		if (found){ 
+			this.specialEvents.splice(j,1);
+		}
+	}
+
 	//aplico una actualizacion al juego
 	Game.prototype.update = function(update, emmiter, data){
 		//aplico y retorno el evento, si existe
 		if (update.apply != null){		
-
 			update.apply(this, emmiter, data);
 		}
 		else{

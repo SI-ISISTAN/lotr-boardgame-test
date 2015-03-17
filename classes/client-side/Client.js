@@ -270,7 +270,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						if (action!= null){
 							self.socket.emit('add activity', action);
 							if (data.value=="Friendship" || data.value=="Fighting" || data.value=="Travelling" || data.value=="Hiding"){
-								console.log("AGREGUE UN NEXT PHASE");
 								self.socket.emit('add activity', {'action' : "NextPhase"});
 							}
 							else{
@@ -462,18 +461,158 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		//boton de usar el anillo (si está)
 		if (this.isActivePlayer()){
 			if (!this.ringUsed){
-				if (data.phase == "drawTile" || data.phase == "playCards" || data.phase=="cleanUp"){
+				if (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp"){
 					$("#use-ring-button").prop('disabled', false);
 				}
 				else{
 					$("#use-ring-button").prop('disabled', true);
 				}
 			}
+			var span = $("#"+this.alias+"-state-div").find("#shield-span");
+			var shields = parseInt(span.text());
+			if (shields >= 5 && (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp") ){
+				$("#call-gandalf-button").prop('disabled', false);
+			}
+			else{
+				$("#call-gandalf-button").prop('disabled', true);
+			}
 		}
 		else{
 			$("#use-ring-button").prop('disabled', true);
+			$("#call-gandalf-button").prop('disabled', true);
 		}
 	};
+
+	//Moverse en una pista elegida una cantidad de espacios
+	Client.prototype.selectTrackMovement = function(data, pop_title, pop_text){
+		var self = this;
+		var popup = new Popup({title: pop_title, text: pop_text,buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+							//pongo los elementos de reparto de cada carta
+							var div = $("<div>  </div>");
+							var el = $("<div id='advance-div'>  </div> ");
+							var listbox = $("<select id='move-track-selector'> </select>");
+							//Agrego los tracks por los que puedo avanzar
+							for (i in data.valid){
+								$(listbox).append("<option value='"+data.valid[i].name+"'> "+data.valid[i].text+"</option>");
+							}			
+							$(el).append($(listbox));
+							div.append(el);	
+							popup.append(div);
+							//cuando me dan ok envio cada carta al jugador correspondiente
+							popup.addListener("ok", function(){
+									$("#move-track-selector").each(function(){
+										var to = $(this).val();
+										var j=0;
+										while (j<data.amount){
+											self.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to, 'amount' : 1 });
+											j++;
+										}
+										
+									});
+							
+								$("#move-track-selector").remove();
+								
+								self.socket.emit('resolve activity');
+								popup.close();
+							});
+
+		popup.draw(self);
+	};
+
+	//Rearreglar los ultimos 3 tiles
+	Client.prototype.rearrangeTiles = function(data){
+			var self=this;
+			var div = $("<div>  </div>")
+			var popup = new Popup({title: "Ficha de evento", id:"die-div", text: "Puedes reordenar los próximos 3 eventos para que salgan como lo desees.", buttons : [{name: "Listo", id:"ok"}] , visibility : "all"});
+			var action = null;
+			for (i in data.tiles){
+				switch (data.tiles[i]){
+					case "Hiding":
+						div.append($('<img src="./assets/img/ripped/T2T3.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> Se mueve un espacio en la pista de Esconderse. </p>"));
+					break;
+					case "Friendship":
+						div.append($('<img src="./assets/img/ripped/T2T1.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> Se mueve un espacio en la pista de Amistad. </p>"));
+					break;
+					case "Travelling":
+						div.append($('<img src="./assets/img/ripped/T2T2.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> Se mueve un espacio en la pista de Viaje. </p>"));
+					break;
+					case "Fighting":
+						div.append($('<img src="./assets/img/ripped/T2T4.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> Se mueve un espacio en la pista de Lucha. </p>"));
+					break;
+					case "Next Event":
+						div.append($('<img src="./assets/img/ripped/T1T3.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> Debe ejecutarse el siguiente evento. </p>"));
+					break;
+					case "Ring Influence":
+						div.append($('<img src="./assets/img/ripped/T1T1.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> El Portador del Anillo se mueve un espacio hacia Battion. </p>"));
+					break;
+					case "Sauron Will":
+						div.append($('<img src="./assets/img/ripped/T1T2.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> Un jugador debe voluntariarse para avanzar dos espacio hacia Sauron, o éste avanza un espacio hacia los aventureros. </p>"));
+					break;
+					case "Out Of Options":
+						div.append($('<img src="./assets/img/ripped/T1T4.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> Los jugadores deben descartar 3 cartas entre todos, o ejecutar el próximo Evento. </p>"));
+					break;
+					case "Losing Ground":
+						div.append($('<img src="./assets/img/ripped/T1T5.png" class="img-responsive token-img" ><br><br>'));
+						div.append($("<p> Los jugadores deben descartar 1 carta, 1 ficha de Vida y 1 Escudo entre todos, o ejecutar el próximo Evento. </p>"));
+					break;
+				}
+				var p =$("<p> En el orden de fichas este evento saldrá en el lugar: </p>");
+				var listbox = $("<select class='order-selector'> </select>");
+				listbox.data("tile",data.tiles[i]);
+				var t = 1;
+				while (t < 4){
+					$(listbox).append("<option value='"+t+"'> "+t+"</option>");
+					t++;
+				}
+				p.append(listbox);
+				p.append($("<br>"));
+				div.append(p);
+			}
+			popup.append(div);
+			popup.draw(this);
+
+			popup.addListener("ok", function(){ 
+				var order = [];
+				$(".order-selector").each(function(){ 
+					order.push({'tile' :  $(this).data('tile'), 'number':$(this).val()})
+				});
+				self.socket.emit('add activity', {'action' : 'PutTiles', 'tiles' : order});
+				self.socket.emit('resolve activity');
+				popup.close();
+			});
+
+			popup.disableButton("ok", true);
+
+			$(".order-selector").on('change', function(){ 
+				var values=[1,2,3];
+				$(".order-selector").each(function(){
+					var currentValue = parseInt($(this).val());
+					if (currentValue > 0 && currentValue < 4){
+						var v = 0; 
+						while (v < values.length){ 
+							if (currentValue == values[v]){ 
+								values.splice(v,1);
+							}
+							v++;
+						}
+					}
+				});
+				if (values.length == 0){ 
+					popup.disableButton("ok", false);
+				}
+				else{ 
+					popup.disableButton("ok", true);
+				}
+			});
+	}
 
 	return Client;
 

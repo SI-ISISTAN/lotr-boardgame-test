@@ -217,12 +217,12 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    		client.socket.emit('update game', {'action' : "NextPhase"});
 			    	}
 			    	client.socket.emit('update game', {'action' : 'DrawTile', 'value': null, 'player':client.alias});
-
 			    });
 
-			    
-
-
+			    $("#call-gandalf-button").on('click', function(){
+			    	$("#call-gandalf-button").prop('disabled', true);
+			    	client.socket.emit('update game', {'action' : 'CallGandalf'});
+			    });
 				
 	}
   

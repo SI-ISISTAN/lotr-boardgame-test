@@ -60,7 +60,35 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				}
 			
 			}
-		}
+		},
+
+		"GandalfCard" : {
+			phase : "any",
+			apply : function (game,player,data){
+				if (this.name == "Magia"){
+					game.specialEvents.push("PreventEvent");
+				}
+			},
+			draw : function(client, data){
+				var self=this;
+				switch (this.name){ 
+					case "Previsión":
+						client.socket.emit('add activity', {'action' : 'RearrangeTiles'});
+					break;
+					case "Guía":
+						client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : null, 'amount' : 2, origin:'gandalf' });
+					break;
+					case "Sanación":
+						client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -2});
+					break;
+					case "Persistencia":
+						client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 4, 'player' : client.alias});
+					break;
+
+				};
+			client.socket.emit('resolve activity');	
+			}
+		},		
 
 	};
 

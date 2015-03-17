@@ -159,48 +159,14 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			client.ringUsed=true;
-			//cierro los popus usados actualmente en el turno
-			if (client.turnPhase == "playCards"){
-				$("#play-cards-dialog").dialog('close');
-			}
-			else if (client.turnPhase == "cleanUp"){
-				$("#cleanup-dialog").dialog('close');
+			//cierro los popus usados actualmente en el turno (despues se redibujan)
+			if (client.turnPhase == "playCards" || client.turnPhase == "cleanUp"){
+				$(".ui-dialog-content").dialog('close');
 			}
 			$("#use-ring-button").prop('disabled', true);
 			client.socket.emit('add activity', {'action' : 'RollDie', 'value' : data.value});
-			var popup = new Popup({title: "Avanzar en una pista", text: "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
-							//pongo los elementos de reparto de cada carta
-							var div = $("<div>  </div>");
-							var el = $("<div id='advance-div'>  </div> ");
-							var listbox = $("<select id='move-track-selector'> </select>");
-							//Agrego los tracks por los que puedo avanzar
-							for (i in data.valid){
-								$(listbox).append("<option value='"+data.valid[i].name+"'> "+data.valid[i].text+"</option>");
-							}			
-							$(el).append($(listbox));
-							div.append(el);	
-							popup.append(div);
-							//cuando me dan ok envio cada carta al jugador correspondiente
-							popup.addListener("ok", function(){
-									$("#move-track-selector").each(function(){
-										var to = $(this).val();
-										var j=0;
-										while (j<data.amount){
-											client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to, 'amount' : 1 });
-
-											j++;
-										}
-										
-									});
-							
-							$("#move-track-selector").remove();
-							client.socket.emit('add activity', {'action' : 'ResumeTurn'});
-							client.socket.emit('resolve activity');
-							popup.close();
-							});
-
-				popup.draw(client);
-
+			client.selectTrackMovement(data, "Avanzar en una pista",  "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.");
+			client.socket.emit('add activity', {'action' : 'ResumeTurn'});
 		}
 
 
@@ -457,6 +423,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					//Agregar el div del anillo
 					if (client.isActivePlayer()){
 						client.turnPhase = "drawTiles";	
+						client.buttonCheck({phase: client.turnPhase});
 						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Runas de mago"><button type="button" class="btn btn-success" id="use-ring-button">Usar el Anillo</button></div>').show('slow');
 			        	
 			        	//debo agregar el chobi este acá
@@ -475,6 +442,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			if (client.isActivePlayer()){
 				client.socket.emit('change location');	
 			}
+
 
 
 		}
@@ -597,30 +565,15 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			//Si el track no existe en el escenario, se le da al usuario la opcion de moverse en el track que quiera
 			if (client.isActivePlayer()){
 				if (data.track==null){
-					var popup = new Popup({title: "Avanzar en una pista", text: "Como la pista de la actividad que has sacado no existe, puedes elegir una en la cual avanzar un espacio.",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
-						//pongo los elementos de reparto de cada carta
-						var div = $("<div>  </div>");
-						var el = $("<div id='advance-div'>  </div> ");
-						var listbox = $("<select id='move-track-selector'> </select>");
-						//Agrego los tracks por los que puedo avanzar
-						for (i in data.valid){
-							$(listbox).append("<option value='"+data.valid[i].name+"'> "+data.valid[i].text+"</option>");
-						}			
-						$(el).append($(listbox));
-						div.append(el);	
-						popup.append(div);
-						//cuando me dan ok envio cada carta al jugador correspondiente
-						popup.addListener("ok", function(){
-								$("#move-track-selector").each(function(){
-									var to = $(this).val();
-									client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to , 'amount' : data.amount });
-									client.socket.emit('resolve activity');
-								});
-						$("#move-track-selector").remove();
-						popup.close(); 
-						});
-
-					popup.draw(client);
+					console.log("origin: "+data.origin);
+					if (typeof (data.origin) == 'undefined'){
+						client.selectTrackMovement(data, "Avanzar en una pista",  "Como la pista de la actividad que has sacado no existe, puedes elegir una en la cual avanzar un espacio.");
+					}
+					else{ 
+						if (data.origin == 'gandalf'){ 
+							client.selectTrackMovement(data, "Avanzar en una pista",  "Elige una pista para avanzar 2 espacios.");
+						}
+					}
 				}
 			}
 		}
@@ -864,20 +817,19 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			client.players = data.players;
 			$(".is-active").removeClass("is-active");
 			$("#"+data.activePlayer.alias+"-state-div").addClass("is-active");
+
 			if (client.alias == data.activePlayer.alias){
 				client.player.turn=true;
 				client.turnPhase = "drawTiles";
-				if (!client.ringUsed){
-					$("#use-ring-button").prop('disabled', false);
-				}
 				$("#draw-tile-button").prop('disabled', false);
 			}
 			else{
 				client.player.turn=false;
 				client.turnPhase = "inactive";
 
-					$("#use-ring-button").prop('disabled', true);
+				$("#use-ring-button").prop('disabled', true);
 			}
+			client.buttonCheck({phase : 'drawTiles'});
 		}
 	},
 
@@ -894,6 +846,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			else if (data.phase == "cleanUp"){
 				$("#cleanup-dialog").dialog();
 			}
+			client.socket.emit('resolve activity');
 		}
 	},
 
@@ -920,6 +873,15 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				else{
 					data['end'] = false;
 				}
+				//si no esta en accion un efecto especial que invaldia el siguiente evento
+				if (game.hasSpecialEvent("PreventEvent")){ 
+					data['prevent'] = true;
+					game.deleteSpecialEvent("PreventEvent");
+					game.io.to(player.room).emit('log message', {'msg' : "¡Hay un efecto de Evitar Evento activado! Se ignorará este evento.", 'mode':'good'});
+				}
+				else{ 
+					data['prevent'] = false;
+				}
 			}
 
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
@@ -929,7 +891,10 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					'top' : "+="+50+"px"
 				},1000, function(){
 					if (client.isActivePlayer()){
-						client.socket.emit('add activity', {'action' : data.newEvent.name});
+						
+						if (!data.prevent){
+							client.socket.emit('add activity', {'action' : data.newEvent.name});
+						}
 						if (data.end){
 							client.socket.emit('add activity', {'action' : 'EndScenario'});		
 						}
@@ -1135,8 +1100,8 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			//chequeo tokens faltantes y aplico las sanciones correspondientes
-			client.socket.emit('add activity',{'action' : 'ChangeRingBearer'});
 			client.socket.emit('add activity',{'action' : 'TokenCheck'});
+			client.socket.emit('add activity',{'action' : 'ChangeRingBearer'});
 			client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 			client.socket.emit('resolve activity');
 		}
@@ -1231,6 +1196,166 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			}
 		}
 	},
+
+	//Llamar a Gandlf (mostrar posibles jugadas)
+	"CallGandalf" : {
+		apply : function(game, player,data){
+			data['options'] = [];
+			for (i in game.gandalfCards){ 
+				var act = game.gandalfCards[i];
+				var valid = true;
+				if (act.name == "Sanación"){
+					console.log(player);
+					if (game.getPlayerByAlias(player.alias).corruption < 2){ 
+						valid = false;
+					}
+				}
+				else if (act.name == "Previsión"){ 
+					if (game.storyTiles.length < 3){ 
+						valid = false;
+					}
+				}
+				else if (act.name == "Persistencia"){ 
+					if (game.hobbitCards.length < 4){ 
+						valid = false;
+					}
+				}
+				data.options.push({'name' : act.name, 'description':act.description, 'valid' : valid});
+			}
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			//cerrar los otros popus
+
+			$(".ui-dialog-content").dialog('close');
+			var popup = new Popup({title: "Llamar al Mago", text: "A cambio de descartar 5 fichas de Escudo, puedes llamar al Mago para auxiliar, eligiendo una efecto válido de la lista. ",buttons : [{name : "Ok", id:"ok"}, {name : "Cancelar", id:"cancel"}], visibility : "active"});
+			//pongo los elementos de reparto de cada carta
+							var div = $("<div>  </div>");
+							var el = $("<div id='advance-div'>  </div> ");
+							var listbox = $("<select id='gandalf-selector'> </select>");
+							//Agrego los tracks por los que puedo avanzar
+							for (i in data.options){
+								var option = $("<option value='"+data.options[i].name+"'> "+data.options[i].name+"</option>");
+								$(listbox).append(option);
+							}			
+							$(el).append($(listbox));
+							div.append(el);
+							var desc = $("<br> <div id='description-div'> <span id='description-span'> </span>  </div> ");
+							div.append(desc);
+							popup.append(div);
+							var selected = data.options[0];
+							console.log(selected.valid);
+							if (!selected.valid){ 
+									popup.disableButton("ok", true);
+								}
+								else{
+									popup.disableButton("ok", false); 
+								}
+							desc.text(selected.description);
+
+							//Mostrar la descripcion del selecto
+							listbox.on('change', function(){ 
+								var selected = {};
+								for (j in data.options){ 
+									if (data.options[j].name == $("#gandalf-selector").val()){ 
+										selected = data.options[j];
+									}
+								}
+								desc.text(selected.description);
+								if (!selected.valid){ 
+									popup.disableButton("ok", true);
+								}
+								else{
+									popup.disableButton("ok", false); 
+								}
+							});
+							
+							
+							//cuando me dan ok envio cada carta al jugador correspondiente
+							popup.addListener("ok", function(){
+								$("#gandalf-selector").each(function(){
+									client.socket.emit('add activity', {'action' : 'PlayGandalfCard', 'card': $("#gandalf-selector").val()});
+								});
+							
+								$("#gandalf-selector").remove();
+								client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-5});
+								client.socket.emit('add activity', {'action' : 'ResumeTurn'});
+								client.socket.emit('resolve activity');
+								popup.close();
+							});
+
+							popup.addListener("cancel", function(){		
+								$("#gandalf-selector").remove();
+								$("#call-gandalf-button").prop('disabled', false);
+								client.socket.emit('add activity', {'action' : 'ResumeTurn'});
+								client.socket.emit('resolve activity');
+								popup.close();
+							});
+
+				popup.draw(client);
+
+				if (data.options.length == 0){ 
+					popup.disableButton("ok", true);
+				}
+		}
+	},
+
+	"PlayGandalfCard" : {
+		apply : function(game, player,data){
+			var pos = 0;
+			for (j in game.gandalfCards){ 
+				if (data.card == game.gandalfCards[j].name){ 
+					pos=j;
+				}
+			}
+			game.gandalfCards.splice(pos,1);
+			data['card'] = new Card({name: data.card, type: 'GandalfCard', color:null, symbol:null, amount:null, image:null}); //crear una nueva instancia de la carta
+			data.card.apply(game,player,data);
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var card = new Card(data.card);
+			card.draw(client, data);
+			client.socket.emit('resolve activity');
+		}
+	},
+
+	"RearrangeTiles" : {
+		apply : function(game, player,data){
+			var tiles = [];
+			var i=0;
+			while (i<3){ 
+				tiles.push(game.storyTiles[game.storyTiles.length-i-1]);
+				game.storyTiles.splice(game.storyTiles.length-i-1,1);
+				i++;
+			}
+			data['tiles'] = tiles;
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.rearrangeTiles(data);
+		}
+	},
+
+	"PutTiles" : {
+		apply : function(game, player,data){
+			var i = 3;
+			while (i > 0){ 
+				for (j in data.tiles){ 
+					if (data.tiles[j].number == i){ 
+						game.storyTiles.push(data.tiles[j].tile);
+					}
+				}
+				i--;
+			}
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.socket.emit('resolve activity');
+		}
+	},
+
+
 
 	};
 
