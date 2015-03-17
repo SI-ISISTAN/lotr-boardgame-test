@@ -44,7 +44,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			for (j in data.given){	//arreglare
 
 				if (data.given[j].player == client.player.alias){
-					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.given[j].card).data("selected",false).appendTo("#player-cards-container").show('slow');
+					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none'>").data("card",data.given[j].card).data("selected",false).appendTo("#player-cards-container").show('slow');
 				}
 			}
 			for (i in data.given){
@@ -90,7 +90,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			for (j in data.given){	//arreglare
 
 				if (data.given[j].player == client.player.alias){
-					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.given[j].card).data("selected",false).appendTo("#player-cards-container").show('slow');
+					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+data.given[j].card.description+"'>").data("card",data.given[j].card).data("selected",false).appendTo("#player-cards-container").show('slow');
 				}
 			}
 			for (i in data.given){
@@ -109,6 +109,20 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	//Accion de juego de tirar el dado
 	"RollDie" :  {
 		apply : function(game,player,data){
+			game.io.to(player.id).emit('update game', data);	//enviar siguiente actividad
+		},
+		draw : function(client, data){
+			$("#roll-dice-button").prop('disabled',false);
+
+			//Especial: si alguna carta previene de tirar el dado, se activa
+			
+		}
+		
+	},
+
+	//Accion de juego de tirar el dado
+	"DieRoll" :  {
+		apply : function(game,player,data){
 			if (typeof data.player == 'undefined'){
 				data.player = player.alias;
 			}
@@ -119,7 +133,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			else{
 				val = game.rollDie();
 			}
-			game.io.to(player.room).emit('update game', {'action' : 'RollDie', 'value' : val, 'player': data.player});	
+			game.io.to(player.room).emit('update game', {'action' : 'DieRoll', 'value' : val, 'player': data.player});	
 		},
 		draw : function(client, data){
 			client.rollDie(data);			
@@ -254,6 +268,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			data.amount = aux_am;
 			//Dibujo una alerta indicandome
 			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias});
+
 			popup.addListener("ok", function(){
 				//ordenar el descarte
 				//getear el numero de cartas seleccionadas
@@ -267,6 +282,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					}
 				});
 				$(".player-card-img").off('click');
+				$(".player-card-img").addClass("grayed-out-card");
 				//Si el "to" es null las cartas se descartan, si no se las dan al compañero indicado
 				if (data.to==null){
 					client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	
@@ -283,6 +299,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			popup.disableButton("ok", true);
 
 			if (client.alias == data.alias){
+				$(".player-card-img").removeClass("grayed-out-card");
 				if (data.cards == null){
 					client.discardAny(data,original_amount, popup);	//chequeo que el descarte sea correcto
 				}
@@ -472,7 +489,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			//Dibujar las cartas recibidas en el receptor
 			if (client.alias == data.to){
 				for (j in data.cards){	//arreglare
-					$("<img src='./assets/img/ripped/"+data.cards[j].image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.cards[j]).data("selected",false).appendTo("#player-cards-container").show('slow');
+					$("<img src='./assets/img/ripped/"+data.cards[j].image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+data.cards[j].description+"'>").data("card",data.cards[j]).data("selected",false).appendTo("#player-cards-container").show('slow');
 				}
 			}
 			if (client.alias == data.from ){
@@ -575,6 +592,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						}
 					}
 				}
+				if (data.isFinished){
+					client.socket.emit('resolve activity');
+				}
 			}
 		}
 		
@@ -653,8 +673,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					f++;
 				}
 			}
-			console.log("los bundles q arme: ");
-			console.log(bundles);
 			data.discards = bundles;
 			//voy borrando los elementos a medida que chequeo para chequear sobre un mismo usuario que tenga que hacer varios descartes
 			//ej: si quiero chequear que un mismo usuario descarte una carta y luego otra igual, tengo que removerla la primera vez
@@ -988,6 +1006,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			
 			popup.addListener("ok", function(){
 				$(".player-card-img").off('click');
+				$(".player-card-img").addClass("grayed-out-card");
 				var played = [];
 				$(".player-card-img").each(function(){
 					if ($(this).hasClass("playing-card")){
@@ -1006,7 +1025,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 			popup.draw(client);
 			popup.disableButton("ok", true);
-
+			$(".player-card-img").removeClass("grayed-out-card");
 			client.playCards(popup);
 
 		}
@@ -1064,7 +1083,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			if (data.dealt!=null){
 				if (data.player == client.player.alias){
-					$("<img src='./assets/img/ripped/"+data.dealt.image+".png' class='player-card-img img-responsive' style='display : none'>").data("card",data.dealt).data("selected",false).appendTo("#player-cards-container").show('slow');
+					$("<img src='./assets/img/ripped/"+data.dealt.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+data.dealt.description+"'>").data("card",data.dealt).data("selected",false).appendTo("#player-cards-container").show('slow');
 				}
 
 				var span = $("#"+data.player+"-state-div").find("#cards-span");
@@ -1255,7 +1274,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 							//Mostrar la descripcion del selecto
 							listbox.on('change', function(){ 
-								var selected = {};
 								for (j in data.options){ 
 									if (data.options[j].name == $("#gandalf-selector").val()){ 
 										selected = data.options[j];
@@ -1274,7 +1292,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 							//cuando me dan ok envio cada carta al jugador correspondiente
 							popup.addListener("ok", function(){
 								$("#gandalf-selector").each(function(){
-									client.socket.emit('add activity', {'action' : 'PlayGandalfCard', 'card': $("#gandalf-selector").val()});
+									client.socket.emit('add activity', {'action' : 'PlayGandalfCard', 'card': $("#gandalf-selector").val(), 'description' : selected.description});
 								});
 							
 								$("#gandalf-selector").remove();
@@ -1309,8 +1327,11 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				}
 			}
 			game.gandalfCards.splice(pos,1);
+			game.io.to(player.room).emit('log message', {'msg' : "¡"+player.alias+" descarta 5 escudos y llama al Mago! Elige usar la carta: "+data.card+".", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : data.description, 'mode':'info'});
 			data['card'] = new Card({name: data.card, type: 'GandalfCard', color:null, symbol:null, amount:null, image:null}); //crear una nueva instancia de la carta
 			data.card.apply(game,player,data);
+
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){

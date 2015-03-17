@@ -11,6 +11,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		this.players = [];
 		this.ringUsed=false;
 		this.turnPhase = "inactive";
+		this.currentActivity = null;
 	}
 
 	Client.prototype.isActivePlayer = function(){
@@ -20,6 +21,11 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		else{
 			return false;
 		}
+	}
+
+	//actualizo la actividad en ejecucion
+	Client.prototype.updateActivity = function(act){
+		this.currentActivity = act;
 	}
 
 	//Metodo auxiliar. encuentra la carta en un array y devuelve su posicion
@@ -72,8 +78,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	// cuando intento descartar, este método asegura que el descarte sea válido
 	Client.prototype.discard = function(data, popup){
 				var discarded = 0;
-				console.log("cantidad a descartar: "+data.amount);
-
 				var cards = data.cards;
 				
 				//deshago los bundles

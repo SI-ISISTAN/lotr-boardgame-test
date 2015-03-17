@@ -4,7 +4,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 		//Cartas genéricas, con un simbolo que permite avanzar en una pista
 		"Generic" : {
-			phase : "playCards",
+			phases : ["playCards"],
 			apply : function (game,player,data){
 				data['valid'] = game.currentLocation.validTracks;
 				if (game.currentLocation.tracks[this.symbol] == null){
@@ -63,7 +63,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 
 		"GandalfCard" : {
-			phase : "any",
+			phases : [],
 			apply : function (game,player,data){
 				if (this.name == "Magia"){
 					game.specialEvents.push("PreventEvent");
@@ -88,7 +88,30 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				};
 			client.socket.emit('resolve activity');	
 			}
-		},		
+		},
+
+		"Miruvor" : {
+			phases : ["drawTile","playCards","cleanUp"],
+			activities : [],
+			apply : function (game,player,data){
+
+			},
+			draw : function(client, data){
+
+			}
+		},
+
+		"Staff" : {
+			phases : ["drawTile","playCards","cleanUp"],
+			apply : function (game,player,data){
+
+			},
+			draw : function(client, data){
+
+			}
+		},
+
+
 
 	};
 

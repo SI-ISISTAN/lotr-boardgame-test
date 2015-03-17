@@ -1,10 +1,9 @@
 Porximo commit:
-- Arregle un bug en el uso del anillo cuando tenia que cerrar los popups (los estaba cerrando como el reverendo ojete)
+- Agregue una rama en el if de movetrack porque parecia que se tildaba si se hacia move track sobre una pista temrinada. parece andar bien ahora
+-Agregado logueo por consola de cuando se usa una llamada al magician
+-Cambie el die roll para que le de al user la chance de hacerlo solitu. habria que chequear bien bien
 
 
 ojota:
-estoy cambiando el sistema de descarte
--le agrege un metodo hascards2 a player
--agregue budling en checkdiscard, sin cambiar el resto del sistema
-- Juntar toda la conducta de enables/disables de acuerdo a la phase en un sólo método. Idea: en cada switch de phase, llamar a un metodo de client que administre los
-enables y disables de acuerdo a los botones que hay.
+- Use el anillo y me tiro findd e turno antes del popup. resolve precoz???
+- Hacer bien el temita de las descripciones de las cartas. Si no esto es cualquiera

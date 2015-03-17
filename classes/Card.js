@@ -13,14 +13,36 @@ define(['../data/cards'], function (cards) {
 		else{
 			this.type="Generic";
 		}
+		if (typeof card.description != 'undefined'){
+			this.description = card.description;
+		}
+		else{
+			this.description="Carta genérica";
+		}
 		this.color = card.color;
 		this.symbol = card.symbol;
 		this.amount = card.amount;
 		this.image = card.image;
+		this.phases = [];
 		this.id = null;
-		if (cards[this.type] != null){
-			this.draw = cards[this.type].draw;
-			this.apply = cards[this.type].apply;
+		//Busco la carta en cards, primero por tipo, dps por nombre
+		if (this.type == "Special"){
+			if (cards[this.name] != null){
+				this.draw = cards[this.name].draw;
+				this.apply = cards[this.name].apply;
+				for (p in cards[this.name].phases){
+					this.phases.push(cards[this.name].phases[p]);
+				}
+			}
+		}
+		else{
+			if (cards[this.type] != null){
+				this.draw = cards[this.type].draw;
+				this.apply = cards[this.type].apply;
+				for (p in cards[this.type].phases){
+					this.phases.push(cards[this.type].phases[p]);
+				}
+			}
 		}
 	}
 

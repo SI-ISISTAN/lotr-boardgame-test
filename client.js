@@ -155,6 +155,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    socket.on('update game', function(res){
 	    		//getear el player que realizo la actualizacion
 	    		if (activities[res.action] != null && typeof activities[res.action] != 'undefined'){
+	    			client.updateActivity(res.action);
 	        		activities[res.action].draw(client, res);									//actualizar la interfaz     			
 	    		}  		
 	    });
@@ -223,6 +224,11 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	$("#call-gandalf-button").prop('disabled', true);
 			    	client.socket.emit('update game', {'action' : 'CallGandalf'});
 			    });
+
+			    $("#roll-dice-button").on('click', function(){
+					client.socket.emit('update game', {'action' : 'DieRoll'});
+					$("#roll-dice-button").prop('disabled',true);
+				});
 				
 	}
   

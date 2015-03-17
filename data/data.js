@@ -62,7 +62,7 @@ define([], function () {
 		exports.hobbitCards.push({symbol : "Joker", color : "None", image:"joker_card", amount:1});
 	}
 
-	exports.gandalfCards = [{name: "Previsión", description: "El jugador activo puede ver los 3 eventos del tope de la pila y reordenarlos como desee."}, {name: "Guía", description: "El jugador activo puede mover dos espacios en la pista que desee."}, {name: "Sanación", description:"El jugador activo puede mover a su aventurero dos espacios hacia atrás en la Línea de Corrupción."}, {name: "Magia", description: "El jugador activo puede evitar la ejecución del próximo evento."}, {name: "Persistencia", description: "El jugador activo puede sacar 4 cartas del mazo."}];
+	exports.gandalfCards = [{name: "Previsión", description: "El jugador activo puede ver los 3 eventos del tope de la pila y reordenarlos como desee."}, {name: "Guía", description: "El jugador activo puede mover dos espacios en la pista que desee."}, {name: "Sanación", description:"El jugador activo puede mover a su aventurero dos espacios hacia atrás en la Línea de Corrupción."}, {name: "Magia", description: "El jugador activo puede evitar la ejecución del próximo evento, sea quien sea que lo active."}, {name: "Persistencia", description: "El jugador activo puede sacar 4 cartas del mazo."}];
 
 	return exports;
 });

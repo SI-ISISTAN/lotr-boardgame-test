@@ -284,3 +284,8 @@
 	position : absolute;
 	opacity : 0.01;
 }
+
+.grayed-out-card{
+	opacity: 0.6;
+    filter: alpha(opacity=60); /* msie */
+}

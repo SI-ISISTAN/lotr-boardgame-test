@@ -54,9 +54,9 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "White", amount : 2, image:"travel_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
-	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"joker_card_2_white"});
-	exports.Rivendell.featureCards.push({name:'Miruvor', symbol : "None", color : "Yellow", amount : 1, image:"no_card"});
-	exports.Rivendell.featureCards.push({name: 'Staff',symbol : "None", color : "Yellow", amount : 1, image:"no_card"});
+	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"joker_card_3_white"});
+	exports.Rivendell.featureCards.push({type: "Special", name:'Miruvor', symbol : "None", color : "Yellow", amount : 1, image:"no_card", description: "Carta Miruvor"});
+	exports.Rivendell.featureCards.push({type: "Special", name: 'Staff',symbol : "None", color : "Yellow", amount : 1, image:"no_card", description: "Carta Staff"});
 
 
 	/////////////////////////////////////////////////////// Moria //////////////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ define(['../classes/Activity'], function (Activity) {
 				startX : 145,
 				startY : 255,
 				isMain : false,
-				spaces :  [{reward : "Card"}, {reward : "ring"}, {reward : "life"}, {reward : "ring"}, {reward : "life"},{reward : "ring"}, {reward : "life"} ]
+				spaces :  [{reward : "Card", name:"Belt"}, {reward : "ring"}, {reward : "life"}, {reward : "ring"}, {reward : "life"},{reward : "ring"}, {reward : "life"} ]
 			},
 			"Travelling" : {
 				position : 0,
@@ -94,6 +94,8 @@ define(['../classes/Activity'], function (Activity) {
 		"activities" : [],
 		"featureCards" : []
 	};
+
+	exports.Moria.featureCards.push({name: 'Belt',symbol : "Friendship", color : "White", amount : 2, image:"friend_card_white_2"});
 
 	exports.Lothlorien = {
 		"name" : "Lothlorien",
