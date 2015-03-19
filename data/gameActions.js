@@ -44,7 +44,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			for (j in data.given){	//arreglare
 
 				if (data.given[j].player == client.player.alias){
-					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none'>").data("card",data.given[j].card).data("selected",false).appendTo("#player-cards-container").show('slow');
+					client.addCard(data.given[j].card);
 				}
 			}
 			for (i in data.given){
@@ -90,7 +90,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			for (j in data.given){	//arreglare
 
 				if (data.given[j].player == client.player.alias){
-					$("<img src='./assets/img/ripped/"+data.given[j].card.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+data.given[j].card.description+"'>").data("card",data.given[j].card).data("selected",false).appendTo("#player-cards-container").show('slow');
+					client.addCard(data.given[j].card);
 				}
 			}
 			for (i in data.given){
@@ -178,7 +178,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				$(".ui-dialog-content").dialog('close');
 			}
 			$("#use-ring-button").prop('disabled', true);
-			client.socket.emit('add activity', {'action' : 'RollDie', 'value' : data.value});
+			client.socket.emit('add activity', {'action' : 'DieRoll', 'value' : data.value});
 			client.selectTrackMovement(data, "Avanzar en una pista",  "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.");
 			client.socket.emit('add activity', {'action' : 'ResumeTurn'});
 		}
@@ -441,7 +441,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					if (client.isActivePlayer()){
 						client.turnPhase = "drawTiles";	
 						client.buttonCheck({phase: client.turnPhase});
-						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Runas de mago"><button type="button" class="btn btn-success" id="use-ring-button">Usar el Anillo</button></div>').show('slow');
+						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Runas de mago"><button type="button" class="btn btn-success async-input" id="use-ring-button">Usar el Anillo</button></div>').show('slow');
 			        	
 			        	//debo agregar el chobi este acá
 			        	$("#use-ring-button").on('click', function(){
@@ -489,7 +489,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			//Dibujar las cartas recibidas en el receptor
 			if (client.alias == data.to){
 				for (j in data.cards){	//arreglare
-					$("<img src='./assets/img/ripped/"+data.cards[j].image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+data.cards[j].description+"'>").data("card",data.cards[j]).data("selected",false).appendTo("#player-cards-container").show('slow');
+					client.addCard(data.cards[j]);
 				}
 			}
 			if (client.alias == data.from ){
@@ -1038,7 +1038,14 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			data.card.apply(game, player,data);
 			game.getPlayerByAlias(player.alias).discardByID([data.card]);
 			data['alias'] = player.alias;
-			game.io.to(player.room).emit('log message', {'msg' : game.activePlayer.alias+" ha jugado una carta de "+data.card.getGameName()+", de "+data.card.amount+" símbolos.", 'mode':'info'});
+			if (data.card.type!="Special"){
+				game.io.to(player.room).emit('log message', {'msg' : game.activePlayer.alias+" ha jugado una carta de "+data.card.getGameName()+", de "+data.card.amount+" símbolos.", 'mode':'info'});
+			}
+			else{
+				game.io.to(player.room).emit('log message', {'msg' : "¡"+game.activePlayer.alias+" ha jugado una carta Especial!", 'mode':'alert'});
+				game.io.to(player.room).emit('log message', {'msg' : data.card.description, 'mode':'info'});
+
+			}
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		
 		},
@@ -1083,7 +1090,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			if (data.dealt!=null){
 				if (data.player == client.player.alias){
-					$("<img src='./assets/img/ripped/"+data.dealt.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+data.dealt.description+"'>").data("card",data.dealt).data("selected",false).appendTo("#player-cards-container").show('slow');
+					client.addCard(data.dealt);
 				}
 
 				var span = $("#"+data.player+"-state-div").find("#cards-span");

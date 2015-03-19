@@ -1,9 +1,9 @@
 Porximo commit:
-- Agregue una rama en el if de movetrack porque parecia que se tildaba si se hacia move track sobre una pista temrinada. parece andar bien ahora
--Agregado logueo por consola de cuando se usa una llamada al magician
--Cambie el die roll para que le de al user la chance de hacerlo solitu. habria que chequear bien bien
+- Agregadas imagenes de las feature cards
+-Agregada las descripciones bien para las cartas, visibles en el juego
+-Agregada la base del engine de jugar las cartas, la conducta de als cartas: Miruvor, Staff
+-AAbstracto en la clase Client la instanciacion de las cartas hdtb
 
 
-ojota:
-- Use el anillo y me tiro findd e turno antes del popup. resolve precoz???
-- Hacer bien el temita de las descripciones de las cartas. Si no esto es cualquiera
+OJOTA:
+-Los resolve y los updates no se tiran bien cuando se interrumpe un turno (anillo, cartas.) TESTEAR Y REVISAR

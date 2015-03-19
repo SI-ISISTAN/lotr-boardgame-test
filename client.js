@@ -214,6 +214,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 			    $("#draw-tile-button").on('click', function(){
 			    	$("#draw-tile-button").prop('disabled', true);
+			    	client.disableInput();
 			    	if (client.turnPhase == "drawTiles"){
 			    		client.socket.emit('update game', {'action' : "NextPhase"});
 			    	}

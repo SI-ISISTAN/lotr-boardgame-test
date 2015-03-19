@@ -146,6 +146,11 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				});		
 	}
 
+	Client.prototype.addCard = function(card){
+		console.log(card);
+		$("<img src='../assets/img/ripped/"+card.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+card.description+"'>").data("card",card).data("selected",false).appendTo("#player-cards-container").show('slow');
+	}
+
 	//Tirar el dado
 	Client.prototype.rollDie = function(data){
 			var self=this;
@@ -463,6 +468,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	//Activa y desactiva los botones y cartas adecuados de acuerdo a la phase de turno en la cual 
 	Client.prototype.buttonCheck = function(data){
 		//boton de usar el anillo (si está)
+		var self=this;
 		if (this.isActivePlayer()){
 			if (!this.ringUsed){
 				if (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp"){
@@ -485,6 +491,27 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			$("#use-ring-button").prop('disabled', true);
 			$("#call-gandalf-button").prop('disabled', true);
 		}
+
+		//Chequeo de cartas
+		$(".player-card-img").each(function(){
+			if ($(this).data("card").type=="Special"){
+				var card = $(this).data("card");
+					if ($.inArray(this.turnPhase,card.phases)){	
+						$(this).removeClass("grayed-out-card");
+						$(this).on('click', function(){
+								$(this).remove();
+								$(this).addClass("grayed-out-card");
+								$(".ui-dialog-content").dialog('close');
+								self.socket.emit('update game',{'action': 'PlayCard', 'played': card});
+								self.socket.emit('add activity', {'action' : 'ResumeTurn'});	
+						});
+					}
+					else{
+						$(this).addClass("grayed-out-card");
+						$(this).off('click');
+					}
+			}
+		});
 	};
 
 	//Moverse en una pista elegida una cantidad de espacios
@@ -616,6 +643,17 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 					popup.disableButton("ok", true);
 				}
 			});
+	}
+
+	Client.prototype.disableInput = function(){
+		console.log("ajippppppppppppppppppppppppppppppp");
+		//$(".async-input").prop('disabled',true);
+		$(".player-card-img").each(function(){
+			$(this).off('click');
+			$(this).addClass("grayed-out-card");
+		});
+		
+
 	}
 
 	return Client;

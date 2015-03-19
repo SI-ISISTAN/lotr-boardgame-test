@@ -169,7 +169,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 		//Cargo escenarios
 		
-		this.locations.push(locations.BagEnd);
+		//this.locations.push(locations.BagEnd);
 		this.locations.push(locations.Rivendell);
 		this.locations.push(locations.Moria);
 		
@@ -259,7 +259,6 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 					i = playerNumber+1;
 		}
 		while (candidates[i].alias != this.ringBearer.alias){
-				console.log("Evaluo al candidato "+candidates[i].alias+" que tiene "+candidates[i].lifeTokens+" tokens de vida");
 				if (candidates[i].lifeTokens > most){
 					most=candidates[i].lifeTokens;
 					neu = candidates[i];

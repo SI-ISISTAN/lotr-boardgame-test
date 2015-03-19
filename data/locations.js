@@ -41,13 +41,13 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Rivendell.activities.push({
 		name: 'Rivendell',
 		draw : null,
-		subactivities : [ {'action' : "Elrond"}, {'action' : "Council"}, {'action': "Fellowship", 'player' : 'first'}]
+		subactivities : [ {'action' : "Elrond"}, {'action': "Fellowship", 'player' : 'first'}]
 		});
 
 	//Cargar las feature cards
 	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "White", amount : 2, image:"hiding_card_white_2"});
 	exports.Rivendell.featureCards.push({symbol : "Friendship", color : "White", amount : 2, image:"friend_card_white_2"});
-	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"friend_card_white_2"})
+	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"hiding_card_white_2"})
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
 	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
@@ -55,9 +55,15 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "White", amount : 2, image:"travel_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"joker_card_3_white"});
-	exports.Rivendell.featureCards.push({type: "Special", name:'Miruvor', symbol : "None", color : "Yellow", amount : 1, image:"no_card", description: "Carta Miruvor"});
-	exports.Rivendell.featureCards.push({type: "Special", name: 'Staff',symbol : "None", color : "Yellow", amount : 1, image:"no_card", description: "Carta Staff"});
-
+	exports.Rivendell.featureCards.push({type: "Special", name:'Miruvor', symbol : "None", color : "Yellow", amount : 0, image:"miruvor_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name: 'Staff',symbol : "None", color : "Yellow", amount : 0, image:"staff_card"});
+	//Todas las q vienen son de testing
+	exports.Rivendell.featureCards.push({type: "Special", name:'Athelas', symbol : "None", color : "Yellow", amount : 0, image:"athelas_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name: 'Belt',symbol : "None", color : "Yellow", amount : 0, image:"belt_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name:'Elessar', symbol : "None", color : "Yellow", amount : 0, image:"elessar_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name: 'Lembas',symbol : "None", color : "Yellow", amount : 0, image:"lembas_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name:'Mithril', symbol : "None", color : "Yellow", amount : 0, image:"mithril_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name: 'Phial',symbol : "None", color : "Yellow", amount : 0, image:"phial_card"});
 
 	/////////////////////////////////////////////////////// Moria //////////////////////////////////////////////////////////////////////////////
 	exports.Moria = {

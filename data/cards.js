@@ -4,7 +4,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 		//Cartas genéricas, con un simbolo que permite avanzar en una pista
 		"Generic" : {
-			phases : ["playCards"],
+			phases : [],
 			apply : function (game,player,data){
 				data['valid'] = game.currentLocation.validTracks;
 				if (game.currentLocation.tracks[this.symbol] == null){
@@ -91,23 +91,91 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 
 		"Miruvor" : {
-			phases : ["drawTile","playCards","cleanUp"],
+			phases : ["drawTile","tileDrawn","cardsPlayed","cleanUp"],
+			description : "Sabor del Encuentro: El jugador activo puede pasar una carta a otro jugador.",
 			activities : [],
 			apply : function (game,player,data){
 
 			},
 			draw : function(client, data){
-
+				client.socket.emit('update game', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': null, 'to':client.players[1].alias});
 			}
 		},
 
 		"Staff" : {
-			phases : ["drawTile","playCards","cleanUp"],
+			phases : ["drawTile","tileDrawn","cleanUp"],
+			description : "Bastón: El próximo evento que deba afrontarse en este escenario quedará sin efecto.",
 			apply : function (game,player,data){
-
+				game.specialEvents.push("PreventEvent");
 			},
 			draw : function(client, data){
+				
+			}
+		},
 
+		"Athelas" : {
+			phases : ["drawTile","tileDrawn","cleanUp"],
+			description : "Hierbabuena: Previene a un aventurero de moverse en la Línea de Corrupción si le faltan fichas al final del escenario.",
+			apply : function (game,player,data){
+				
+			},
+			draw : function(client, data){
+				
+			}
+		},
+
+		"Elessar" : {
+			phases : ["drawTile","tileDrawn","cleanUp"],
+			description : "Amuleto: El aventurero se aleja un espacio del peligro en la Línea de Corrupción.",
+			apply : function (game,player,data){
+				
+			},
+			draw : function(client, data){
+				
+			}
+		},
+
+		"Lembas" : {
+			phases : ["drawTile","tileDrawn","cleanUp"],
+			description : "Alimento: El jugador activo recibe tantas cartas como le falten para llegar a 6 cartas en su mano.",
+			apply : function (game,player,data){
+				game.specialEvents.push("PreventEvent");
+			},
+			draw : function(client, data){
+				
+			}
+		},
+
+		"Mithril" : {
+			phases : ["drawTile","tileDrawn","cleanUp"],
+			description : "Armadura: El jugador ignora los eventos resultantes de una tirada del Dado.",
+			apply : function (game,player,data){
+				game.specialEvents.push("PreventEvent");
+			},
+			draw : function(client, data){
+				
+			}
+		},
+
+		"Phial" : {
+			phases : ["drawTile","tileDrawn","cleanUp"],
+			description : "Vial: El próximo evento que deba afrontarse en este escenario quedará sin efecto.",
+			apply : function (game,player,data){
+				game.specialEvents.push("PreventEvent");
+			},
+			draw : function(client, data){
+				
+			}
+		},
+
+		"Belt" : {
+			phases : ["drawTile","tileDrawn","cleanUp"],
+			description : "Cinturón Mágico: El jugador ignora los eventos resultantes de una tirada del Dado.",
+			apply : function (game,player,data){
+				game.specialEvents.push("PreventEvent");
+			},
+			draw : function(client, data){
+				
 			}
 		},
 
