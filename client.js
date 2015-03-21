@@ -1,7 +1,7 @@
 
    ////////////////////////////////////////// FUNCIONES VARIAS /////////////////////////////////////////////////////
 
-require(['./data/activities','./data/gameActions','./classes/client-side/Client','http://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'http://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity'], function(activities, gameActions, Client, jquery, io, jqueryui, Activity){
+require(['./data/activities','./data/gameActions','./classes/client-side/Client','https://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'https://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity'], function(activities, gameActions, Client, jquery, io, jqueryui, Activity){
 
     var socket = io();  //habilito el socketo
     var client = new Client();
