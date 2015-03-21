@@ -7,3 +7,4 @@ Porximo commit:
 
 OJOTA:
 -Los resolve y los updates no se tiran bien cuando se interrumpe un turno (anillo, cartas.) TESTEAR Y REVISAR
+FLAG EN CLIENTE CUANDO SE ABRE UN DIALOGO Y AL CHOTO

@@ -52,6 +52,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	Client.prototype.discardAny = function(data, original_amount, popup){
 		data.amount = original_amount;
 		var discarded = 0;
+		$(".player-card-img").off('click');
 		$(".player-card-img").on('click', function(){
 				if (! $(this).data("selected")){	//si no estaba seleccionada		
 					$(this).addClass("highlighted-image");
@@ -94,7 +95,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						cards.splice(p,1);
 					}
 				}
-
+				$(".player-card-img").off('click');
 				$(".player-card-img").on('click', function(){
 						
 					if (! $(this).data("selected")){ //si no estaba seleccionada
@@ -515,9 +516,12 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	};
 
 	//Moverse en una pista elegida una cantidad de espacios
-	Client.prototype.selectTrackMovement = function(data, pop_title, pop_text){
+	Client.prototype.selectTrackMovement = function(data, pop_title, pop_text, blocking){
 		var self = this;
-		var popup = new Popup({title: pop_title, text: pop_text,buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+		if (typeof (blocking) =="undefined"){
+			blocking = false;
+		}
+		var popup = new Popup({title: pop_title, text: pop_text,buttons : [{name : "Ok", id:"ok"}], visibility : "active", modal:blocking});
 							//pongo los elementos de reparto de cada carta
 							var div = $("<div>  </div>");
 							var el = $("<div id='advance-div'>  </div> ");

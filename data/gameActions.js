@@ -173,14 +173,10 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			client.ringUsed=true;
-			//cierro los popus usados actualmente en el turno (despues se redibujan)
-			if (client.turnPhase == "playCards" || client.turnPhase == "cleanUp"){
-				$(".ui-dialog-content").dialog('close');
-			}
 			$("#use-ring-button").prop('disabled', true);
 			client.socket.emit('add activity', {'action' : 'DieRoll', 'value' : data.value});
-			client.selectTrackMovement(data, "Avanzar en una pista",  "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.");
-			client.socket.emit('add activity', {'action' : 'ResumeTurn'});
+			client.selectTrackMovement(data, "Avanzar en una pista",  "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.",true);
+			//client.socket.emit('add activity', {'action' : 'ResumeTurn'});
 		}
 
 
@@ -945,20 +941,23 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
 			popup.addListener("playcards", function(){
-				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				
 				client.socket.emit('add activity', {'action' : 'PlayCards'});
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("heal", function(){
-				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				
 				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("draw", function(){
-				client.socket.emit('add activity', {'action' : 'NextPhase'});
-				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});	
+				
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});
+				client.socket.emit('add activity', {'action' : 'NextPhase'});	
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
@@ -1251,10 +1250,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			//cerrar los otros popus
-
-			$(".ui-dialog-content").dialog('close');
-			var popup = new Popup({title: "Llamar al Mago", text: "A cambio de descartar 5 fichas de Escudo, puedes llamar al Mago para auxiliar, eligiendo una efecto válido de la lista. ",buttons : [{name : "Ok", id:"ok"}, {name : "Cancelar", id:"cancel"}], visibility : "active"});
+			var popup = new Popup({title: "Llamar al Mago", text: "A cambio de descartar 5 fichas de Escudo, puedes llamar al Mago para auxiliar, eligiendo una efecto válido de la lista. ",buttons : [{name : "Ok", id:"ok"}, {name : "Cancelar", id:"cancel"}], visibility : "active", modal:false});
 			//pongo los elementos de reparto de cada carta
 							var div = $("<div>  </div>");
 							var el = $("<div id='advance-div'>  </div> ");
@@ -1304,7 +1300,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 							
 								$("#gandalf-selector").remove();
 								client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-5});
-								client.socket.emit('add activity', {'action' : 'ResumeTurn'});
+								//client.socket.emit('add activity', {'action' : 'ResumeTurn'});
 								client.socket.emit('resolve activity');
 								popup.close();
 							});
@@ -1312,7 +1308,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 							popup.addListener("cancel", function(){		
 								$("#gandalf-selector").remove();
 								$("#call-gandalf-button").prop('disabled', false);
-								client.socket.emit('add activity', {'action' : 'ResumeTurn'});
+								//client.socket.emit('add activity', {'action' : 'ResumeTurn'});
 								client.socket.emit('resolve activity');
 								popup.close();
 							});

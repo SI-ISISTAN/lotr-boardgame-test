@@ -10,6 +10,12 @@ define([], function () {
 		else{
 			this.visibility = "active";
 		}
+		if (typeof data.modal != 'undefined'){
+			this.modal= data.modal;
+		}
+		else{
+			this.modal = false;
+		}
 		if (data.id != null){
 			this.id = data.id;
 		}
@@ -20,7 +26,8 @@ define([], function () {
 		this.popup = $('<div/>', {
 						    'id':this.id,
 						    'title':this.title,
-							'html': '<div id= "main-popup-div"> <p>'+data.text+'</p> </div>'
+							'html': '<div id= "main-popup-div"> <p>'+data.text+'</p> </div>',
+							'class': "popup-dialog"
 						});
 		for (i in this.buttons){
 				this.popup.append('<br>');
@@ -32,6 +39,9 @@ define([], function () {
 				this.popup.append('<br>');
 		}
 	}
+
+	//var estática popups abiertos
+	Popup.openPopups = 0;
 
 	//agregar listener a un boton, que ejecutará la función callback pasada por parámetro
 	Popup.prototype.addListener = function(button, callback){
@@ -65,9 +75,17 @@ define([], function () {
 
 	//mostrar el popup
 	Popup.prototype.draw = function(client){
+		
+		
 		if ( (this.visibility == "all" ) || (this.visibility == "active" && client.isActivePlayer())  || (this.visibility == "rest" && !client.isActivePlayer()) || (this.visibility == client.alias) ){
+			Popup.openPopups++;
+			if(Popup.openPopups > 0){
+				$(".popup-dialog").children().attr("disabled","disabled");
+			}
+
 			this.popup.dialog({
 				dialogClass : 'no-close',
+				modal:this.modal,
 				show : {
 					effect: "bounce",
 					duration: 300
@@ -84,11 +102,14 @@ define([], function () {
 
 	//cerrar el popup, eliminar los listeners
 	Popup.prototype.close = function(){
+		console.log(Popup.openPopups);
+		Popup.openPopups--;
 		for (i in this.buttons){
 			var name = "#"+this.buttons[i].id;
 			$(name).off('click');
 		}
 		this.popup.dialog('close');
+
 	}
 
 	return Popup;

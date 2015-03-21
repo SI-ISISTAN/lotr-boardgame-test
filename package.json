@@ -1,0 +1,31 @@
+{
+  "name": "lotr-boardgame-test",
+  "version": "0.0.0",
+  "description": "Version inicial para deploy",
+  "main": "index.js",
+  "dependencies": {
+    "angular": "~1.3.8",
+    "augment": "~4.3.0",
+    "browserify": "~7.0.0",
+    "cookie-parser": "~1.3.3",
+    "express": "~4.10.2",
+    "express-session": "~1.10.0",
+    "jquery-ui": "~1.10.5",
+    "requirejs": "~2.1.15",
+    "session.socket.io": "~0.1.6",
+    "socket.io": "~1.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "nodejs index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matanegui/lotr-boardgame-test"
+  },
+  "author": "Matías Cincunegui",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/matanegui/lotr-boardgame-test/issues"
+  }
+}
