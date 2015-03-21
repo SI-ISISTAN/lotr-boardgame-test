@@ -31,7 +31,7 @@ app.get('/lotr', function(req, res){
 
 //////// VARIABLES GENERALES ////////////
 var clients = [];
-var port = process.env.port || 3000;
+var port = process.env.PORT || 3000;
 
 
 ///////////////////////////////////////////////////       GESTIÓN DE MENSAJES SOCKET.IO            /////////////////////////////////////////////////////////////
