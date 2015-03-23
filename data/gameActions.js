@@ -176,7 +176,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			$("#use-ring-button").prop('disabled', true);
 			client.socket.emit('add activity', {'action' : 'DieRoll', 'value' : data.value});
 			client.selectTrackMovement(data, "Avanzar en una pista",  "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.",true);
-			//client.socket.emit('add activity', {'action' : 'ResumeTurn'});
+			
 		}
 
 
@@ -263,7 +263,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			}
 			data.amount = aux_am;
 			//Dibujo una alerta indicandome
-			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias});
+			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias, modal:false});
 
 			popup.addListener("ok", function(){
 				//ordenar el descarte
@@ -437,7 +437,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					if (client.isActivePlayer()){
 						client.turnPhase = "drawTiles";	
 						client.buttonCheck({phase: client.turnPhase});
-						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Runas de mago"><button type="button" class="btn btn-success async-input" id="use-ring-button">Usar el Anillo</button></div>').show('slow');
+						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Runas de mago"><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
 			        	
 			        	//debo agregar el chobi este acá
 			        	$("#use-ring-button").on('click', function(){
@@ -813,7 +813,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					}
 					else if (data.phase == 'cleanUp'){
 						client.socket.emit('add activity', {'action' : 'CleanUpPhase'});
-						client.socket.emit('add activity', {'action' : 'NextTurn'});
+						
 					}
 					client.socket.emit('resolve activity');
 			}
@@ -939,7 +939,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
+			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas de movimiento", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
 			popup.addListener("playcards", function(){
 				
 				client.socket.emit('add activity', {'action' : 'PlayCards'});
@@ -986,6 +986,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 			popup.addListener("ok", function(){	
 				popup.close();
+				client.socket.emit('add activity', {'action' : 'NextTurn'});
 				client.socket.emit('resolve activity');
 			});
 
@@ -1001,7 +1002,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Jugar cartas", text: "Puedes jugar hasta 2 cartas, como máximo una blanca y una gris (los comodines no cuentan hacia este límite).",buttons : [{name : "Listo", id:"ok"}], visibility : "active"});
+			var popup = new Popup({title: "Jugar cartas", text: "Puedes jugar hasta 2 cartas, como máximo una blanca y una gris (los comodines no cuentan hacia este límite).",buttons : [{name : "Listo", id:"ok"}], visibility : "active", modal:false});
 			
 			popup.addListener("ok", function(){
 				$(".player-card-img").off('click');
@@ -1250,7 +1251,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Llamar al Mago", text: "A cambio de descartar 5 fichas de Escudo, puedes llamar al Mago para auxiliar, eligiendo una efecto válido de la lista. ",buttons : [{name : "Ok", id:"ok"}, {name : "Cancelar", id:"cancel"}], visibility : "active", modal:false});
+			var popup = new Popup({title: "Llamar al Mago", text: "A cambio de descartar 5 fichas de Escudo, puedes llamar al Mago para auxiliar, eligiendo una efecto válido de la lista. ",buttons : [{name : "Ok", id:"ok"}, {name : "Cancelar", id:"cancel"}], visibility : "active"});
 			//pongo los elementos de reparto de cada carta
 							var div = $("<div>  </div>");
 							var el = $("<div id='advance-div'>  </div> ");
@@ -1300,7 +1301,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 							
 								$("#gandalf-selector").remove();
 								client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-5});
-								//client.socket.emit('add activity', {'action' : 'ResumeTurn'});
 								client.socket.emit('resolve activity');
 								popup.close();
 							});
@@ -1308,8 +1308,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 							popup.addListener("cancel", function(){		
 								$("#gandalf-selector").remove();
 								$("#call-gandalf-button").prop('disabled', false);
-								//client.socket.emit('add activity', {'action' : 'ResumeTurn'});
-								client.socket.emit('resolve activity');
 								popup.close();
 							});
 

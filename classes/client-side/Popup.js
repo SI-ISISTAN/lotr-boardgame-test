@@ -10,12 +10,7 @@ define([], function () {
 		else{
 			this.visibility = "active";
 		}
-		if (typeof data.modal != 'undefined'){
 			this.modal= data.modal;
-		}
-		else{
-			this.modal = false;
-		}
 		if (data.id != null){
 			this.id = data.id;
 		}
@@ -76,13 +71,13 @@ define([], function () {
 	//mostrar el popup
 	Popup.prototype.draw = function(client){
 		
-		
+		console.log(Popup.openPopups);
 		if ( (this.visibility == "all" ) || (this.visibility == "active" && client.isActivePlayer())  || (this.visibility == "rest" && !client.isActivePlayer()) || (this.visibility == client.alias) ){
-			Popup.openPopups++;
-			if(Popup.openPopups > 0){
-				$(".popup-dialog").children().attr("disabled","disabled");
+			var drag = true;
+			if(Popup.openPopups > 0 && typeof(this.modal)=='undefined'){
+				$( ".popup-dialog" ).hide();
 			}
-
+			Popup.openPopups++;
 			this.popup.dialog({
 				dialogClass : 'no-close',
 				modal:this.modal,
@@ -93,7 +88,8 @@ define([], function () {
 				hide: {
 					effect: "explode",
 					duration: 1000
-				}
+				},
+				draggable:drag,
 			});
 		}
 		
@@ -109,6 +105,7 @@ define([], function () {
 			$(name).off('click');
 		}
 		this.popup.dialog('close');
+		$( ".popup-dialog" ).show();
 
 	}
 

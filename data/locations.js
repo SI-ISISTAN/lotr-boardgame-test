@@ -47,7 +47,7 @@ define(['../classes/Activity'], function (Activity) {
 	//Cargar las feature cards
 	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "White", amount : 2, image:"hiding_card_white_2"});
 	exports.Rivendell.featureCards.push({symbol : "Friendship", color : "White", amount : 2, image:"friend_card_white_2"});
-	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"hiding_card_white_2"})
+	exports.Rivendell.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"hiding_card_gray_2"})
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
 	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});

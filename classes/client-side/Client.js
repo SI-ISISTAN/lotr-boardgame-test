@@ -494,6 +494,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		}
 
 		//Chequeo de cartas
+		/*
 		$(".player-card-img").each(function(){
 			if ($(this).data("card").type=="Special"){
 				var card = $(this).data("card");
@@ -513,6 +514,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 					}
 			}
 		});
+		*/
 	};
 
 	//Moverse en una pista elegida una cantidad de espacios
@@ -521,7 +523,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		if (typeof (blocking) =="undefined"){
 			blocking = false;
 		}
-		var popup = new Popup({title: pop_title, text: pop_text,buttons : [{name : "Ok", id:"ok"}], visibility : "active", modal:blocking});
+		var popup = new Popup({title: pop_title, text: pop_text,buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
 							//pongo los elementos de reparto de cada carta
 							var div = $("<div>  </div>");
 							var el = $("<div id='advance-div'>  </div> ");
@@ -546,9 +548,8 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 									});
 							
 								$("#move-track-selector").remove();
-								
 								self.socket.emit('resolve activity');
-								popup.close();
+							popup.close();
 							});
 
 		popup.draw(self);
@@ -650,7 +651,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	}
 
 	Client.prototype.disableInput = function(){
-		console.log("ajippppppppppppppppppppppppppppppp");
 		//$(".async-input").prop('disabled',true);
 		$(".player-card-img").each(function(){
 			$(this).off('click');
