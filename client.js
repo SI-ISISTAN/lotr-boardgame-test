@@ -75,7 +75,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 		        		panel.append("<img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img ring-bearer-img'>");
 		        	}
 		        	$("#player-list-div").append(panel); 
-		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+res.game.players[i].character.image+'.jpg" id= "'+res.game.players[i].alias+'-chip" class="hobbit-chip" style="left: 18px; top: '+(140 + (i*8))+'px; z-index:'+(i+1)*1+';">');	
+		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+res.game.players[i].character.image+'.jpg" id= "'+res.game.players[i].alias+'-chip" class="hobbit-chip" style="left: 10px; top: '+(126 + (i*8))+'px; z-index:'+(i+1)*1+';">');	
 		        }
 
 		        	
@@ -96,10 +96,9 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 		       }
 
 		        $("#player-cards-container").append('<img src="./assets/img/ripped/'+client.player.character.image +'.jpg"  class="player-hobbit-img img-responsive" title="'+client.player.character.name+'">');
-		        
-		        $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id="world-chip" class="cone-chip" style="left: 30px; top: 34px;">');
-		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 625px; top: 90px;">');
-
+		         $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id="world-chip" class="cone-chip" style="left: 18px; top: 30px;">');
+		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 532px; top: 72px;">');
+		       
 
 		        if (client.player.turn){
 

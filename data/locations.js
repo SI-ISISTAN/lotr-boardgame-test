@@ -52,7 +52,7 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
 	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
-	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "White", amount : 2, image:"travel_card_gray_2"});
+	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "White", amount : 2, image:"travel_card_white_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"joker_card_3_white"});
 	exports.Rivendell.featureCards.push({type: "Special", name:'Miruvor', symbol : "None", color : "Yellow", amount : 0, image:"miruvor_card"});
@@ -73,22 +73,22 @@ define(['../classes/Activity'], function (Activity) {
 		"tracks" : {
 			"Fighting" : {
 				position : 0,
-				startX : 230,
-				startY : 160,
+				startX : 180,
+				startY : 116,
 				isMain : true,
-				spaces :  [{x: 40, y:-15, reward : "shield"}, {x: 45, y:12, reward : "shield"}, {x: 45, y:12, reward : "ring"}, {x: 45, y:12, reward : "shield"}, {x: 45, y:15, reward : "shield"}, {x: 45, y:-5, reward : "ring"}, {x: 42, y:-10, reward : "die"}, {x: 30, y:-40, reward : "shield"}, {x: 20, y:-35, reward : "die"}, {x: 10, y:-45, reward : "big-shield"} ]
+				spaces :  [{x: 35, y:-12, reward : "shield"}, {x: 40, y:10, reward : "shield"}, {x: 38, y:8, reward : "ring"}, {x: 37, y:8, reward : "shield"}, {x: 42, y:13, reward : "shield"}, {x: 37, y:-1, reward : "ring"}, {x: 34, y:-7, reward : "die"}, {x: 22, y:-32, reward : "shield"}, {x: 13, y:-28, reward : "die"}, {x: 7, y:-35, reward : "big-shield"} ]
 			},
 			"Hiding" : {
 				position : 0,
-				startX : 145,
-				startY : 255,
+				startX : 110,
+				startY : 192,
 				isMain : false,
 				spaces :  [{reward : "Card", name:"Belt"}, {reward : "ring"}, {reward : "life"}, {reward : "ring"}, {reward : "life"},{reward : "ring"}, {reward : "life"} ]
 			},
 			"Travelling" : {
 				position : 0,
-				startX : 470,
-				startY : 255,
+				startX : 378,
+				startY : 190,
 				isMain : false,
 				spaces : [{reward : "shield"}, {reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"}]
 			},
@@ -125,7 +125,7 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"joker_card_2_gray"});
 	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 2, image:"joker_card_2_gray"});
 	exports.Lothlorien.featureCards.push({symbol : "Joker", color : "Gray", amount : 1, image:"joker_card_gray"});
-	exports.Lothlorien.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"joker_card_gray_2"});
+	exports.Lothlorien.featureCards.push({symbol : "Hiding", color : "Gray", amount : 2, image:"hiding_card_gray_2"});
 	exports.Lothlorien.featureCards.push({symbol : "Friendship", color : "Gray", amount : 1, image:"friend_card_gray"});
 	exports.Lothlorien.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
 	exports.Lothlorien.featureCards.push({symbol : "Travelling", color : "Gray", amount : 1, image:"travel_card_gray"});
@@ -138,22 +138,22 @@ define(['../classes/Activity'], function (Activity) {
 		"tracks" : {
 			"Fighting" : {
 				position : 0,
-				startX : 166,
-				startY : 32,
+				startX : 132,
+				startY : 20,
 				isMain : true,
-				spaces :  [{x: 30, y:20, reward : "shield"}, {x: 35, y:22, reward : "shield"}, {x: 40, y:20, reward : "ring"}, {x: 40, y:15, reward : "shield"}, {x: 38, y:15, reward : "shield"}, {x: 45, y:15, reward : "ring"}, {x: 40, y:5, reward : "shield"}, {x: 40, y:5, reward : "shield"}, {x: 40, y:5, reward : "shield"}, {x: 40, y:0, reward : "big-shield"} ]
+				spaces :  [{x: 24, y:16, reward : "shield"}, {x: 28, y:16, reward : "shield"}, {x: 32, y:16, reward : "ring"}, {x: 32, y:12, reward : "shield"}, {x: 30, y:10, reward : "shield"}, {x: 35, y:12, reward : "ring"}, {x: 36, y:2, reward : "shield"}, {x: 36, y:4, reward : "shield"}, {x: 32, y:3, reward : "shield"}, {x: 36, y:0, reward : "big-shield"} ]
 			},
 			"Friendship" : {
 				position : 0,
-				startX : 110,
-				startY : 255,
+				startX : 88,
+				startY : 190,
 				isMain : false,
 				spaces :  [{reward : "die"},{reward : "Card", name:"Theoden"}, {reward : "Card", name:"Shadowfax"}, {reward : "ring"}, {reward : "Card", name:"Eomer"}, {reward : "ring"},{reward : "Card", name:"RohanRiders"}, {reward : "ring"} ]
 			},
 			"Travelling" : {
 				position : 0,
-				startX : 374,
-				startY : 255,
+				startX : 300,
+				startY : 190,
 				isMain : false,
 				spaces : [{reward : "shield"}, {reward : "life"},{reward : "life"},{reward : "life"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"}]
 			},
@@ -178,22 +178,22 @@ define(['../classes/Activity'], function (Activity) {
 		"tracks" : {
 			"Fighting" : {
 				position : 0,
-				startX : 190,
-				startY : 160,
+				startX : 152,
+				startY : 118,
 				isMain : true,
-				spaces :  [{x: 30, y:-30, reward : "shield"}, {x: 45, y:-15, reward : "shield"}, {x: 45, y:7, reward : "shield"}, {x: 40, y:15, reward : "shield"}, {x: 35, y:8, reward : "shield"}, {x: 45, y:15, reward : "die"}, {x: 40, y:15, reward : "die"}, {x: 40, y:0, reward : "big-shield"}, {x: 35, y:-15, reward : "ring"}, {x: 30, y:-40, reward : "ring"} ]
+				spaces :  [{x: 24, y:-24, reward : "shield"}, {x: 34, y:-12, reward : "shield"}, {x: 34, y:4, reward : "shield"}, {x: 32, y:12, reward : "shield"}, {x: 28, y:6, reward : "shield"}, {x: 36, y:11, reward : "die"}, {x: 34, y:11, reward : "die"}, {x: 34, y:0, reward : "big-shield"}, {x: 29, y:-10, reward : "ring"}, {x: 22, y:-32, reward : "ring"} ]
 			},
 			"Hiding" : {
 				position : 0,
-				startX : 110,
-				startY : 255,
+				startX : 88,
+				startY : 190,
 				isMain : false,
 				spaces :  [{reward : "Card", name: "Curtiss"}, {reward : "ring"}, {reward : "life"},{reward : "ring"},{reward : "life"}, {reward : "ring"},{reward : "life"}]
 			},
 			"Travelling" : {
 				position : 0,
-				startX : 379,
-				startY : 255,
+				startX : 303,
+				startY : 190,
 				isMain : false,
 				spaces : [{reward : "shield"}, {reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "heal"},{reward : "shield"},{reward : "sun"}]
 			},
@@ -216,29 +216,29 @@ define(['../classes/Activity'], function (Activity) {
 		"tracks" : {
 			"Fighting" : {
 				position : 0,
-				startX : 100,
-				startY : 255,
+				startX : 80,
+				startY : 190,
 				isMain : false,
 				spaces :  [{reward : "shield"},{reward : "life"},{reward : "shield"},{reward : "life"},{reward : "shield"},{reward : "life"},{reward : "heal"}]
 			},
 			"Hiding" : {
 				position : 0,
-				startX : 462,
-				startY : 255,
+				startX : 375,
+				startY : 190,
 				isMain : false,
 				spaces :  [{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "shield"},{reward : "sun"},{reward : "heal"}]
 			},
 			"Travelling" : {
 				position : 0,
-				startX : 158,
-				startY : 140,
+				startX : 126,
+				startY : 102,
 				isMain : true,
-				spaces : [{x: 40, y:-15, reward : "shield"},{x: 35, y:-10, reward : "shield"},{x: 40, y:0, reward : "shield"},{x: 40, y:10, reward : "shield"},{x: 40, y:5, reward : "shield"},{x: 40, y:10, reward : "die"},{x: 40, y:10, reward : "shield"},{x: 40, y:10, reward : "shield"},{x: 40, y:0, reward : "shield"},{x: 40, y:-10, reward : "shield"},{x: 30, y:-20, reward : "die"},{x: 5, y:-40, reward : "shield"},{x: -30, y:-20, reward : "die"},{x: -110, y:-90, reward : "die"}]
+				spaces : [{x: 32, y:-12, reward : "shield"},{x: 28, y:-8, reward : "shield"},{x: 32, y:0, reward : "shield"},{x: 32, y:8, reward : "shield"},{x: 30, y:4, reward : "shield"},{x: 32, y:7, reward : "die"},{x: 30, y:7, reward : "shield"},{x: 36, y:8, reward : "shield"},{x: 32, y:0, reward : "shield"},{x: 32, y:-9, reward : "shield"},{x: 26, y:-17, reward : "die"},{x: 4, y:-32, reward : "shield"},{x: -25, y:-16, reward : "die"},{x: -70, y:-74, reward : "die"}]
 			},
 			"Friendship" : {
 				position : 0,
-				startX : 140,
-				startY : 0,
+				startX : 112,
+				startY : -10,
 				isMain : false,
 				spaces : [{reward : "shield"}, {reward : "Card", name:"Asylum"}, {reward : "shield"},{reward : "Card", name:"Wollys"},{reward : "shield"}, {reward : "Card", name:"DyerMaker"},{reward : "heal"}]
 			}

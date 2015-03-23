@@ -40,9 +40,9 @@ define([], function () {
 			//aca tendria que ir su habilidad especial
 		}];
 		
-	exports.worldPositions=[{x:126, y:0},{x:116, y:-44},{x:60, y:0},{x:60, y:0},{x:60, y:0}];
+	exports.worldPositions=[{x:110, y:0},{x:93, y:-38},{x:51, y:0},{x:51, y:0},{x:51, y:0}];
 
-	exports.storyTiles = ["Friendship","Friendship","Friendship","Travelling","Travelling","Travelling","Hiding","Hiding","Hiding","Fighting","Fighting","Fighting","Next Event","Next Event","Next Event","Next Event","Next Event","Next Event","Ring Influence","Ring Influence","Sauron Will","Out Of Options","Losing Ground"];
+	exports.storyTiles = ["Travelling","Travelling","Travelling","Travelling","Travelling","Travelling","Travelling","Travelling","Travelling"];
 
 	exports.hobbitCards = [];
 

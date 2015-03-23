@@ -324,7 +324,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			$("#"+data.alias+"-chip").animate({
-				'left' : "+="+41*data.amount+"px" //moves right
+				'left' : "+="+36*data.amount+"px" //moves right
 			},800);
 			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
@@ -343,7 +343,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			$(".sauron-chip").animate({
-				'left' : "-="+41*data.amount+"px" //moves right
+				'left' : "-="+36*data.amount+"px" //moves right
 			},800);
 			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
@@ -431,7 +431,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					if (data.tracks.Hiding != null){
 						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Hiding-chip" class="cone-chip" style="left: '+data.tracks.Hiding.startX+'px; top: '+data.tracks.Hiding.startY+'px;">');
 					}
-					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -45px;">');
+					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -55px;">');
 
 					//Agregar el div del anillo
 					if (client.isActivePlayer()){
@@ -544,7 +544,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			if (data.track!=null && !data.isFinished){
 				if (!data.track.isMain){
 					$("#"+data.trackName+"-chip").animate({
-						'left' : "+="+31*data.amount+"px" //moves right
+						'left' : "+="+26*data.amount+"px" //moves right
 					},800, function(){
 						//si es el ultimo espacio de la main track cambio de escenario
 						if (client.isActivePlayer()){
@@ -902,7 +902,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 				$("#Event-chip").animate({
-					'top' : "+="+50+"px"
+					'top' : "+="+41+"px"
 				},1000, function(){
 					if (client.isActivePlayer()){
 						
