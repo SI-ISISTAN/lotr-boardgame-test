@@ -91,22 +91,46 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 
 		"Miruvor" : {
-			phases : ["drawTile","tileDrawn","cardsPlayed","cleanUp"],
+			phases : ["drawTiles","playCards","cleanUp"],
 			description : "Sabor del Encuentro: El jugador activo puede pasar una carta a otro jugador.",
 			activities : [],
 			apply : function (game,player,data){
 
 			},
 			draw : function(client, data){
-				client.socket.emit('update game', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': null, 'to':client.players[1].alias});
+				var popup = new Popup({title: "Sabor del Encuentro", text: "Elige el jugador a quien pasarle la carta.",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+						//pongo los elementos de reparto de cada carta
+						var div = $("<div>  </div>");
+						var el = $("<div id='advance-div'>  </div> ");
+						var listbox = $("<select class='player-selector'> </select>");
+						//Agrego los tracks por los que puedo avanzar
+						for (i in client.players){
+							$(listbox).append("<option value='"+client.players[i].alias+"'> "+client.players[i].alias+"</option>");
+						}			
+						$(el).append($(listbox));
+						div.append(el);	
+						popup.append(div);
+						//cuando me dan ok envio cada carta al jugador correspondiente
+						popup.addListener("ok", function(){
+								$(".player-selector").each(function(){
+									var to = $(this).val();
+									client.socket.emit('update game', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': null, 'to':to});
+								});
+								client.socket.emit('resolve activity');
+								popup.close(); 
+						});
+
+					popup.draw(client);
+				
 			}
 		},
 
 		"Staff" : {
-			phases : ["drawTile","tileDrawn","cleanUp"],
+			phases : ["drawTiles","playCards","cleanUp"],
+			activities : [],
 			description : "Bastón: El próximo evento que deba afrontarse en este escenario quedará sin efecto.",
 			apply : function (game,player,data){
-				game.specialEvents.push("PreventEvent");
+				game.specialEvents.push({'event' : "PreventEvent"});
 			},
 			draw : function(client, data){
 				
@@ -114,10 +138,12 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 
 		"Athelas" : {
-			phases : ["drawTile","tileDrawn","cleanUp"],
+			phases : ["drawTiles","playCards","cleanUp"],
+			activities : [],
 			description : "Hierbabuena: Previene a un aventurero de moverse en la Línea de Corrupción si le faltan fichas al final del escenario.",
 			apply : function (game,player,data){
-				
+				game.specialEvents.push({'event' : "PreventAdvance", 'player':player.alias});
+				console.log(game.specialEvents);
 			},
 			draw : function(client, data){
 				
@@ -125,43 +151,51 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 
 		"Elessar" : {
-			phases : ["drawTile","tileDrawn","cleanUp"],
+			phases : ["drawTiles","playCards","cleanUp"],
+			activities : [],
 			description : "Amuleto: El aventurero se aleja un espacio del peligro en la Línea de Corrupción.",
 			apply : function (game,player,data){
 				
 			},
 			draw : function(client, data){
-				
+				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				client.socket.emit('resolve activity');
 			}
 		},
 
 		"Lembas" : {
-			phases : ["drawTile","tileDrawn","cleanUp"],
+			phases : ["drawTiles","playCards","cleanUp"],
+			activities : [],
 			description : "Alimento: El jugador activo recibe tantas cartas como le falten para llegar a 6 cartas en su mano.",
 			apply : function (game,player,data){
-				game.specialEvents.push("PreventEvent");
+				data['amount'] = game.getPlayerByAlias(player.alias).hand.length;
 			},
 			draw : function(client, data){
+				if (data.amount<=6){
+					client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 6-data.amount+1, 'player' : client.alias});
+					client.socket.emit('resolve activity');
+				}
 				
 			}
 		},
 
 		"Mithril" : {
-			phases : ["drawTile","tileDrawn","cleanUp"],
+			phases : [],
+			activities : ["RollDie"],
 			description : "Armadura: El jugador ignora los eventos resultantes de una tirada del Dado.",
 			apply : function (game,player,data){
-				game.specialEvents.push("PreventEvent");
 			},
 			draw : function(client, data){
-				
+				client.socket.emit('resolve activity');
 			}
 		},
 
 		"Phial" : {
-			phases : ["drawTile","tileDrawn","cleanUp"],
+			phases : ["drawTiles","playCards","cleanUp"],
+			activities : [],
 			description : "Vial: El próximo evento que deba afrontarse en este escenario quedará sin efecto.",
 			apply : function (game,player,data){
-				game.specialEvents.push("PreventEvent");
+				game.specialEvents.push({'event' : "PreventEvent"});
 			},
 			draw : function(client, data){
 				
@@ -169,13 +203,13 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 
 		"Belt" : {
-			phases : ["drawTile","tileDrawn","cleanUp"],
+			phases : [],
+			activities : ["RollDie"],
 			description : "Cinturón Mágico: El jugador ignora los eventos resultantes de una tirada del Dado.",
 			apply : function (game,player,data){
-				game.specialEvents.push("PreventEvent");
 			},
 			draw : function(client, data){
-				
+				client.socket.emit('resolve activity');
 			}
 		},
 

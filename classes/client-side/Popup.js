@@ -10,7 +10,13 @@ define([], function () {
 		else{
 			this.visibility = "active";
 		}
+		if (typeof data.modal != 'undefined'){
 			this.modal= data.modal;
+		}
+		else{
+			this.modal=false;
+		}
+			
 		if (data.id != null){
 			this.id = data.id;
 		}
@@ -70,11 +76,9 @@ define([], function () {
 
 	//mostrar el popup
 	Popup.prototype.draw = function(client){
-		
-		console.log(Popup.openPopups);
 		if ( (this.visibility == "all" ) || (this.visibility == "active" && client.isActivePlayer())  || (this.visibility == "rest" && !client.isActivePlayer()) || (this.visibility == client.alias) ){
 			var drag = true;
-			if(Popup.openPopups > 0 && typeof(this.modal)=='undefined'){
+			if(Popup.openPopups > 0){
 				$( ".popup-dialog" ).hide();
 			}
 			Popup.openPopups++;
@@ -98,7 +102,6 @@ define([], function () {
 
 	//cerrar el popup, eliminar los listeners
 	Popup.prototype.close = function(){
-		console.log(Popup.openPopups);
 		Popup.openPopups--;
 		for (i in this.buttons){
 			var name = "#"+this.buttons[i].id;

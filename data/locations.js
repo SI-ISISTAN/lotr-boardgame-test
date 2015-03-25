@@ -55,15 +55,10 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Rivendell.featureCards.push({symbol : "Travelling", color : "White", amount : 2, image:"travel_card_white_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
 	exports.Rivendell.featureCards.push({symbol : "Joker", color : "White", amount : 3, image:"joker_card_3_white"});
-	exports.Rivendell.featureCards.push({type: "Special", name:'Miruvor', symbol : "None", color : "Yellow", amount : 0, image:"miruvor_card"});
-	exports.Rivendell.featureCards.push({type: "Special", name: 'Staff',symbol : "None", color : "Yellow", amount : 0, image:"staff_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name:'Miruvor', symbol : "None", color : "Yellow", amount : 1, image:"miruvor_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name: 'Staff',symbol : "None", color : "Yellow", amount : 1, image:"staff_card"});
 	//Todas las q vienen son de testing
-	exports.Rivendell.featureCards.push({type: "Special", name:'Athelas', symbol : "None", color : "Yellow", amount : 0, image:"athelas_card"});
-	exports.Rivendell.featureCards.push({type: "Special", name: 'Belt',symbol : "None", color : "Yellow", amount : 0, image:"belt_card"});
-	exports.Rivendell.featureCards.push({type: "Special", name:'Elessar', symbol : "None", color : "Yellow", amount : 0, image:"elessar_card"});
-	exports.Rivendell.featureCards.push({type: "Special", name: 'Lembas',symbol : "None", color : "Yellow", amount : 0, image:"lembas_card"});
-	exports.Rivendell.featureCards.push({type: "Special", name:'Mithril', symbol : "None", color : "Yellow", amount : 0, image:"mithril_card"});
-	exports.Rivendell.featureCards.push({type: "Special", name: 'Phial',symbol : "None", color : "Yellow", amount : 0, image:"phial_card"});
+	exports.Rivendell.featureCards.push({type: "Special", name: 'Phial',symbol : "None", color : "Yellow", amount : 1, image:"phial_card"});
 
 	/////////////////////////////////////////////////////// Moria //////////////////////////////////////////////////////////////////////////////
 	exports.Moria = {
@@ -101,7 +96,7 @@ define(['../classes/Activity'], function (Activity) {
 		"featureCards" : []
 	};
 
-	exports.Moria.featureCards.push({name: 'Belt',symbol : "Friendship", color : "White", amount : 2, image:"friend_card_white_2"});
+	exports.Moria.featureCards.push({type: "Special", name: 'Belt',symbol : "None", color : "Yellow", amount : 1, image:"belt_card"});
 
 	exports.Lothlorien = {
 		"name" : "Lothlorien",
@@ -130,6 +125,9 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Lothlorien.featureCards.push({symbol : "Travelling", color : "Gray", amount : 2, image:"travel_card_gray_2"});
 	exports.Lothlorien.featureCards.push({symbol : "Travelling", color : "Gray", amount : 1, image:"travel_card_gray"});
 	exports.Lothlorien.featureCards.push({symbol : "Fighting", color : "Gray", amount : 1, image:"fight_card_gray"});
+	exports.Lothlorien.featureCards.push({type: "Special", name:'Athelas', symbol : "None", color : "Yellow", amount : 1, image:"athelas_card"});
+	exports.Lothlorien.featureCards.push({type: "Special", name: 'Lembas',symbol : "None", color : "Yellow", amount : 1, image:"lembas_card"});
+	exports.Lothlorien.featureCards.push({type: "Special", name:'Elessar', symbol : "None", color : "Yellow", amount : 1, image:"elessar_card"});
 
 	exports.Helm = {
 
@@ -188,7 +186,7 @@ define(['../classes/Activity'], function (Activity) {
 				startX : 88,
 				startY : 190,
 				isMain : false,
-				spaces :  [{reward : "Card", name: "Curtiss"}, {reward : "ring"}, {reward : "life"},{reward : "ring"},{reward : "life"}, {reward : "ring"},{reward : "life"}]
+				spaces :  [{reward : "Card", name: "Mithril"}, {reward : "ring"}, {reward : "life"},{reward : "ring"},{reward : "life"}, {reward : "ring"},{reward : "life"}]
 			},
 			"Travelling" : {
 				position : 0,
@@ -206,7 +204,7 @@ define(['../classes/Activity'], function (Activity) {
 		"featureCards" : []
 	};
 
-	exports.Shelob.featureCards.push({name: 'Curtiss',symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
+	exports.Shelob.featureCards.push({type: "Special", name:'Mithril', symbol : "None", color : "Yellow", amount : 1, image:"mithril_card"});
 	exports.Shelob.featureCards.push({name: 'Gollum',symbol : "Joker", color : "White", amount : 3, image:"gollum_card"});
 
 	exports.Mordor = {

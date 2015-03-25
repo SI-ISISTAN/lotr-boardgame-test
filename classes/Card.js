@@ -18,6 +18,7 @@ define(['../data/cards'], function (cards) {
 		this.amount = card.amount;
 		this.image = card.image;
 		this.phases = [];
+		this.activities = [];
 		this.id = null;
 		//cargo la descripcion
 		if (typeof card.description != 'undefined'){
@@ -49,6 +50,9 @@ define(['../data/cards'], function (cards) {
 				this.description = cards[this.name].description;
 				for (p in cards[this.name].phases){
 					this.phases.push(cards[this.name].phases[p]);
+				}
+				for (p in cards[this.name].activities){
+					this.activities.push(cards[this.name].activities[p]);
 				}
 			}
 		}

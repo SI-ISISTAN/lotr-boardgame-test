@@ -169,18 +169,14 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 		//Cargo escenarios
 		
-		//this.locations.push(locations.BagEnd);
+		this.locations.push(locations.BagEnd);
 		this.locations.push(locations.Rivendell);
-		//this.locations.push(locations.Moria);
-		
+		this.locations.push(locations.Moria);
+		this.locations.push(locations.Lothlorien);
+		this.locations.push(locations.Helm);
+		this.locations.push(locations.Shelob);
 		
 		this.locations.push(locations.Mordor);
-		//this.locations.push(locations.Shelob);
-		//this.locations.push(locations.Helm);
-		
-		
-		
-		this.locations.push(locations.Lothlorien);
 
 		//inicio en la 1º location
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
@@ -301,21 +297,27 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		var found = false;
 		var j=0;
 		while (!found && j < this.specialEvents.length){	
-			if (this.specialEvents[j] == event){ 
+			if (this.specialEvents[j].event == event){ 
 				found = true;
 			}
 			else { 
 				j++;
 			}
 		}
-		return found;
+		if (found){
+			return this.specialEvents[j];
+		}
+		else{
+			return null;
+		}
+		
 	}
 
 	Game.prototype.deleteSpecialEvent= function(event){
 		var found = false;
 		var j=0;
 		while (!found && j < this.specialEvents.length){	
-			if (this.specialEvents[j] == event){ 
+			if (this.specialEvents[j].event == event){ 
 				found = true;
 			}
 			else { 

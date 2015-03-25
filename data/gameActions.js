@@ -113,7 +113,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			$("#roll-dice-button").prop('disabled',false);
-
+			if (client.isActivePlayer()){
+				$("#special-card-button").prop('disabled',false);
+			}
 			//Especial: si alguna carta previene de tirar el dado, se activa
 			
 		}
@@ -313,19 +315,27 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			if (data.alias=="RingBearer"){
 				data.alias = game.ringBearer.alias;
 			}
-			game.getPlayerByAlias(data.alias).move(data.amount);
-			if (data.amount>0){
-				game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se mueve "+data.amount+" lugares hacia el peligro!", 'mode':'danger'});
+			if (game.getPlayerByAlias(data.alias).corruption+data.amount > 0){
+				data['valid'] = true;
+				game.getPlayerByAlias(data.alias).move(data.amount);
+				if (data.amount>0){
+					game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se mueve "+data.amount+" lugares hacia el peligro!", 'mode':'danger'});
+				}
+				else{
+					game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se aleja "+(-data.amount)+" espacios del peligro!", 'mode':'danger'});
+				}
 			}
 			else{
-				game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se aleja "+(-data.amount)+" espacios del peligro!", 'mode':'danger'});
+				data['valid'] = false;
 			}
-			game.io.to(player.room).emit('update game', data);	
+				game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
-			$("#"+data.alias+"-chip").animate({
-				'left' : "+="+36*data.amount+"px" //moves right
-			},800);
+			if (data.valid){
+				$("#"+data.alias+"-chip").animate({
+					'left' : "+="+36*data.amount+"px" //moves right
+				},800);
+			}
 			if (client.isActivePlayer()){
 				client.socket.emit('resolve activity');
 			}
@@ -796,8 +806,12 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	"NextPhase" : {
 		apply : function(game, player,data){
 			game.nextPhase(data);
-			console.log(game.turnPhase);
-			data['phase'] = game.turnPhase;
+			if (typeof(data.phase) == 'undefined'){
+				data['phase'] = game.turnPhase;
+			}
+			else{
+				game.turnPhase = data.phase;
+			}
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -864,17 +878,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		}
 	},
 
-	//Habilitar el boton de draw tile
-	"EnableTile" : {
-		apply : function(game, player,data){
-			game.io.to(game.activePlayer.id).emit('update game', data);	//repetir el evento al jugador
-		},
-		draw : function(client, data){
-				$("#draw-tile-button").prop('disabled', false);
-				client.socket.emit('resolve activity');
-			}
-		},
-
 	//Ejecutar el siguiente evento de un conflicto
 	"NextEvent" : {
 		apply : function(game, player,data){
@@ -888,7 +891,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					data['end'] = false;
 				}
 				//si no esta en accion un efecto especial que invaldia el siguiente evento
-				if (game.hasSpecialEvent("PreventEvent")){ 
+				if (game.hasSpecialEvent("PreventEvent") != null){ 
 					data['prevent'] = true;
 					game.deleteSpecialEvent("PreventEvent");
 					game.io.to(player.room).emit('log message', {'msg' : "¡Hay un efecto de Evitar Evento activado! Se ignorará este evento.", 'mode':'good'});
@@ -941,23 +944,23 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas de movimiento", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
 			popup.addListener("playcards", function(){
-				
-				client.socket.emit('add activity', {'action' : 'PlayCards'});
 				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				client.socket.emit('add activity', {'action' : 'PlayCards'});
+				
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("heal", function(){
-				
-				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
 				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("draw", function(){
-				
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});
-				client.socket.emit('add activity', {'action' : 'NextPhase'});	
+					
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
@@ -1002,7 +1005,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Jugar cartas", text: "Puedes jugar hasta 2 cartas, como máximo una blanca y una gris (los comodines no cuentan hacia este límite).",buttons : [{name : "Listo", id:"ok"}], visibility : "active", modal:false});
+			var popup = new Popup({title: "Jugar cartas", text: "Puedes jugar hasta 2 cartas, como máximo una blanca y una gris (los comodines rojos no cuentan hacia este límite).",buttons : [{name : "Listo", id:"ok"}], visibility : "active", modal:false});
 			
 			popup.addListener("ok", function(){
 				$(".player-card-img").off('click');
@@ -1025,7 +1028,11 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 			popup.draw(client);
 			popup.disableButton("ok", true);
-			$(".player-card-img").removeClass("grayed-out-card");
+			$(".player-card-img").each(function(){
+				if ($(this).data("card").type!="Special"){
+					$(this).removeClass("grayed-out-card");
+				}
+			})
 			client.playCards(popup);
 
 		}
@@ -1046,8 +1053,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				game.io.to(player.room).emit('log message', {'msg' : data.card.description, 'mode':'info'});
 
 			}
-			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
-		
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador		
 		},
 		draw : function(client, data){
 			if (client.isActivePlayer()){
@@ -1058,6 +1064,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			var span = $("#"+data.alias+"-state-div").find("#cards-span");
 			var currentValue = parseInt(span.text());
 			span.text(currentValue-1);
+			client.buttonCheck({phase:client.turnPhase});
 		}
 	},
 
@@ -1138,36 +1145,41 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			var people = game.getAlivePlayers();
 			data['moves'] = [];
 			for (i in people){
-				var actual = people[i];
-				var am=0;
-				var text = "¡El jugador "+actual.alias+" no tiene suficientes fichas de: ";
-				if (actual.lifeTokens < 1){
-					text+="Vida"
-					am++;
+				if (game.hasSpecialEvent("PreventAdvance")!=null && game.hasSpecialEvent("PreventAdvance").player == people[i].alias){
+					game.io.to(player.room).emit('log message', {'msg' : "El jugador "+people[i].alias+" está protegido de avanzar en la Línea de Corrupción por efecto de una carta especial.", 'mode':'info'});
+					data.moves.push({'alias' : people[i].alias, 'amount': 0})
 				}
-				if (actual.sunTokens < 1){
-					if (am>0){
-						text+=", "
+				else{
+					var actual = people[i];
+					var am=0;
+					var text = "¡El jugador "+actual.alias+" no tiene suficientes fichas de: ";
+					if (actual.lifeTokens < 1){
+						text+="Vida"
+						am++;
 					}
-					text+="Sol"
-					am++;	
-				}
-				if (actual.ringTokens < 1){
-					if (am>0){
-						text+=", y "
+					if (actual.sunTokens < 1){
+						if (am>0){
+							text+=", "
+						}
+						text+="Sol"
+						am++;	
 					}
-					text+="Anillo"
-					am++;
+					if (actual.ringTokens < 1){
+						if (am>0){
+							text+=", y "
+						}
+						text+="Anillo"
+						am++;
+					}
+					if (am>0){
+						text+="! Por lo tanto, deberá avanzar "+am+" espacios hacia el Malvado."
+						game.io.to(player.room).emit('log message', {'msg' : text, 'mode':'info'});
+					}
+						
+					data.moves.push({'alias' : actual.alias, 'amount': am})
 				}
-				if (am>0){
-					text+="! Por lo tanto, deberá avanzar "+am+" espacios hacia el Malvado."
-					game.io.to(player.room).emit('log message', {'msg' : text, 'mode':'info'});
-				}
-					
-				data.moves.push({'alias' : actual.alias, 'amount': am})
-				
+
 			}
-			
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
@@ -1377,7 +1389,68 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		}
 	},
 
+	"PlaySpecialCard" : {
+		apply : function(game, player,data){
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			
+			var popup = new Popup({title: "Jugar cartas", id:"play-special-popup", text: "Haz click en una carta especial habilitada para jugarla.",buttons : [{name : "Cancelar", id:"cancel"}], visibility : "active"});
+			$(".player-card-img").each(function(){
+				console.log($(this).data("card"));
+				if ($(this).data("card").type=="Special"){
+						var card = $(this).data("card");
+						//busco si el momento de juego es adecuado para activar la carta
+						var found = false;
+						var i=0;
+						while (!found && i<card.phases.length){
+							if (card.phases[i] == client.turnPhase){
+								found = true;
+							}
+							else{
+								i++;
+							}
+						}
+						//busco en activities
+						if (!found){
+							var found2 = false;
+							var j=0;
+								while (!found2 && j<card.activities.length){
+									if (card.activities[j] == client.currentActivity){
+										found2 = true;
+									}
+									else{
+										j++;
+									}
+								}
+						}
+						if (found || found2 ){	
+							$(this).removeClass("grayed-out-card");
+							$(this).on('click', function(){
+									$(this).remove();
+									$(this).addClass("grayed-out-card");
+									$(".player-card-img").off('click');
+									popup.close();
+									client.socket.emit('update game',{'action': 'PlayCard', 'played': card});
 
+							});
+						}
+						else{
+							$(this).addClass("grayed-out-card");
+							$(this).off('click');
+						}
+				}
+			});
+			popup.addListener("cancel", function(){
+				$(".player-card-img").off('click');
+				$(".player-card-img").addClass("grayed-out-card");
+				client.restoreAsync();
+				popup.close();
+			});
+
+			popup.draw(client);
+		}
+	}
 
 	};
 

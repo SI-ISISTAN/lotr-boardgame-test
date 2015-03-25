@@ -1,10 +1,12 @@
 Porximo commit:
-- Agregadas imagenes de las feature cards
--Agregada las descripciones bien para las cartas, visibles en el juego
--Agregada la base del engine de jugar las cartas, la conducta de als cartas: Miruvor, Staff
--AAbstracto en la clase Client la instanciacion de las cartas hdtb
+-Conducta de feature cards
+-debugueo general
 
+Falta:
+-Matar a un jugador (y que siga)
+-Conteo de puntos
 
-OJOTA:
--Los resolve y los updates no se tiran bien cuando se interrumpe un turno (anillo, cartas.) TESTEAR Y REVISAR
-FLAG EN CLIENTE CUANDO SE ABRE UN DIALOGO Y AL CHOTO
+Debbuging(Acá anoto todo lo raro que aparezca en test):
+-A veces me tira un error al jugar una feature card , de data.card undefined
+-No anda la carta que previene que un tipo no avance si le faltan fichas
+-la verga no se desactivan los botones en la fase playedCard. q onda??

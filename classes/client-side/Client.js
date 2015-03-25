@@ -12,6 +12,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		this.ringUsed=false;
 		this.turnPhase = "inactive";
 		this.currentActivity = null;
+		this.asyncInput = []; //guarda el estado de los inputs cuando alguna accion interrumpe el flujo de turno
 	}
 
 	Client.prototype.isActivePlayer = function(){
@@ -148,7 +149,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	}
 
 	Client.prototype.addCard = function(card){
-		console.log(card);
 		$("<img src='../assets/img/ripped/"+card.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+card.description+"'>").data("card",card).data("selected",false).appendTo("#player-cards-container").show('slow');
 	}
 
@@ -166,7 +166,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				case 2:
 
 					div.append($('<img src="./assets/img/ripped/die1.png" alt="Dado de amenaza" class="img-responsive token-img"><br><br>'));
-					div.append($("<p> Battión se mueve un espacio hacia los aventureros. </p>"));
+					div.append($("<p> El Malvado se mueve un espacio hacia los aventureros. </p>"));
 					action = {'action' : 'MoveSauron', 'amount' : 1};
 
 				break;
@@ -248,7 +248,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 				break;
 				case "Ring Influence":
 					div.append($('<img src="./assets/img/ripped/T1T1.png" class="img-responsive token-img" ><br><br>'));
-					div.append($("<p> El Portador del Anillo se mueve un espacio hacia Battion. </p>"));
+					div.append($("<p> El Portador del Anillo se mueve un espacio hacia el Malvado. </p>"));
 					action = {'action' : 'MovePlayer', 'alias' : 'RingBearer', 'amount' : 1 };
 				break;
 				case "Sauron Will":
@@ -280,10 +280,10 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						if (action!= null){
 							self.socket.emit('add activity', action);
 							if (data.value=="Friendship" || data.value=="Fighting" || data.value=="Travelling" || data.value=="Hiding"){
-								self.socket.emit('add activity', {'action' : "NextPhase"});
+								self.socket.emit('add activity', {'action' : "NextPhase", 'phase':"playCards"});
 							}
 							else{
-								self.socket.emit('add activity', {'action' : "EnableTile"});
+								self.socket.emit('add activity', {'action' : "NextPhase", 'phase':"drawTiles"});
 							}
 							self.socket.emit('resolve activity');	
 						}
@@ -416,30 +416,31 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		var played = [];
 		var self=this;
 		$(".player-card-img").on('click', function(){
-				if (! $(this).data("selected")){	//si no estaba seleccionada
-					if (!self.arrayHasColoredCard(played, $(this).data("card").color)){		
-						$(this).addClass("playing-card");
-						$(this).data("selected", true);
-						$(this).data("order", played.length);
-						$(this).data("number", $(this).index()-1);
-						played.push($(this).data("card"));
-					}
-				}					
-				else{								//si esta estaba seleccionada, deselecciono
-					
-					$(this).removeClass("playing-card");
-					$(this).data("selected", false);
-					played.splice($(this).data("order"),1);
-					$(this).data("order", null);
+				if ($(this).data("card").type != "Special"){
+					if (! $(this).data("selected")){	//si no estaba seleccionada
+						if (!self.arrayHasColoredCard(played, $(this).data("card").color)){		
+							$(this).addClass("playing-card");
+							$(this).data("selected", true);
+							$(this).data("order", played.length);
+							$(this).data("number", $(this).index()-1);
+							played.push($(this).data("card"));
+						}
+					}					
+					else{								//si esta estaba seleccionada, deselecciono
+						
+						$(this).removeClass("playing-card");
+						$(this).data("selected", false);
+						played.splice($(this).data("order"),1);
+						$(this).data("order", null);
 
+					}
+					if (played.length>0 && played.length<3){
+						popup.disableButton("ok", false);
+					}
+					else{
+						popup.disableButton("ok", true);
+					}
 				}
-				if (played.length>0 && played.length<3){
-					popup.disableButton("ok", false);
-				}
-				else{
-					popup.disableButton("ok", true);
-				}
-					
 		});
 	}
 
@@ -481,16 +482,26 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			}
 			var span = $("#"+this.alias+"-state-div").find("#shield-span");
 			var shields = parseInt(span.text());
+			if (data.phase == "drawTiles"){
+				$("#draw-tile-button").prop('disabled', false);
+			}
 			if (shields >= 5 && (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp") ){
 				$("#call-gandalf-button").prop('disabled', false);
 			}
 			else{
 				$("#call-gandalf-button").prop('disabled', true);
 			}
+			if ($(".player-card-img").length > 0 && (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp")){
+				$("#special-card-button").prop('disabled', false);
+			}
+			else{
+				$("#special-card-button").prop('disabled', true);
+			}
 		}
 		else{
 			$("#use-ring-button").prop('disabled', true);
 			$("#call-gandalf-button").prop('disabled', true);
+			$("#special-card-button").prop('disabled', true);
 		}
 
 		//Chequeo de cartas
@@ -585,7 +596,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 					break;
 					case "Ring Influence":
 						div.append($('<img src="./assets/img/ripped/T1T1.png" class="img-responsive token-img" ><br><br>'));
-						div.append($("<p> El Portador del Anillo se mueve un espacio hacia Battion. </p>"));
+						div.append($("<p> El Portador del Anillo se mueve un espacio hacia el Malvado. </p>"));
 					break;
 					case "Sauron Will":
 						div.append($('<img src="./assets/img/ripped/T1T2.png" class="img-responsive token-img" ><br><br>'));
@@ -651,7 +662,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	}
 
 	Client.prototype.disableInput = function(){
-		//$(".async-input").prop('disabled',true);
+		$(".async-input").prop('disabled',true);
 		$(".player-card-img").each(function(){
 			$(this).off('click');
 			$(this).addClass("grayed-out-card");
@@ -659,6 +670,24 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		
 
 	}
+
+	Client.prototype.saveAsync = function(){
+		var async = [];
+		$(".async-input").each(function(){
+			async.push($(this).prop('disabled'));
+		});
+		this.asyncInput = async;
+	};
+
+	Client.prototype.restoreAsync = function(){
+		var self=this;
+		var i=0;
+		$(".async-input").each(function(){
+			var ac = self.asyncInput[i];
+			$(this).prop('disabled', ac);
+			i++;
+		});
+	};
 
 	return Client;
 

@@ -154,15 +154,14 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    socket.on('update game', function(res){
 	    		//getear el player que realizo la actualizacion
 	    		if (activities[res.action] != null && typeof activities[res.action] != 'undefined'){
-	    			client.updateActivity(res.action);
+	    			
 	        		activities[res.action].draw(client, res);									//actualizar la interfaz     			
+	    			client.updateActivity(res.action);
 	    		}  		
 	    });
 
 	    //Resolver una actividad
 	    socket.on('resolve activity', function(res){
-	    	console.log("resolve act de cliente");
-	    	console.log(res);
 	    	socket.emit('update game', res);	//repetir el evento a los otros clientes
 	    });
 
@@ -228,7 +227,16 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    $("#roll-dice-button").on('click', function(){
 					client.socket.emit('update game', {'action' : 'DieRoll'});
 					$("#roll-dice-button").prop('disabled',true);
+					$("#special-card-button").prop('disabled',true);
 				});
+
+			    $("#special-card-button").on('click', function(){
+			    	client.saveAsync();
+			    	client.disableInput();
+					client.socket.emit('update game', {'action' : 'PlaySpecialCard'});
+					$("#roll-dice-button").prop('disabled',true);
+				});
+
 				
 	}
   

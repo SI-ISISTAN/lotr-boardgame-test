@@ -12,8 +12,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			//Si el track no existe en el escenario, se le da al usuario la opcion de moverse en el track que quiera
-					var popup = new Popup({title: "Voluntad de Battion", text: "Los jugadores deben acordar y elegir a un jugador para que avance dos espacios hacia el peligro, o Battion avanzará un espacio hacia los aventureros.",buttons : [{name : "Este jugador avanzará", id:"advance"}, {name : "Ningún jugador avanzará", id:"stay"}], visibility : "active"});
+					var popup = new Popup({title: "Voluntad de el Malvado", text: "Los jugadores deben acordar y elegir a un jugador para que avance dos espacios hacia el peligro, o el Malvado avanzará un espacio hacia los aventureros.",buttons : [{name : "Este jugador avanzará", id:"advance"}, {name : "Ningún jugador avanzará", id:"stay"}], visibility : "active"});
 						//pongo los elementos de reparto de cada carta
 						var div = $("<div>  </div>");
 						var el = $("<div id='advance-div'>  </div> ");
@@ -134,7 +133,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			data['cards'] = cards;
 
 			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Un Sah'mid Aparece.", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, Battión avanza un espacio hacia los aventureros.", 'mode':'info'});
+			game.io.to(player.room).emit('log message', {'msg' : "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, el Malvado avanza un espacio hacia los aventureros.", 'mode':'info'});
 
 			game.io.to(player.room).emit('update game', data);	
 		},
@@ -142,7 +141,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		draw : function(client, data){
 			var popup = new Popup({
 				title: "Un Sah'mid Aparece", 
-				text: "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, Battión avanza un espacio hacia los aventureros. Cuando estés listo, elige un jugador de la siguiente lista, que contiene sólo a quienes pueden hacer este descarte:", 
+				text: "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, el Malvado avanza un espacio hacia los aventureros. Cuando estés listo, elige un jugador de la siguiente lista, que contiene sólo a quienes pueden hacer este descarte:", 
 				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
 			});
 			popup.addListener("discard", function(){
@@ -277,7 +276,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 	'SpeakFriend' :  {
 		title: "Habla, Amigo",
-		description: "El grupo debe descartar un símbolo de Amistad y uno de Comodín. De no poder o no querer hacerlo, Battion se mueve un espacio hacia los aventureros.",
+		description: "El grupo debe descartar un símbolo de Amistad y uno de Comodín. De no poder o no querer hacerlo, el Malvado se mueve un espacio hacia los aventureros.",
 		apply : function(game, player,data){
 			this.logEventInfo(game,player);
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
@@ -390,7 +389,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 	'Trapped' :  {
 		title: "Atrapados",
-		description: "Si las pistas de Esconderse y Viajar del escenario no han sido completas, Battion se mueve dos espacios hacia los aventureros y el Portador del Anillo debe lanzar el dado.",
+		description: "Si las pistas de Esconderse y Viajar del escenario no han sido completas, el Malvado se mueve dos espacios hacia los aventureros y el Portador del Anillo debe lanzar el dado.",
 		apply : function(game, player,data){
 			if (game.currentLocation.isTrackComplete("Travelling") && game.currentLocation.isTrackComplete("Hiding")){
 				data['complete'] = true;
@@ -414,7 +413,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 	'OrcsAttack' :  {
 		title: "¡Al Ataque!",
-		description: "El grupo debe descartar 5 símbolos de Lucha. De no poder o no querer hacerlo, Battion se mueve dos espacios hacia los aventureros.",
+		description: "El grupo debe descartar 5 símbolos de Lucha. De no poder o no querer hacerlo, el Malvado se mueve dos espacios hacia los aventureros.",
 		apply : function(game, player,data){
 			this.logEventInfo(game,player);
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador

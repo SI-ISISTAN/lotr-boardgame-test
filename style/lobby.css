@@ -26,6 +26,10 @@
 	list-style-type:none;
 }
 
+.overcard{
+	background-color: #000000;
+}
+
 .client-list-item{
 	background-color: #4d4d4a;
 }
