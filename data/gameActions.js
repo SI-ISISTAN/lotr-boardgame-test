@@ -112,6 +112,8 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.io.to(player.id).emit('update game', data);	//enviar siguiente actividad
 		},
 		draw : function(client, data){
+			var popup = new Popup({title: "Lanzar dado", text: "Debes lanzar el dado, haciendo click en el botón correspondiente.", buttons : [], id: "dice-info", visibility : client.alias});
+			popup.draw(client);
 			$("#roll-dice-button").prop('disabled',false);
 			if (client.isActivePlayer()){
 				$("#special-card-button").prop('disabled',false);
@@ -447,7 +449,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					if (client.isActivePlayer()){
 						client.turnPhase = "drawTiles";	
 						client.buttonCheck({phase: client.turnPhase});
-						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Runas de mago"><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
+						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Anillo"><br><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
 			        	
 			        	//debo agregar el chobi este acá
 			        	$("#use-ring-button").on('click', function(){

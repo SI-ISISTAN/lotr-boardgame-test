@@ -149,7 +149,11 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	}
 
 	Client.prototype.addCard = function(card){
-		$("<img src='../assets/img/ripped/"+card.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+card.description+"'>").data("card",card).data("selected",false).appendTo("#player-cards-container").show('slow');
+		var newcard = $("<img src='../assets/img/ripped/"+card.image+".png' class='player-card-img img-responsive grayed-out-card' style='display : none' title= '"+card.description+"'>");
+		newcard.data("card",card).data("selected",false).appendTo("#player-cards-container").show('slow');
+		if(newcard.data("card").type == "Special"){
+			newcard.addClass("special-card");
+		}
 	}
 
 	//Tirar el dado
@@ -467,7 +471,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			}
 	};
 
-	//Activa y desactiva los botones y cartas adecuados de acuerdo a la phase de turno en la cual 
+	//Activa y desactiva los botones y cartas adecuados de acuerdo a la phase de turno en la cual estoy
 	Client.prototype.buttonCheck = function(data){
 		//boton de usar el anillo (si está)
 		var self=this;
@@ -483,6 +487,8 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			var span = $("#"+this.alias+"-state-div").find("#shield-span");
 			var shields = parseInt(span.text());
 			if (data.phase == "drawTiles"){
+				var popup = new Popup({title: "Sacar tile", text: "En esta fase debes sacar tiles de eventos hasta sacar uno de movimiento. Haz click en el botón 'Sacar tile'.", buttons : [], id: "tile-info", visibility : "active"});
+				popup.draw(self);
 				$("#draw-tile-button").prop('disabled', false);
 			}
 			if (shields >= 5 && (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp") ){
@@ -491,7 +497,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			else{
 				$("#call-gandalf-button").prop('disabled', true);
 			}
-			if ($(".player-card-img").length > 0 && (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp")){
+			if ($(".special-card").length > 0 && (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp")){
 				$("#special-card-button").prop('disabled', false);
 			}
 			else{

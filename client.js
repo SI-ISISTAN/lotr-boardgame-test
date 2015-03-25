@@ -210,7 +210,9 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	socket.emit('toggle ready',{});
 			    });
 
+			    //Botón de sacar tile
 			    $("#draw-tile-button").on('click', function(){
+			    	$(".popup-dialog").dialog('close'); //cierro el popup informativo
 			    	$("#draw-tile-button").prop('disabled', true);
 			    	client.disableInput();
 			    	if (client.turnPhase == "drawTiles"){
@@ -219,22 +221,28 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	client.socket.emit('update game', {'action' : 'DrawTile', 'value': null, 'player':client.alias});
 			    });
 
+			    //Botón de llamar a Gandalf
 			    $("#call-gandalf-button").on('click', function(){
 			    	$("#call-gandalf-button").prop('disabled', true);
 			    	client.socket.emit('update game', {'action' : 'CallGandalf'});
 			    });
 
+			    //Boton de lanzar dado
 			    $("#roll-dice-button").on('click', function(){
-					client.socket.emit('update game', {'action' : 'DieRoll'});
+			    	$(".popup-dialog").dialog('close'); //cierro el popup informativo
 					$("#roll-dice-button").prop('disabled',true);
 					$("#special-card-button").prop('disabled',true);
+					client.socket.emit('update game', {'action' : 'DieRoll'});
+
 				});
 
+			    //Botón de carta especial
 			    $("#special-card-button").on('click', function(){
 			    	client.saveAsync();
+			    	$("#roll-dice-button").prop('disabled',true);
 			    	client.disableInput();
 					client.socket.emit('update game', {'action' : 'PlaySpecialCard'});
-					$("#roll-dice-button").prop('disabled',true);
+					
 				});
 
 				

@@ -3,7 +3,7 @@ define([], function () {
 
 	var exports = {};
 	
-	exports.names = ["Maradona", "Zidane", "Ruggeri", "Passarella", "Ronaldo", "Rivaldo","Cafú", "Kempes", "Burruchaga", "Bertoni", "Tostao", "Sócrates", "Beckenbauer", "Maldini", "Kluivert", "Pelé","Cantona","Baresi","Pirlo","Valderrama","Higuita"];
+	exports.names = ["Platón","Sócrates","Aristóteles","Parménides","Pirrón","Hume","Locke","Descartes","Berkeley","Aquino","Adorno","Hegel","Kant","Marx","Mill","Heidegger","Kirkegaard","Feuerbach","Nietzsche","Leibniz","Hobbes","Rosseau","Wittgenstein","Arendt","Rand","Sartre"];
 
 	exports.chatColors = ["#24FC2F", "#E09AFF", "#7BD6FF", "#FF2B7C", "#FF9543"]; 
 

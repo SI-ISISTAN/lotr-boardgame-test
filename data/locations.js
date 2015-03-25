@@ -41,7 +41,7 @@ define(['../classes/Activity'], function (Activity) {
 	exports.Rivendell.activities.push({
 		name: 'Rivendell',
 		draw : null,
-		subactivities : [ {'action' : "Elrond"}, {'action': "Fellowship", 'player' : 'first'}]
+		subactivities : [ {'action' : "Elrond"}, {'action': "Council", 'player' : 'first'},{'action': "Fellowship", 'player' : 'first'}]
 		});
 
 	//Cargar las feature cards

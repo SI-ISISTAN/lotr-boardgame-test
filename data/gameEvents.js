@@ -132,7 +132,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			data['candidates'] = candidates;
 			data['cards'] = cards;
 
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Un Sah'mid Aparece.", 'mode':'alert'});
+			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Un Monstruo Aparece.", 'mode':'alert'});
 			game.io.to(player.room).emit('log message', {'msg' : "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, el Malvado avanza un espacio hacia los aventureros.", 'mode':'info'});
 
 			game.io.to(player.room).emit('update game', data);	
@@ -140,7 +140,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 		draw : function(client, data){
 			var popup = new Popup({
-				title: "Un Sah'mid Aparece", 
+				title: "Un Monstruo Aparece", 
 				text: "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, el Malvado avanza un espacio hacia los aventureros. Cuando estés listo, elige un jugador de la siguiente lista, que contiene sólo a quienes pueden hacer este descarte:", 
 				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
 			});
