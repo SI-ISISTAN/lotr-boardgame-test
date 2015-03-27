@@ -21,6 +21,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.sauronPosition = 15;		//Cargar de un file
 		this.ringUsed = false;
 		this.specialEvents=[];
+		this.score = 0;
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -175,13 +176,10 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.locations.push(locations.Lothlorien);
 		this.locations.push(locations.Helm);
 		this.locations.push(locations.Shelob);
-		
 		this.locations.push(locations.Mordor);
 
 		//inicio en la 1º location
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
-		
-
 	}
 
 	Game.prototype.rollDie = function(){
@@ -191,7 +189,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	}
 
 	Game.prototype.moveSauron = function(amount){
-		this.sauronPosition+=amount;
+		this.sauronPosition-=amount;
 	}
 
 	Game.prototype.resolveActivity = function(client){
@@ -211,10 +209,12 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	//Paso a la location siguiente
 	Game.prototype.advanceLocation = function(data){
 		this.locationNumber++;
-		this.currentLocation = new Location(this.locations[this.locationNumber]);
-		data['mov']=gameData.worldPositions[this.locationNumber-1];
-		this.turnPhase = 'drawTiles';
-		this.ringUsed = false;
+		if (this.locationNumber<this.locations.length){
+			this.currentLocation = new Location(this.locations[this.locationNumber]);
+			data['mov']=gameData.worldPositions[this.locationNumber-1];
+			this.turnPhase = 'drawTiles';
+			this.ringUsed = false;
+		}
 	}
 
 	//Paso a la location siguiente
@@ -272,17 +272,23 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 	Game.prototype.nextTurn = function(data){
 		this.activePlayer.turn=false;
+		var alive =false;
+		while (!alive){
 			if (this.turnedPlayer < this.players.length-1){
 				this.turnedPlayer++;
 			}
 			else{
 				this.turnedPlayer=0;
 			}
-			this.activePlayer=this.players[this.turnedPlayer];
-			this.activePlayer.turn=true;
-			data['players'] = this.players;
-			data['activePlayer'] = this.activePlayer;
-			this.turnPhase="drawTiles";
+			if (!this.players[this.turnedPlayer].dead){
+				this.activePlayer=this.players[this.turnedPlayer];
+				this.activePlayer.turn=true;
+				data['players'] = this.players;
+				data['activePlayer'] = this.activePlayer;
+				this.turnPhase="drawTiles";
+				alive=true;
+			}
+		}
 	}
 
 

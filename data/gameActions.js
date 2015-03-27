@@ -12,11 +12,12 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			var i=0;
 			while (i<data.amount){
 				if (data.player == null){			//si me pasan nulo le reparto a todos
-					for (j in game.players){
+					var people = game.getAlivePlayers();
+					for (j in people){
 						var card = game.hobbitCards[game.hobbitCards.length-1];
-						game.getPlayerByID(game.players[j].id).addCard(card);
+						game.getPlayerByID(people[j].id).addCard(card);
 						game.hobbitCards.splice(game.hobbitCards.length-1);
-						given.push({'card' : card, 'player' : game.players[j].alias, 'number' : game.getPlayerByID(game.players[j].id).hand.length-1});	
+						given.push({'card' : card, 'player' : people[j].alias, 'number' : game.getPlayerByID(people[j].id).hand.length-1});	
 					}
 					
 				}
@@ -71,10 +72,11 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			var len=game.currentLocation.featureCards.length;
 			for (var j=0; j<len;j++){
 				var card = game.currentLocation.featureCards[game.currentLocation.featureCards.length-1];
-				game.players[turn].addCard(card);
+				var people = game.getAlivePlayers();
+				people[turn].addCard(card);
 				game.currentLocation.featureCards.splice(game.currentLocation.featureCards.length-1,1);
-				given.push({'card' : card, 'player' : game.players[turn].alias, 'number' : game.players[turn].hand.length-1});
-				if (turn < game.players.length-1){
+				given.push({'card' : card, 'player' : people[turn].alias, 'number' : people[turn].hand.length-1});
+				if (turn < people.length-1){
 					turn++;
 				}
 				else{
@@ -207,104 +209,117 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 	//Un jugador debe, forzosamente, elegir algunas cartas de su mano para descartarse
 	"ForceDiscard" :  {
-		apply: function(game,player,data){
-			game.io.to(player.room).emit('update game', data);	
-		},
-		draw : function(client, data){
-			var discarded = [];
-			//Elijo el titulo segun la cantidad y tipo de cartas que deba descartar
-			var texto = "";
-			if (data.cards == null){
-				if (data.to==null){
-					texto = "Debes descartar un total de "+data.amount+" cartas de tu mano, con símbolos cualesquiera.";
-				}
-				else{
-					texto = "Escoge "+data.amount+" cartas para dar a otro jugador.";
-				}
+		apply: function(game,player,data){	
+			//chequeo que, si tengo que hacer un descarte que no puedo hacer por falta de numero de cartas, se mate al personaje
+			if (game.getPlayerByAlias(data.alias).hand.length < data.amount){
+				data['dead']=true;
 			}
 			else{
-				texto = "Debes descartar cartas de tu mano, por un valor equivalente a los siguientes símbolos: ";
-				for (i in data.cards){
-						if (data.cards[i].amount<=1 || typeof(data.cards[i].amount) == 'undefined'){
-							texto+= "una carta "
-						}
-						else{
-							texto+= data.cards[i].amount+ " cartas "
-						}
-						if (data.cards[i].color!=null){
-							if (data.cards[i].color=="White") texto+="blanca "
-							else texto+="gris "
-						}
-						if (data.cards[i].symbol!=null){
-							if (data.cards[i].symbol=="Fighting") texto+="de símbolo Luchar"
-							else if (data.cards[i].symbol=="Hiding") texto+="de símbolo Esconderse"
-							else if (data.cards[i].symbol=="Travelling") texto+="de símbolo Viajar"
-							else if (data.cards[i].symbol=="Friendship") texto+="de símbolo Amistad"
-							else texto+="de Comodín"
-						}
-						if (data.cards[i].color==null && data.cards[i].symbol==null){
-							texto+= "de cualquier símbolo"
-						}
-						if (i<data.cards.length-1){
-							texto+=", "
-						}
-						else{
-							texto+=". ";
-						}
-					
-				}
+				data['dead']=false;
 			}
-			//calculo la verdadera cantidad de cartas a descartar
-			var original_amount = data.amount;
-			var aux_am = 0;
-			for (l in data.cards){
-				if (typeof(data.cards[i].amount) == 'undefined'){
-					aux_am+=1;
-				}
-				else{
-					aux_am+=data.cards[l].amount;
-				}
-			}
-			data.amount = aux_am;
-			//Dibujo una alerta indicandome
-			var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias, modal:false});
-
-			popup.addListener("ok", function(){
-				//ordenar el descarte
-				//getear el numero de cartas seleccionadas
-				var discard = [];
-				var to_give = [];
-				var hand = $(".player-card-img");
-				$(".player-card-img").each(function(){
-					if ($(this).hasClass("highlighted-image")){
-						discard.push($(this).data("card"));
-						to_give.push($(this).data("card"));
-					}
-				});
-				$(".player-card-img").off('click');
-				$(".player-card-img").addClass("grayed-out-card");
-				//Si el "to" es null las cartas se descartan, si no se las dan al compañero indicado
-				if (data.to==null){
-					client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	
+			game.io.to(player.room).emit('update game', data);
+		},
+		draw : function(client, data){
+			//si debo matar la personaje por no tener las cartas minimas
+			if (data.dead){
+				if (client.alias == data.alias){
+					client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No tenía suficientes cartas para hacer un descarte obligatorio."});
 					client.socket.emit('resolve activity');
 				}
-				else{
-					client.socket.emit('add activity', {'action' : 'PlayerGiveCards', 'from' : client.alias, 'to':data.to, 'cards' : to_give});	
-					client.socket.emit('resolve activity');
-				}
-				
-				popup.close();
-			});
-			popup.draw(client);
-			popup.disableButton("ok", true);
-
-			if (client.alias == data.alias){
-				$(".player-card-img").removeClass("grayed-out-card");
+			}else{
+				var discarded = [];
+				//Elijo el titulo segun la cantidad y tipo de cartas que deba descartar
+				var texto = "";
 				if (data.cards == null){
-					client.discardAny(data,original_amount, popup);	//chequeo que el descarte sea correcto
+					if (data.to==null){
+						texto = "Debes descartar un total de "+data.amount+" cartas de tu mano, con símbolos cualesquiera.";
+					}else{
+						texto = "Escoge "+data.amount+" cartas para dar a otro jugador.";
+					}
+				}else{
+					texto = "Debes descartar cartas de tu mano, por un valor equivalente a los siguientes símbolos: ";
+					for (i in data.cards){
+							if (data.cards[i].amount<=1 || typeof(data.cards[i].amount) == 'undefined'){
+								texto+= "una carta "
+							}
+							else{
+								texto+= data.cards[i].amount+ " cartas "
+							}
+							if (data.cards[i].color!=null){
+								if (data.cards[i].color=="White") texto+="blanca "
+								else texto+="gris "
+							}
+							if (data.cards[i].symbol!=null){
+								if (data.cards[i].symbol=="Fighting") texto+="de símbolo Luchar"
+								else if (data.cards[i].symbol=="Hiding") texto+="de símbolo Esconderse"
+								else if (data.cards[i].symbol=="Travelling") texto+="de símbolo Viajar"
+								else if (data.cards[i].symbol=="Friendship") texto+="de símbolo Amistad"
+								else texto+="de Comodín"
+							}
+							if (data.cards[i].color==null && data.cards[i].symbol==null){
+								texto+= "de cualquier símbolo"
+							}
+							if (i<data.cards.length-1){
+								texto+=", "
+							}
+							else{
+								texto+=". ";
+							}
+						
+					}
 				}
-				else{
-					client.discard(data, popup);	//chequeo que el descarte sea correcto
+				//calculo la verdadera cantidad de cartas a descartar
+				var original_amount = data.amount;
+				var aux_am = 0;
+				for (l in data.cards){
+					if (typeof(data.cards[i].amount) == 'undefined'){
+						aux_am+=1;
+					}
+					else{
+						aux_am+=data.cards[l].amount;
+					}
+				}
+				data.amount = aux_am;
+				//Dibujo una alerta indicandome
+				var popup = new Popup({title: "Descartar", text: texto, buttons : [{name : "Ok", id:"ok"}] , visibility : data.alias, modal:false});
+
+				popup.addListener("ok", function(){
+					//ordenar el descarte
+					//getear el numero de cartas seleccionadas
+					var discard = [];
+					var to_give = [];
+					var hand = $(".player-card-img");
+					$(".player-card-img").each(function(){
+						if ($(this).hasClass("highlighted-image")){
+							discard.push($(this).data("card"));
+							to_give.push($(this).data("card"));
+						}
+					});
+					$(".player-card-img").off('click');
+					$(".player-card-img").addClass("grayed-out-card");
+					//Si el "to" es null las cartas se descartan, si no se las dan al compañero indicado
+					if (data.to==null){
+						client.socket.emit('add activity', {'action' : 'PlayerDiscard', 'player' : client.alias, 'discard' : discard});	
+						client.socket.emit('resolve activity');
+					}
+					else{
+						client.socket.emit('add activity', {'action' : 'PlayerGiveCards', 'from' : client.alias, 'to':data.to, 'cards' : to_give});	
+						client.socket.emit('resolve activity');
+					}
+					
+					popup.close();
+				});
+				popup.draw(client);
+				popup.disableButton("ok", true);
+
+				if (client.alias == data.alias){
+					$(".player-card-img").removeClass("grayed-out-card");
+					if (data.cards == null){
+						client.discardAny(data,original_amount, popup);	//chequeo que el descarte sea correcto
+					}
+					else{
+						client.discard(data, popup);	//chequeo que el descarte sea correcto
+					}
 				}
 			}
 		}
@@ -322,6 +337,13 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				game.getPlayerByAlias(data.alias).move(data.amount);
 				if (data.amount>0){
 					game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se mueve "+data.amount+" lugares hacia el peligro!", 'mode':'danger'});
+					//chequo si choca con Sauron
+					if (game.sauronPosition <= game.getPlayerByAlias(data.alias).corruption){
+						data['dead'] =true;
+					}
+					else{
+						data['dead'] =false;
+					}
 				}
 				else{
 					game.io.to(player.room).emit('log message', {'msg' : "¡"+data.alias+" se aleja "+(-data.amount)+" espacios del peligro!", 'mode':'danger'});
@@ -335,12 +357,17 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			if (data.valid){
 				$("#"+data.alias+"-chip").animate({
-					'left' : "+="+36*data.amount+"px" //moves right
-				},800);
+					'left' : "+="+37*data.amount+"px" //moves right
+				},800, function(){
+					if (client.isActivePlayer()){
+						if (data.dead){
+							client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
+							}
+							client.socket.emit('resolve activity');
+						}
+				});
 			}
-			if (client.isActivePlayer()){
-				client.socket.emit('resolve activity');
-			}
+			
 
 		}
 		
@@ -350,16 +377,29 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	'MoveSauron' :  {
 		apply : function(game, player,data){
 			game.moveSauron(data.amount);
+			//chequeo si no mato a andie en el movimiento
+			var people = game.getAlivePlayers();
+			data['dead']=[];
+			for (i in people){
+				if (game.sauronPosition <= game.getPlayerByAlias(people[i].alias).corruption){
+					data.dead.push(people[i].alias);
+				}
+			}
 			game.io.to(player.room).emit('log message', {'msg' : "¡Battion se mueve "+data.amount+" lugares hacia los aventureros!", 'mode':'danger'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
 			$(".sauron-chip").animate({
-				'left' : "-="+36*data.amount+"px" //moves right
-			},800);
-			if (client.isActivePlayer()){
-				client.socket.emit('resolve activity');
-			}
+				'left' : "-="+37*data.amount+"px" //moves right
+			},800, function(){
+				if (client.isActivePlayer()){
+					for (i in data.dead){
+						client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.dead[i], 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
+					}
+					client.socket.emit('resolve activity');
+				}
+			});
+			
 		}
 		
 	},
@@ -378,14 +418,15 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			//pongo los elementos de reparto de cada carta
 			var div = $("<div>  </div>");
 
-
+			var people = client.getAlivePlayers();
 			for (i in data.cards){
 				var el = $("<div id='deal-card-div'>  </div> ");
 				el.append("<img src='./assets/img/ripped/"+data.cards[i].image+".png' class='player-card-img img-responsive'>");
 
 				var listbox = $("<select class='card-to-selector'> </select>");
-				for (j in client.players){
-					$(listbox).append("<option value='"+client.players[j].alias+"'> "+client.players[j].alias+"</option>");
+				
+				for (j in people){
+					$(listbox).append("<option value='"+people[j].alias+"'> "+people[j].alias+"</option>");
 				}
 				listbox.data("id",i);
 				$(el).append($(listbox));
@@ -417,59 +458,68 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	"AdvanceLocation" : {
 		apply : function(game, player,data){
 			game.advanceLocation(data);
-			data['tracks'] = game.currentLocation.tracks;
-			data['isConflict'] = game.currentLocation.isConflict;
-			data['events'] = game.currentLocation.events;
-			data['image'] = game.currentLocation.image;
-			game.io.to(player.room).emit('log message', {'msg' : "¡Los aventureros avanzan hacia la siguiente locación! ", 'mode':'good'});
+			if (game.locationNumber == game.locations.length){
+				data['victory'] = true;
+			}
+			else{
+				data['tracks'] = game.currentLocation.tracks;
+				data['isConflict'] = game.currentLocation.isConflict;
+				data['events'] = game.currentLocation.events;
+				data['image'] = game.currentLocation.image;
+				game.io.to(player.room).emit('log message', {'msg' : "¡Los aventureros avanzan hacia la siguiente locación! ", 'mode':'good'});
+				data['victory'] = false;
+			}
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			if (data.isConflict){
-				client.ringUsed=false;
-				$("#location-board-img-container").children().remove();
-				$("#ring-bearer-div").remove();
-				$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img">');
-				
-					if (data.tracks.Fighting != null){
-						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Fighting-chip" class="cone-chip" style="left: '+data.tracks.Fighting.startX+'px; top: '+data.tracks.Fighting.startY+'px;">');
-					}
-					if (data.tracks.Travelling != null){
-						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Travelling-chip" class="cone-chip" style="left: '+data.tracks.Travelling.startX+'px; top: '+data.tracks.Travelling.startY+'px;">');
-					}
-					if (data.tracks.Friendship != null){
-						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Friendship-chip" class="cone-chip" style="left: '+data.tracks.Friendship.startX+'px; top: '+data.tracks.Friendship.startY+'px;">');
-					}
-					if (data.tracks.Hiding != null){
-						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Hiding-chip" class="cone-chip" style="left: '+data.tracks.Hiding.startX+'px; top: '+data.tracks.Hiding.startY+'px;">');
-					}
-					$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -55px;">');
+			if (!data.victory){
+				if (data.isConflict){
+					client.ringUsed=false;
+					$("#location-board-img-container").children().remove();
+					$("#ring-bearer-div").remove();
+					$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img">');
+					
+						if (data.tracks.Fighting != null){
+							$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Fighting-chip" class="cone-chip" style="left: '+data.tracks.Fighting.startX+'px; top: '+data.tracks.Fighting.startY+'px;">');
+						}
+						if (data.tracks.Travelling != null){
+							$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Travelling-chip" class="cone-chip" style="left: '+data.tracks.Travelling.startX+'px; top: '+data.tracks.Travelling.startY+'px;">');
+						}
+						if (data.tracks.Friendship != null){
+							$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Friendship-chip" class="cone-chip" style="left: '+data.tracks.Friendship.startX+'px; top: '+data.tracks.Friendship.startY+'px;">');
+						}
+						if (data.tracks.Hiding != null){
+							$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Hiding-chip" class="cone-chip" style="left: '+data.tracks.Hiding.startX+'px; top: '+data.tracks.Hiding.startY+'px;">');
+						}
+						$("#location-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id ="Event-chip" class="cone-chip" style="left: 0px; top: -55px;">');
 
-					//Agregar el div del anillo
-					if (client.isActivePlayer()){
-						client.turnPhase = "drawTiles";	
-						client.buttonCheck({phase: client.turnPhase});
-						$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Anillo"><br><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
-			        	
-			        	//debo agregar el chobi este acá
-			        	$("#use-ring-button").on('click', function(){
-					    	
-					    	client.socket.emit('update game', {'action' : 'UseRing'});
+						//Agregar el div del anillo
+						if (client.isActivePlayer()){
+							client.turnPhase = "drawTiles";	
+							client.buttonCheck({phase: client.turnPhase});
+							$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Anillo"><br><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
+				        	
+				        	//debo agregar el chobi este acá
+				        	$("#use-ring-button").on('click', function(){
+						    	
+						    	client.socket.emit('update game', {'action' : 'UseRing'});
 
-				    	});
-					}
-
+					    	});
+						}
+				}
+				$("#world-chip").animate({
+							'left' : "+="+data.mov.x+"px",
+							'top' : "+="+data.mov.y+"px",
+						},1300);
+				if (client.isActivePlayer()){
+					client.socket.emit('change location');	
+				}
 			}
-			$("#world-chip").animate({
-						'left' : "+="+data.mov.x+"px",
-						'top' : "+="+data.mov.y+"px",
-					},1300);
-			if (client.isActivePlayer()){
-				client.socket.emit('change location');	
+			else{
+				if (client.isActivePlayer()){
+					client.socket.emit('update game', {'action' : 'EndGame', 'success':true, 'reason': ""});	
+				}
 			}
-
-
-
 		}
 	},
 
@@ -526,6 +576,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					data['track'] = game.currentLocation.tracks[data.trackName];
 					if (game.currentLocation.tracks[data.trackName].position < game.currentLocation.tracks[data.trackName].spaces.length){
 						game.currentLocation.tracks[data.trackName].position++;
+						if (game.currentLocation.tracks[data.trackName].isMain){
+							game.score++;
+						}
 						data['reward'] = game.currentLocation.tracks[data.trackName].spaces[game.currentLocation.tracks[data.trackName].position-1];
 						if (game.currentLocation.tracks[data.trackName].position == game.currentLocation.tracks[data.trackName].spaces.length){
 							if (game.currentLocation.tracks[data.trackName].isMain){	
@@ -590,7 +643,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			//Si el track no existe en el escenario, se le da al usuario la opcion de moverse en el track que quiera
 			if (client.isActivePlayer()){
 				if (data.track==null){
-					console.log("origin: "+data.origin);
 					if (typeof (data.origin) == 'undefined'){
 						client.selectTrackMovement(data, "Avanzar en una pista",  "Como la pista de la actividad que has sacado no existe, puedes elegir una en la cual avanzar un espacio.");
 					}
@@ -818,7 +870,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			if (client.isActivePlayer()){
-				console.log("La fase actual es: "+data.phase);
 				client.turnPhase = data.phase;
 				//activo y desactivo los botones de las cartas de acuerdo a en que fase del turno estoy
 				client.buttonCheck(data);
@@ -981,10 +1032,8 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 	//Pasar a la siguiente fase del turno
 	"CleanUpPhase" : {
-		apply : function(game, player,data){
-			
+		apply : function(game, player,data){	
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
-		
 		},
 		draw : function(client, data){
 			var popup = new Popup({title: "Fin del turno", id:"cleanup-dialog", text: "Es el fin del turno. Antes de darlo por terminado puedes jugar alguna carta especial válida, o, de ser el Portador, utilizar el Anillo.",buttons : [{name : "Terminar turno", id:"ok"}], visibility : "active"});
@@ -994,7 +1043,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				client.socket.emit('add activity', {'action' : 'NextTurn'});
 				client.socket.emit('resolve activity');
 			});
-
 			popup.draw(client);
 		}
 	},
@@ -1031,7 +1079,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			popup.draw(client);
 			popup.disableButton("ok", true);
 			$(".player-card-img").each(function(){
-				if ($(this).data("card").type!="Special"){
+				if (typeof($(this).data("card"))!='undefined' && $(this).data("card").type!="Special"){
 					$(this).removeClass("grayed-out-card");
 				}
 			})
@@ -1047,7 +1095,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			data.card.apply(game, player,data);
 			game.getPlayerByAlias(player.alias).discardByID([data.card]);
 			data['alias'] = player.alias;
-			if (data.card.type!="Special"){
+			if (typeof(data.card)!='undefined' && data.card.type!="Special"){
 				game.io.to(player.room).emit('log message', {'msg' : game.activePlayer.alias+" ha jugado una carta de "+data.card.getGameName()+", de "+data.card.amount+" símbolos.", 'mode':'info'});
 			}
 			else{
@@ -1084,7 +1132,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				}				
 			}
 			if (found){
-				console.log(game.currentLocation.featureCards[i]);
 				data['dealt'] = game.currentLocation.featureCards[i];
 				game.getPlayerByAlias(data.player).addCard(game.currentLocation.featureCards[i]);
 				game.currentLocation.featureCards.splice(i,1);
@@ -1211,20 +1258,20 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			for (i in people){
 				game.getPlayerByAlias(people[i].alias).resetTokens();
 			}
-			data['players'] = game.players;
+			data['players'] = game.getAlivePlayers();
 
 			game.io.to(player.room).emit('log message', {'msg' : "¡El nuevo Portador es: "+game.ringBearer.alias+"!", 'mode':'alert'});
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
 			client.players = data.players;
-			console.log(client.players);
-			for (i in client.players){
-				var span = $("#"+client.players[i].alias+"-state-div").find("#life-span");
+			var people = client.getAlivePlayers();
+			for (i in people){
+				var span = $("#"+people[i].alias+"-state-div").find("#life-span");
 				span.text("0");
-				var span = $("#"+client.players[i].alias+"-state-div").find("#sun-span");
+				var span = $("#"+people[i].alias+"-state-div").find("#sun-span");
 				span.text("0");
-				var span = $("#"+client.players[i].alias+"-state-div").find("#ring-span");
+				var span = $("#"+people[i].alias+"-state-div").find("#ring-span");
 				span.text("0");	
 			}
 
@@ -1245,7 +1292,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				var act = game.gandalfCards[i];
 				var valid = true;
 				if (act.name == "Sanación"){
-					console.log(player);
 					if (game.getPlayerByAlias(player.alias).corruption < 2){ 
 						valid = false;
 					}
@@ -1281,7 +1327,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 							div.append(desc);
 							popup.append(div);
 							var selected = data.options[0];
-							console.log(selected.valid);
 							if (!selected.valid){ 
 									popup.disableButton("ok", true);
 								}
@@ -1399,7 +1444,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			
 			var popup = new Popup({title: "Jugar cartas", id:"play-special-popup", text: "Haz click en una carta especial habilitada para jugarla.",buttons : [{name : "Cancelar", id:"cancel"}], visibility : "active"});
 			$(".player-card-img").each(function(){
-				console.log($(this).data("card"));
 				if ($(this).data("card").type=="Special"){
 						var card = $(this).data("card");
 						//busco si el momento de juego es adecuado para activar la carta
@@ -1452,9 +1496,73 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 			popup.draw(client);
 		}
-	}
+	},
 
-	};
+	//Acciones a realizar cuando un aventurero muere
+	"KillPlayer" : {
+		apply : function(game, player,data){
+			var dead_player = game.getPlayerByAlias(data.alias);
+			dead_player.dead=true;
+			dead_player.lifeTokens = 0;
+			dead_player.sunTokens = 0;
+			dead_player.ringTokens = 0;
+			data['dead_player'] = dead_player;
+			//si el muerto es el ring bearer temrina el juego
+			if (dead_player.alias == game.ringBearer.alias){
+				data['lose']=true;
+			}
+			else{
+				data['lose']=false;
+			}
+			game.io.to(player.room).emit('log message', {'msg' : "¡El jugador "+data.alias+" ha muerto! Su aventurero será eliminado del juego.", 'mode':'death'});
+			game.io.to(player.room).emit('log message', {'msg' : "La muerte del jugador fue debido a: "+data.reason, 'mode':'death'});
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.players[data.dead_player.number] = data.dead_player;
+			//si el usuario era el ring bearer, el juego está automaticamente perdido
+			
+				$("#"+data.dead_player.alias+"-chip").remove();
+				$("#"+data.dead_player.alias+"-state-div").append("<div class='dead-player-overlay'> </div>");
+				if (client.alias == data.alias){
+					client.player.dead = true;
+					if (!data.lose){
+						client.socket.emit('resolve activity');
+					}
+					else{
+						client.socket.emit('update game', {'action' : 'EndGame', 'success':false, 'reason': "El Portador del Anillo encontró al Malvado en la Línea de Corrupción."});
+					}
+					
+				}
+		}
+	},
+
+	//El juego termina, sea derrota o victoria y por cualquier razón
+	"EndGame" : {
+		apply : function(game, player,data){
+			if (data.success){
+				for (i in game.players){
+					game.score+=game.players[i].shields;
+				}				
+			}
+			data['score'] = game.score;
+			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			$("#main-game-div").fadeOut(300, function(){ $(this).remove();})
+			$("#end-game-div").appendTo('body').show('slow');
+			if (data.success){
+				$("#outcome-header").append("<span style='color: #2ECCFA;'> ¡Victoria! Los aventureros han completado el úlitmo escenario y triunfado sobre el Mal. </span>")
+			}
+			else{
+				$("#outcome-header").append( "<span style='color: #FF0000;'>¡Derrota! Los aventureros han caido en las garras del Malvado.<span style='color: #2ECCFA;'>")
+				$("#reason-header").append("La derrota se debió a: "+data.reason);
+			}
+			$("#score-header").append("El puntaje final de los aventureros es: "+data.score);
+		}
+	}
+	
+	}
 
 	return exports;
 });

@@ -24,6 +24,16 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		}
 	}
 
+	Client.prototype.getAlivePlayers = function(){
+		var ret = [];
+		for (j in this.players){
+			if (!this.players[j].dead){
+				ret.push(this.players[j]);
+			}
+		}
+		return ret;
+	}
+
 	//actualizo la actividad en ejecucion
 	Client.prototype.updateActivity = function(act){
 		this.currentActivity = act;
@@ -107,8 +117,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 							{
 								valid = true;
 								$(this).data("discarded", cards[j]);
-								console.log("Me estoy deshaciendo de la carta: ");
-								console.log(cards[j]);
 								cards.splice(j,1);
 							}
 							else j++;
@@ -126,10 +134,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 								$(this).data("put", ($(this).data("card").amount));
 							}
 						}
-						else{
-							console.log("Carta invalida");
-							}
-						} 			
+					} 			
 					else{								//si esta estaba seleccionada, deselecciono
 							$(this).removeClass("highlighted-image");
 							$(this).data("selected", false);
@@ -301,7 +306,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 
 	Client.prototype.commonDiscard = function(data){
 		var self = this;
-		console.log(data.elements);
 		var popup = new Popup({
 					title: "Descarte común", 
 					text: "Debes elegir a los jugadores que harán los descartes.", 
@@ -361,8 +365,9 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 					el.append("<p>"+texto+"</p>");
 					var listbox = $("<select class='discard-selector'> </select>");
 					listbox.data("element", data.elements[i]);
-					for (j in self.players){
-						var sel = $("<option id='option-"+self.players[j].alias+"' value='"+self.players[j].alias+"'> "+self.players[j].alias+"</option>");
+					var people = self.getAlivePlayers();
+					for (j in people){
+						var sel = $("<option id='option-"+people[j].alias+"' value='"+people[j].alias+"'> "+people[j].alias+"</option>");
 						sel.data("element", data.elements[i]);			
 						$(listbox).append(sel);
 					}
@@ -378,7 +383,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 					$(".discard-selector").each(function(){
 						var name = $(this).val();
 						discards.push({'alias' : name, 'discard' : $(this).data("element")});
-						console.log($(this).data("element"));
 					});
 					
 					self.socket.emit('add activity', {'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : data.defaultAction, 'discardActions' : data.discardActions});	//voy dando las cartas de a una
@@ -451,21 +455,35 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 	//Retransmitir un evento en ronda desde el jugador activo hacia los demas
 	Client.prototype.roundTransmission = function(action, playerNumber){
 		var act = action;
-		
+
 		if (this.isActivePlayer()){
 					//envio la tarea a todos los players
-					var i=0;
-					if (playerNumber<this.players.length-1){
-						i = playerNumber+1;
-					}
-					while (this.players[i].alias != this.alias){
-						action['player'] = this.players[i].alias;
-						this.socket.emit('add activity', action);
-						if (i<this.players.length-1){
-							i++;
+					var alive = this.getAlivePlayers();
+					//busco al jugador en los vivos
+					var j =0;
+					var found = false;
+					while (!found && j<alive.length){
+						if (this.alias == alive[j].alias){
+							found=true;
 						}
 						else{
-							i=0;
+							j++;
+						}
+					}
+					if (found){
+						var i=0;
+						if (j<alive.length-1){
+							i = j+1;
+						}
+						while (alive[i].alias != this.alias){
+							action['player'] = alive[i].alias;
+							this.socket.emit('add activity', action);
+							if (i<alive.length-1){
+								i++;
+							}
+							else{
+								i=0;
+							}
 						}
 					}
 			}

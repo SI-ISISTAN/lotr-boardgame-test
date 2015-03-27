@@ -1,12 +1,17 @@
 Porximo commit:
--Conducta de feature cards
--debugueo general
+- Implementacion de la muerte (faltan animaciones)
+- Rehechos los get alive players, ahora se usan
+- Muerte por falta de cartas
+- Muerte por chocar a Sauron
 
-Falta:
--Matar a un jugador (y que siga)
--Conteo de puntos
 
-Debbuging(Acá anoto todo lo raro que aparezca en test):
--A veces me tira un error al jugar una feature card , de data.card undefined
--No anda la carta que previene que un tipo no avance si le faltan fichas
--la verga no se desactivan los botones en la fase playedCard. q onda??
+OJOTA:
+-Si mato a un peoaje en meido de una roll de acciones estas continuan. che que ar
+
+problema:
+-El enable de los botones se ejecuta solamente ante los cambios de fase. apenas tiro el boton del draw tile cambia la fase y se activan de nuevo las muy putas
+
+TODO:
+-Determinar muerte de un aventurero y perder partida
+-Contar puntos e informarlos al final de la partida
+-DESAPARECE LA PRIMERA CARTA? QUE ONDA? (parece que el paso de cartas entre jugadores está turbio. quiza sean las featue cards el origen. investigar)

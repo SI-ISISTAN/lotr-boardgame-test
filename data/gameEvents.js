@@ -18,8 +18,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						var el = $("<div id='advance-div'>  </div> ");
 						var listbox = $("<select class='player-selector'> </select>");
 						//Agrego los tracks por los que puedo avanzar
-						for (i in client.players){
-							$(listbox).append("<option value='"+client.players[i].alias+"'> "+client.players[i].alias+"</option>");
+						var people = client.getAlivePlayers();
+						for (i in people){
+							$(listbox).append("<option value='"+people[i].alias+"'> "+people[i].alias+"</option>");
 						}			
 						$(el).append($(listbox));
 						div.append(el);	
@@ -104,13 +105,11 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			});
 			popup.addListener("prepare", function(){
 				client.socket.emit('add activity', {'action' : 'RollDie'});	
-
 				client.socket.emit('add activity', {'action' : 'PlayerDealCards', 'amount' : 4});	
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
 			popup.addListener("dont-prepare", function(){
-
 				client.socket.emit('resolve activity');
 				popup.close();	
 			});
@@ -124,9 +123,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		apply : function(game,player,data){
 			var candidates = [];
 			var cards = [{symbol: 'Hiding', color: null}, {symbol: 'Hiding', color: null}]; //son dos cartas de Esconderse
-			for (v in game.players){
-				if (game.players[v].hasCards(cards)){
-					candidates.push(game.players[v].alias);
+			var people = game.getAlivePlayers();
+			for (v in people){
+				if (people[v].hasCards(cards)){
+					candidates.push(people[v].alias);
 				}
 			}
 			data['candidates'] = candidates;
@@ -203,12 +203,13 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			var popup = new Popup({title: "Elrond", text: "Cada jugador, comenzando por el Portador y siguiendo hasta el último, debe elegir una carta para pasársela al jugador siguiente.", buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
 			popup.addListener("ok", function(){
 				popup.close();
-				for (var i=0; i < client.players.length; i++){
-					if (i<client.players.length-1){
-						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.players[i].alias, 'cards': null, 'to':client.players[i+1].alias});	
+				var people = client.getAlivePlayers();
+				for (var i=0; i < people.length; i++){
+					if (i<people.length-1){
+						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : people[i].alias, 'cards': null, 'to':people[i+1].alias});	
 					}
 					else{
-						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.players[i].alias, 'cards': null, 'to':client.players[0].alias});
+						client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : people[i].alias, 'cards': null, 'to':people[0].alias});
 					}
 				}
 				client.socket.emit('resolve activity');
@@ -222,7 +223,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 	"Fellowship" : {
 		apply: function(game,player,data){
 			if (data.player =='first'){
-				data['player']=game.players[0].alias;
+				data['player']=game.activePlayer.alias;
 				game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: Comunidad.", 'mode':'alert'});
 				game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador y siguiendo hasta el último, debe elegir entre descartar una carta de símbolo Comodín o, de no poder o no querer hacerlo, tirar el Dado de Corrupción.", 'mode':'info'});
 			}
@@ -240,12 +241,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			popup.addListener("discard", function(){
 				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': [{color:null, symbol:"Joker"}], 'to': null});
 				if (client.isActivePlayer()){
-					for (var i=1; i < client.players.length; i++){
-						if (i<client.players.length){
-							client.socket.emit('add activity', {'action' : "Fellowship", 'player' : client.players[i].alias});	
-						}
-					}
-				client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
+					
+					client.roundTransmission({'action' : "Fellowship"}, client.player.number);	
+					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				}
 				client.socket.emit('resolve activity');
 				popup.close();
@@ -253,11 +251,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			popup.addListener("rolldie", function(){
 				client.socket.emit('add activity', {'action' : 'RollDie'});	
 				if (client.isActivePlayer()){
-					for (var i=1; i < client.players.length; i++){
-						if (i<client.players.length){
-							client.socket.emit('add activity', {'action' : "Fellowship", 'player' : client.players[i].alias});
-						}
-					}
+					client.roundTransmission({'action' : "Fellowship"}, client.player.number);	
 					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
 				}
 				client.socket.emit('resolve activity');
@@ -448,8 +442,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [{name : "Este jugador avanzará", id:"advance"},  {name : "Lanzar el dado", id:"rolldie"}] , visibility : data.player});
 			
 			var listbox = $("<select class='advance-selector'> </select>");
-			for (j in client.players){
-				$(listbox).append("<option value='"+client.players[j].alias+"'> "+client.players[j].alias+"</option>");
+			var people = client.getAlivePlayers();
+			for (j in people){
+				$(listbox).append("<option value='"+people[j].alias+"'> "+people[j].alias+"</option>");
 			}
 			popup.append($(listbox));
 
@@ -459,8 +454,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("rolldie", function(){
-				for (t in client.players){
-					client.socket.emit('add activity', {'action' : 'RollDie', 'player':client.players[t].alias});	
+				var people2 = client.getAlivePlayers();
+				for (t in people2){
+					client.socket.emit('add activity', {'action' : 'RollDie', 'player':people2[t].alias});	
 				}
 				popup.close();
 				client.socket.emit('resolve activity');
@@ -600,9 +596,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		apply : function(game,player,data){
 			var candidates = [];
 			var cards = [{symbol: 'Friendship', color: null}, {symbol: 'Joker', color: null}]; //son dos cartas de Esconderse
-			for (v in game.players){
-				if (game.players[v].hasCards(cards)){
-					candidates.push(game.players[v].alias);
+			var people = game.getAlivePlayers();
+			for (v in people){
+				if (people[v].hasCards(cards)){
+					candidates.push(people[v].alias);
 				}
 			}
 			data['candidates'] = candidates;
@@ -849,9 +846,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		description: "Se debe elegir a un jugador para que descarte 5 escudos. De hacerlo, cada jugador recibe una carta del Mazo. De no poder ninguno, o no ponerse de acuerdo, el Malvado avanza dos espacios hacia los aventureros.",
 		apply : function(game,player,data){
 			var candidates = [];
-			for (v in game.players){
-				if (game.players[v].hasTokens('shield',5)){
-					candidates.push(game.players[v].alias);
+			var people =game.getAlivePlayers();
+			for (v in people){
+				if (people[v].hasTokens('shield',5)){
+					candidates.push(people[v].alias);
 				}
 			}
 			data['candidates'] = candidates;
@@ -1036,9 +1034,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		apply : function(game, player,data){
 			var candidates = [];
 			var cards = [{symbol: null, color: null}, {symbol: null, color: null},{symbol: null, color: null}]; //son dos cartas de Esconderse
-			for (v in game.players){
-				if (game.players[v].hasCards(cards)){
-					candidates.push(game.players[v].alias);
+			var people = game.getAlivePlayers();
+			for (v in people){
+				if (people[v].hasCards(cards)){
+					candidates.push(people[v].alias);
 				}
 			}
 			data['candidates'] = candidates;

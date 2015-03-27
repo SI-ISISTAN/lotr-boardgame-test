@@ -26,8 +26,13 @@
 	list-style-type:none;
 }
 
-.overcard{
-	background-color: #000000;
+.dead-player-overlay{
+	position:absolute;
+    top:0px;
+    left:0px;
+    bottom:0px;
+    right:0px;
+    background-color:rgba(0,0,255,0.5);
 }
 
 .client-list-item{
@@ -84,7 +89,7 @@
 	padding-top:5px;
 	text-align:left;
 	height:80vh;
-	overflow-y:scroll;
+	overflow-y:auto;
 }
 .chat-message{
 	margin-bottom:1px;
@@ -176,10 +181,12 @@
 	font-size: 1.4vm;   /* IE9 */
   	font-size: 1.4vmin;
   	margin-top:15px;
+  	overflow-y :scroll;
 }
 
 /* Imágenes de jugadores en la bara izquierda */
 .player-state-div{
+	position : relative;
 	border-bottom: solid #6a3b44;
 	border-width: 2px;
 	padding-top:5px;
@@ -196,21 +203,6 @@
 .player-stat-img{
 	display:inline;
 	text-align:left;
-}
-
-/* Div donde va el mazo de location */
-#location-quest-div{
-
-}
-
-/* Div donde van las runas de Gandalf */
-#mage-runes-div{
-
-}
-
-/* Div donde van las cartas de Gandalf */
-#mage-cards-div{
-
 }
 
 #chat-msg-div{

@@ -14,7 +14,7 @@ define([], function () {
 		this.lifeTokens = 0;
 		this.sunTokens = 0;
 		this.ringTokens = 0;
-		this.shields = 5;
+		this.shields = 0;
 		this.hand = [];
 		this.corruption = 0;
 		this.dead= false;
@@ -124,6 +124,8 @@ define([], function () {
 	//Descartar cartas basadas en su ID
 	Player.prototype.discardByID= function(discard){
 		for (i in discard){
+			console.log("Estoy descartando:");
+			console.log(this.hand[this.findCardByID(discard[i].id)]);
 			this.hand.splice(this.findCardByID(discard[i].id),1);
 		}
 	}
@@ -187,9 +189,7 @@ define([], function () {
 	}
 
 	Player.prototype.addCard = function(card){
-		if (card.id==null){
 			card["id"] = Math.random().toString(36).substring(7);	//Nombre random
-		}
 		this.hand.push(card);
 	}
 
@@ -225,7 +225,7 @@ define([], function () {
 	Player.prototype.giveCards= function(discard, to){
 		for (i in discard){
 			var card = this.hand[this.findCardByID(discard[i].id)];
-			this.hand.splice(card.id,1);
+			this.hand.splice(this.findCardByID(discard[i].id),1);
 			to.addCard(card);
 		}
 	}

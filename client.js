@@ -21,7 +21,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    		client.connected=true;
 	    		client.alias = res.alias;
 	    		client.id = res.id;
-	    		$("#username-header").append("Welcome, "+client.alias+"!");
+	    		$("#username-header").append("Se te ha asignado el alias: "+client.alias+"");
 	            $("#connected-list").append("<li class='client-list-item-highlighted'> <span class='client-list-name'> <b>"+client.alias+"</b> </span> <span class='client-list-state'> (Esperando) </span> </li>");
 	            socket.emit('find game',{'alias' : client.alias, 'id':client.id});
       	});
@@ -75,12 +75,13 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 		        		panel.append("<img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img ring-bearer-img'>");
 		        	}
 		        	$("#player-list-div").append(panel); 
-		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+res.game.players[i].character.image+'.jpg" id= "'+res.game.players[i].alias+'-chip" class="hobbit-chip" style="left: 10px; top: '+(126 + (i*8))+'px; z-index:'+(i+1)*1+';">');	
+		        	$("#master-board-img-container").append('<img src="./assets/img/ripped/'+res.game.players[i].character.image+'.jpg" id= "'+res.game.players[i].alias+'-chip" class="hobbit-chip" style="left: '+(7+(37*res.game.players[i].corruption))+'px; top: '+(126 + (i*8))+'px; z-index:'+(i+1)*1+';">');	
 		        }
 
 		        	
 		       for (i in res.game.players){
-		       		client.players.push({'id':res.game.players[i].id, 'alias': res.game.players[i].alias});
+		       		client.players.push({'id':res.game.players[i].id, 'alias': res.game.players[i].alias, 'dead':res.game.players[i].dead});
+
 		       } 
 
 		       var found = false;
@@ -97,7 +98,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 		        $("#player-cards-container").append('<img src="./assets/img/ripped/'+client.player.character.image +'.jpg"  class="player-hobbit-img img-responsive" title="'+client.player.character.name+'">');
 		         $("#master-board-img-container").append('<img src="./assets/img/ripped/cono_de_dunshire.png" id="world-chip" class="cone-chip" style="left: 18px; top: 30px;">');
-		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left: 532px; top: 72px;">');
+		        $("#master-board-img-container").append('<img src="./assets/img/ripped/suaron.png" class="sauron-chip" style="left:'+(532-(37*(15-res.game.sauronPosition)))+'px; top: 72px;">');
 		       
 
 		        if (client.player.turn){
@@ -130,6 +131,9 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    	}
 	    	else if (res.mode=='tip'){
 	    		$("#chat-msg-div").append('<p style= "color: #58D3F7" class="chat-message"> '+ res.msg+' </p>');
+	    	}
+	    	else if (res.mode=='death'){
+	    		$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #FF0000;"> '+ res.msg+' </p>');
 	    	}
 	    	$('#chat-msg-div').scrollTop($('#chat-msg-div').prop("scrollHeight"));
 	    });

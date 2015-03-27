@@ -150,7 +150,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				if (self.activeGames[client.room].canGameStart()){
 					self.activeGames[client.room].isActive = true;
 					self.activeGames[client.room].start();
-					io.to(client.room).emit('start game',{'game' : {'players' : self.activeGames[client.room].players}});		
+					io.to(client.room).emit('start game',{'game' : {'sauronPosition': self.activeGames[client.room].sauronPosition, 'players' : self.activeGames[client.room].players}});		
 					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!", 'mode':'alert'});
 					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". ", 'mode':'alert'});
 				}
