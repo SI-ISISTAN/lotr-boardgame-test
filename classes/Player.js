@@ -189,7 +189,9 @@ define([], function () {
 	}
 
 	Player.prototype.addCard = function(card){
+		if (typeof(card.id)=='undefined' || card.id==null){
 			card["id"] = Math.random().toString(36).substring(7);	//Nombre random
+		}
 		this.hand.push(card);
 	}
 

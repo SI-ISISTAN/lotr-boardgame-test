@@ -9,7 +9,9 @@ OJOTA:
 -Si mato a un peoaje en meido de una roll de acciones estas continuan. che que ar
 
 problema:
--El enable de los botones se ejecuta solamente ante los cambios de fase. apenas tiro el boton del draw tile cambia la fase y se activan de nuevo las muy putas
+-Cuando quise pasar una carta pasada a mi (feature) me tira error : Cannot set property 'id' of undefined
+    at Player.addCard (/home/matias/Escritorio/lotr-boardgame-test/classes/Player.js:192:15)
+
 
 TODO:
 -Determinar muerte de un aventurero y perder partida

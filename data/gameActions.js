@@ -362,12 +362,13 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					if (client.isActivePlayer()){
 						if (data.dead){
 							client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
-							}
-							client.socket.emit('resolve activity');
+							}	
 						}
 				});
 			}
-			
+			if (client.isActivePlayer()){
+				client.socket.emit('resolve activity');
+			}
 
 		}
 		
@@ -997,22 +998,25 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas de movimiento", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
 			popup.addListener("playcards", function(){
-				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				
 				client.socket.emit('add activity', {'action' : 'PlayCards'});
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("heal", function(){
-				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				//client.socket.emit('add activity', {'action' : 'NextPhase'});
 				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("draw", function(){
-				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				//client.socket.emit('add activity', {'action' : 'NextPhase'});
 				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 					
 				popup.close();
 				client.socket.emit('resolve activity');
@@ -1091,7 +1095,12 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	//Elegir cartas para jugar
 	"PlayCard" : {
 		apply : function(game, player,data){
+			console.log("Como llega la info");
+			console.log(data.played);
+			console.log(game.getPlayerByAlias(player.alias).hand);
 			data['card'] = game.getPlayerByAlias(player.alias).hand[game.getPlayerByAlias(player.alias).findCardByID(data.played.id)];
+			console.log("Carta jugada");
+			console.log(data.card);
 			data.card.apply(game, player,data);
 			game.getPlayerByAlias(player.alias).discardByID([data.card]);
 			data['alias'] = player.alias;
@@ -1444,7 +1453,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			
 			var popup = new Popup({title: "Jugar cartas", id:"play-special-popup", text: "Haz click en una carta especial habilitada para jugarla.",buttons : [{name : "Cancelar", id:"cancel"}], visibility : "active"});
 			$(".player-card-img").each(function(){
-				if ($(this).data("card").type=="Special"){
+				if (typeof($(this).data("card"))!=="undefined" && $(this).data("card").type=="Special"){
 						var card = $(this).data("card");
 						//busco si el momento de juego es adecuado para activar la carta
 						var found = false;

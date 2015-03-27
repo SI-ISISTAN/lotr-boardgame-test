@@ -158,7 +158,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 		for (i in gameData.hobbitCards){
 			var card = new Card(gameData.hobbitCards[i]);
-			card.id = i;
+			//card.id = i;
 			this.hobbitCards.push(card);
 		}
 		this.hobbitCards = this.shuffleArray(this.hobbitCards);
