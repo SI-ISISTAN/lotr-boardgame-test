@@ -6,7 +6,9 @@ Porximo commit:
 
 
 OJOTA:
--Si mato a un peoaje en meido de una roll de acciones estas continuan. che que ar
+-Si mato a un peoaje en meido de una roll de acciones estas continuan. che qUE AR VIEJO
+-reworkee el popu de draw tile para que aparezca solo cuando debe y parece que quedo medio mocho. en fin (reimplementar el chequeo)
+-si tiro un remove despues del close del popup (rompo todo???)
 
 problema:
 -Cuando quise pasar una carta pasada a mi (feature) me tira error : Cannot set property 'id' of undefined

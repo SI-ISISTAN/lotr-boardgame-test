@@ -505,8 +505,10 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			var span = $("#"+this.alias+"-state-div").find("#shield-span");
 			var shields = parseInt(span.text());
 			if (data.phase == "drawTiles"){
-				var popup = new Popup({title: "Sacar tile", text: "En esta fase debes sacar tiles de eventos hasta sacar uno de movimiento. Haz click en el botón 'Sacar tile'.", buttons : [], id: "tile-info", visibility : "active"});
-				popup.draw(self);
+				if ($("#tile-info").length == 0){
+					var popup = new Popup({title: "Sacar tile", text: "En esta fase debes sacar tiles de eventos hasta sacar uno de movimiento. Haz click en el botón 'Sacar tile'.", buttons : [], id: "tile-info", visibility : "active"});
+					popup.draw(self);
+				}
 				$("#draw-tile-button").prop('disabled', false);
 			}
 			if (shields >= 5 && (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp") ){

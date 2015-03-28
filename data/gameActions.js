@@ -1095,12 +1095,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	//Elegir cartas para jugar
 	"PlayCard" : {
 		apply : function(game, player,data){
-			console.log("Como llega la info");
-			console.log(data.played);
-			console.log(game.getPlayerByAlias(player.alias).hand);
 			data['card'] = game.getPlayerByAlias(player.alias).hand[game.getPlayerByAlias(player.alias).findCardByID(data.played.id)];
-			console.log("Carta jugada");
-			console.log(data.card);
 			data.card.apply(game, player,data);
 			game.getPlayerByAlias(player.alias).discardByID([data.card]);
 			data['alias'] = player.alias;

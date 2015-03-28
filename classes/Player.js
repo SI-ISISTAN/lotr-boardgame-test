@@ -124,8 +124,6 @@ define([], function () {
 	//Descartar cartas basadas en su ID
 	Player.prototype.discardByID= function(discard){
 		for (i in discard){
-			console.log("Estoy descartando:");
-			console.log(this.hand[this.findCardByID(discard[i].id)]);
 			this.hand.splice(this.findCardByID(discard[i].id),1);
 		}
 	}

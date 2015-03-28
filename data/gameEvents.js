@@ -491,11 +491,12 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 	"Recovery" : {
 		apply: function(game,player,data){
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: 'Recuperación'.", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador, puede descartar dos escudos. Si desea hacerlo, entonces puede elegir entre sacar dos cartas del mazo o alejarse del peligro 1 paso en la Línea de Corrupción.", 'mode':'info'});
+			
 			if (data.player == "RingBearer"){
 				data.player = game.ringBearer.alias;
 				data['playerNumber'] = 	game.ringBearer.number;
+				game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: 'Recuperación'.", 'mode':'alert'});
+				game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador, puede descartar dos escudos. Si desea hacerlo, entonces puede elegir entre sacar dos cartas del mazo o alejarse del peligro 1 paso en la Línea de Corrupción.", 'mode':'info'});
 			}
 			if (game.getPlayerByAlias(data.player).shields >=2){
 				data['canDiscard'] = true;
@@ -550,11 +551,11 @@ define(['../classes/client-side/Popup'], function (Popup) {
 
 	"GalardielTest" : {
 		apply: function(game,player,data){
-			game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: 'La Prueba'.", 'mode':'alert'});
-			game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador, debe descartar un símbolo de Comodín. De no querer o no poder, debe lanzar el Dado.", 'mode':'info'});
 			if (data.player == "RingBearer"){
 				data.player = game.ringBearer.alias;
 				data['playerNumber'] = 	game.ringBearer.number;
+				game.io.to(player.room).emit('log message', {'msg' : "El jugador activo debe resolver la actividad: 'La Prueba'.", 'mode':'alert'});
+				game.io.to(player.room).emit('log message', {'msg' : "Cada jugador, comenzando por el Portador, debe descartar un símbolo de Comodín. De no querer o no poder, debe lanzar el Dado.", 'mode':'info'});
 			}
 			if (game.getPlayerByAlias(data.player).hasCards([{color:null, symbol:"Joker"}])){
 				data['canDiscard'] = true;
@@ -571,13 +572,19 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			popup.addListener("discard", function(){
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : 1, 'alias' : client.alias, 'cards': [{color:null, symbol:"Joker"}], 'to': null});
-				client.roundTransmission({'action' : "GalardielTest"}, data.playerNumber);	
+				client.roundTransmission({'action' : "GalardielTest"}, data.playerNumber);
+				if (client.isActivePlayer()){
+					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
+				}	
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("dont", function(){
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'RollDie'});	
 				client.roundTransmission({'action' : "GalardielTest"}, data.playerNumber);	
+				if (client.isActivePlayer()){
+					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
+				}
 				client.socket.emit('resolve activity');
 			});
 
