@@ -332,7 +332,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			if (data.alias=="RingBearer"){
 				data.alias = game.ringBearer.alias;
 			}
-			if (game.getPlayerByAlias(data.alias).corruption+data.amount > 0){
+			if (game.getPlayerByAlias(data.alias).corruption+data.amount >= 0){
 				data['valid'] = true;
 				game.getPlayerByAlias(data.alias).move(data.amount);
 				if (data.amount>0){
