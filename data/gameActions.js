@@ -14,17 +14,15 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				if (data.player == null){			//si me pasan nulo le reparto a todos
 					var people = game.getAlivePlayers();
 					for (j in people){
-						var card = game.hobbitCards[game.hobbitCards.length-1];
+						var card = game.dealHobbitCard(game.hobbitCards.length-1);
 						game.getPlayerByID(people[j].id).addCard(card);
-						game.hobbitCards.splice(game.hobbitCards.length-1);
 						given.push({'card' : card, 'player' : people[j].alias, 'number' : game.getPlayerByID(people[j].id).hand.length-1});	
 					}
 					
 				}
 				else{
-					var card = game.hobbitCards[game.hobbitCards.length-1];
+					var card = game.dealHobbitCard(game.hobbitCards.length-1);
 					game.getPlayerByAlias(data.player).addCard(card);
-					game.hobbitCards.splice(game.hobbitCards.length-1);
 					given.push({'card' : card, 'player' : data.player});
 					em=true;
 				}
@@ -410,7 +408,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		apply : function(game, player,data){
 			data.cards = [];
 			for (var i=0; i<data.amount; i++){
-				data.cards.push(game.hobbitCards[game.hobbitCards.length-1-i]);
+				data.cards.push(game.dealHobbitCard(game.hobbitCards.length-1));
 			}
 			game.io.to(player.room).emit('update game', data);	
 		},
@@ -507,6 +505,11 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 					    	});
 						}
+				}
+				else{
+					if (client.isActivePlayer()){
+						client.turnPhase = "inactive";	
+					}
 				}
 				$("#world-chip").animate({
 							'left' : "+="+data.mov.x+"px",
@@ -1255,6 +1258,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	"ChangeRingBearer" : {
 		apply : function(game, player,data){
 			game.ringBearer = game.changeRingBearer();
+			game.activePlayer = game.ringBearer;
 			data['ringBearer'] = game.ringBearer.alias;
 
 			//Reset tokens
@@ -1281,6 +1285,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 
 			$(".ring-bearer-img").remove();
 			$("#"+data.ringBearer+"-state-div").append("<img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img ring-bearer-img'>");
+			//lo pongo como activo
+			$(".is-active").removeClass("is-active");
+			$("#"+data.ringBearer+"-state-div").addClass("is-active");
 			if (client.isActivePlayer()){
 				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : data.ringBearer});	
 				client.socket.emit('resolve activity');

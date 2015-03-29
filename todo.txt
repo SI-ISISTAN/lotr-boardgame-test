@@ -9,10 +9,13 @@ OJOTA:
 -Si mato a un peoaje en meido de una roll de acciones estas continuan. che qUE AR VIEJO
 -reworkee el popu de draw tile para que aparezca solo cuando debe y parece que quedo medio mocho. en fin (reimplementar el chequeo)
 -si tiro un remove despues del close del popup (rompo todo???)
+-agregue un "fase=inactive" cuando no es conflicto
+-agregue un activeplayer=ringbearer en change ring bearer
 
 problema:
 -Cuando quise pasar una carta pasada a mi (feature) me tira error : Cannot set property 'id' of undefined
     at Player.addCard (/home/matias/Escritorio/lotr-boardgame-test/classes/Player.js:192:15)
+- cuando la actividad "recovery" de lothlorien arranca por el 2º jugador no da toda la vuelta. que onda??. se taro despues de "la prueba".
 
 
 TODO:

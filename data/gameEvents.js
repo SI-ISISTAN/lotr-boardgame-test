@@ -340,8 +340,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		title: "Piedra del Pozo",
 		description: "El jugador activo debe sacar una carta del mazo y descartar dos símbolos coincidentes con el de la carta que saca (o Comodines).",
 		apply : function(game, player,data){
-			data['card'] = {color: null, symbol: game.hobbitCards[game.hobbitCards.length-1].symbol, image:game.hobbitCards[game.hobbitCards.length-1].image};
-			game.hobbitCards.splice(game.hobbitCards.length-1);
+			var dealt = game.dealHobbitCard(game.hobbitCards.length-1);
+			data['card'] = {color: null, symbol: dealt.symbol, image:dealt.image};
 			if (game.getPlayerByAlias(game.activePlayer.alias).hasCards([data.card,data.card])){
 				data['canDiscard']=true;
 			}
@@ -703,8 +703,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		'title': "Incendio en la Torre",
 		'description' : "El jugador activo debe sacar una carta del mazo y descartar dos símbolos coincidentes con el de la carta que saca (o Comodines). De no poder o querer hacerlo todos los jugadores, en orden, deben lanzar el dado.",
 		apply : function(game, player,data){
-			data['card'] = {color: null, symbol: game.hobbitCards[game.hobbitCards.length-1].symbol, image:game.hobbitCards[game.hobbitCards.length-1].image};
-			game.hobbitCards.splice(game.hobbitCards.length-1);
+			var dealt =game.dealHobbitCard(game.hobbitCards.length-1);
+			data['card'] = {color: null, symbol: dealt.symbol, image: dealt.image};
 			if (game.getPlayerByAlias(game.activePlayer.alias).hasCards([data.card,data.card])){
 				data['canDiscard']=true;
 			}
@@ -900,8 +900,8 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		'title': "Un Esbirro Busca el Anillo",
 		'description' : "El Portador revela la carta superior del Mazo. Si puede descartar cartas con 3 símbolos coincidentes al de la carta (o comodines), se aleja un espacio del Malvado en la Línea de Corrupción. De no poder hacerlo, todos los jugadores deben lanzar el Dado.",
 		apply : function(game, player,data){
-			data['card'] = {color: null, symbol: game.hobbitCards[game.hobbitCards.length-1].symbol, image:game.hobbitCards[game.hobbitCards.length-1].image};
-			game.hobbitCards.splice(game.hobbitCards.length-1);
+			var dealt = game.dealHobbitCard(game.hobbitCards.length-1);
+			data['card'] = {color: null, symbol: dealt.symbol, image: dealt.image};
 			if (game.getPlayerByAlias(game.ringBearer.alias).hasCards([data.card,data.card,data.card])){
 				data['canDiscard']=true;
 			}

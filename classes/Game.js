@@ -294,8 +294,35 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 	//Recibe el estado de juego ante algun cambio grande
 	Game.prototype.drawTile= function(data){
-		data.value = this.storyTiles[this.storyTiles.length-1];
-		this.storyTiles.splice(this.storyTiles.length-1,1);
+		if (this.storyTiles.length > 0){
+			data.value = this.storyTiles[this.storyTiles.length-1];
+			this.storyTiles.splice(this.storyTiles.length-1,1);
+		}
+		else{
+			//repongo los tiles
+			for (i in gameData.storyTiles){
+				this.storyTiles.push(gameData.storyTiles[i]);
+			}
+			this.storyTiles = this.shuffleArray(this.storyTiles);
+		}
+	}
+
+	Game.prototype.dealHobbitCard= function(position){
+		var card = {};
+		if (this.hobbitCards.length > 0 && typeof(this.hobbitCards[position]) != 'undefined' ){
+			card = this.hobbitCards.splice(position,1);
+		}
+		else{
+			//vuelvo a dar cartas
+			for (i in gameData.hobbitCards){
+				var card = new Card(gameData.hobbitCards[i]);
+				this.hobbitCards.push(card);
+			}
+			this.hobbitCards = this.shuffleArray(this.hobbitCards);
+			card = this.hobbitCards.splice(position,1);
+		}
+
+		return card[0];
 	}
 
 	//Chequeo un evento especial
