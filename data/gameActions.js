@@ -1001,9 +1001,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas de movimiento", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
 			popup.addListener("playcards", function(){
-				
-				client.socket.emit('add activity', {'action' : 'PlayCards'});
 				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				client.socket.emit('add activity', {'action' : 'PlayCards'});
+				
 				
 				popup.close();
 				client.socket.emit('resolve activity');
@@ -1282,7 +1282,12 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				var span = $("#"+people[i].alias+"-state-div").find("#ring-span");
 				span.text("0");	
 			}
-
+			if (client.alias == data.ringBearer){
+				client.player.turn=true;
+			}
+			else{
+				client.player.turn=false;
+			}
 			$(".ring-bearer-img").remove();
 			$("#"+data.ringBearer+"-state-div").append("<img src='./assets/img/ripped/ring-mini.png' class='img-responsive player-stat-img ring-bearer-img'>");
 			//lo pongo como activo
