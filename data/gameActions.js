@@ -384,7 +384,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					data.dead.push(people[i].alias);
 				}
 			}
-			game.io.to(player.room).emit('log message', {'msg' : "¡Battion se mueve "+data.amount+" lugares hacia los aventureros!", 'mode':'danger'});
+			game.io.to(player.room).emit('log message', {'msg' : "¡El Malvado se mueve "+data.amount+" lugares hacia los aventureros!", 'mode':'danger'});
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
@@ -1001,8 +1001,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas de movimiento", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
 			popup.addListener("playcards", function(){
-				client.socket.emit('add activity', {'action' : 'NextPhase'});
+				
 				client.socket.emit('add activity', {'action' : 'PlayCards'});
+				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				
 				
 				popup.close();
@@ -1062,6 +1063,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		
 		},
 		draw : function(client, data){
+			client.buttonCheck({phase:'inactive'});
 			var popup = new Popup({title: "Jugar cartas", text: "Puedes jugar hasta 2 cartas, como máximo una blanca y una gris (los comodines rojos no cuentan hacia este límite).",buttons : [{name : "Listo", id:"ok"}], visibility : "active", modal:false});
 			
 			popup.addListener("ok", function(){
@@ -1413,7 +1415,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			var card = new Card(data.card);
 			card.draw(client, data);
-			client.socket.emit('resolve activity');
+			//client.socket.emit('resolve activity');
 		}
 	},
 

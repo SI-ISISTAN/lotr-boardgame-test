@@ -8,6 +8,7 @@ En testing:
 -si tiro un remove despues del close del popup (rompo todo???)
 -agregue un "fase=inactive" cuando no es conflicto
 -agregue un activeplayer=ringbearer en change ring bearer
+-volvi a meter el cambio en cardsphase despues de jugar ls cartas y agregue un muteador de botones durante play cards. a ver q ondis
 
 Bugs:
 -Cuando quise pasar una carta pasada a mi (feature) me tira error : Cannot set property 'id' of undefined

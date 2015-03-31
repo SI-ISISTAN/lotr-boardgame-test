@@ -304,6 +304,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 				this.storyTiles.push(gameData.storyTiles[i]);
 			}
 			this.storyTiles = this.shuffleArray(this.storyTiles);
+			data.value = this.storyTiles[this.storyTiles.length-1];
 		}
 	}
 

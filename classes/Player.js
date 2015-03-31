@@ -14,7 +14,7 @@ define([], function () {
 		this.lifeTokens = 0;
 		this.sunTokens = 0;
 		this.ringTokens = 0;
-		this.shields = 0;
+		this.shields = 5;
 		this.hand = [];
 		this.corruption = 0;
 		this.dead= false;
