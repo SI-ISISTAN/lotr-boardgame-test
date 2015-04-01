@@ -198,6 +198,11 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				self.activeGames[client.room].resolveActivity(client);
 			});
 
+			//Se resuleve una actividad
+			client.on('log message', function (data){		
+				io.to(client.room).emit('log message', {'msg' : data.msg, 'mode':data.mode});
+			});
+
 			//Se desconecto un usuario
 			client.on('disconnect', function (){
 				var disconnectedAlias = self.disconnectClient(client.id).alias;

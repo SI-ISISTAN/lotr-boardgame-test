@@ -148,7 +148,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	//Accion de usar el anillo
 	"UseRing" : {
 		apply: function(game,player,data){
-			game.io.to(player.room).emit('log message', {'msg' : "¡"+player.alias+" usa el Anillo!", 'mode':'good'});
 			game.ringUsed = true;
 			data['value'] = game.rollDie();
 			data['amount'] = 0;
@@ -178,11 +177,43 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			client.ringUsed=true;
 			$("#use-ring-button").prop('disabled', true);
-			client.socket.emit('add activity', {'action' : 'DieRoll', 'value' : data.value});
-			client.selectTrackMovement(data, "Avanzar en una pista",  "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.",true);
 			
+			var popup = new Popup({title: "Avanzar en una pista", text: "¡Has activado el Poder del Anillo. Selecciona una pista en la cual moverte y luego deberás tirar el dado; una vez asumidas las consecuencias de la tirada, te moverás en la pista elegida un total de 4 espacios menos la cantidad de símbolos en la cara del dado.",buttons : [{name : "Ok", id:"ok"}, {name : "Cancelar", id:"cancel"}], visibility : "active"});
+							//pongo los elementos de reparto de cada carta
+							var div = $("<div>  </div>");
+							var el = $("<div id='advance-div'>  </div> ");
+							var listbox = $("<select id='move-track-selector'> </select>");
+							//Agrego los tracks por los que puedo avanzar
+							for (i in data.valid){
+								$(listbox).append("<option value='"+data.valid[i].name+"'> "+data.valid[i].text+"</option>");
+							}			
+							$(el).append($(listbox));
+							div.append(el);	
+							popup.append(div);
+							//cuando me dan ok envio cada carta al jugador correspondiente
+							popup.addListener("ok", function(){
+									client.socket.emit('log message', {'msg' : "¡"+client.alias+" usa el Anillo!", 'mode':'good'});
+									client.socket.emit('add activity', {'action' : 'DieRoll', 'value' : data.value});
+									$("#move-track-selector").each(function(){
+										var to = $(this).val();
+										var j=0;
+										while (j<data.amount){
+											client.socket.emit('add activity', {'action' : 'MoveTrack', 'trackName' : to, 'amount' : 1 });
+											j++;
+										}						
+									});
+									$("#move-track-selector").remove();
+									client.socket.emit('resolve activity');
+									popup.close();
+							
+							});
+							popup.addListener("cancel", function(){
+								$("#use-ring-button").prop('disabled', false);
+								popup.close();
+							});
+		
+		popup.draw(client);
 		}
-
 
 	},
 
@@ -500,9 +531,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				        	
 				        	//debo agregar el chobi este acá
 				        	$("#use-ring-button").on('click', function(){
-						    	
 						    	client.socket.emit('update game', {'action' : 'UseRing'});
-
 					    	});
 						}
 				}
@@ -685,7 +714,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			var span = $("#"+data.alias+"-state-div").find("#"+data.token+"-span");
 			var currentValue = parseInt(span.text());
 			span.text(currentValue+data.amount);
-			if (client.alias == data.alias){
+			if (client.alias == data.alias && typeof(data.gandalf) == 'undefined'){
 				client.socket.emit('resolve activity');
 			}
 		}
@@ -866,9 +895,11 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.nextPhase(data);
 			if (typeof(data.phase) == 'undefined'){
 				data['phase'] = game.turnPhase;
+				console.log("indefindoi");
 			}
 			else{
 				game.turnPhase = data.phase;
+				console.log("definido con "+data.phase);
 			}
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
@@ -881,6 +912,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						$("#draw-tile-button").prop('disabled', true);
 						client.socket.emit('add activity', {'action' : 'CardsPhase'});
 						client.socket.emit('add activity', {'action' : 'NextPhase'});
+
 					}
 					else if (data.phase == 'cleanUp'){
 						client.socket.emit('add activity', {'action' : 'CleanUpPhase'});
@@ -1001,16 +1033,13 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		draw : function(client, data){
 			var popup = new Popup({title: "Jugar cartas", id: "play-cards-dialog", text: "En esta fase de tu turno, puedes elegir entre: jugar hasta 2 cartas, 'curar' a tu aventurero (retroceder un paso en la Línea de Corrupción), o sacar 2 cartas del mazo.",buttons : [{name : "Jugar cartas de movimiento", id:"playcards"}, {name : "Curarse", id:"heal"},{name : "Sacar cartas", id:"draw"}], visibility : "active"});
 			popup.addListener("playcards", function(){
-				
-				client.socket.emit('add activity', {'action' : 'PlayCards'});
 				client.socket.emit('add activity', {'action' : 'NextPhase'});
-				
-				
+				client.socket.emit('add activity', {'action' : 'PlayCards'});
 				popup.close();
+
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("heal", function(){
-				//client.socket.emit('add activity', {'action' : 'NextPhase'});
 				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -1});
 				client.socket.emit('add activity', {'action' : 'NextPhase'});
 				
@@ -1018,7 +1047,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				client.socket.emit('resolve activity');
 			});
 			popup.addListener("draw", function(){
-				//client.socket.emit('add activity', {'action' : 'NextPhase'});
 				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : client.alias});
 				client.socket.emit('add activity', {'action' : 'NextPhase'});
 					
@@ -1063,7 +1091,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		
 		},
 		draw : function(client, data){
-			client.buttonCheck({phase:'inactive'});
 			var popup = new Popup({title: "Jugar cartas", text: "Puedes jugar hasta 2 cartas, como máximo una blanca y una gris (los comodines rojos no cuentan hacia este límite).",buttons : [{name : "Listo", id:"ok"}], visibility : "active", modal:false});
 			
 			popup.addListener("ok", function(){
@@ -1080,7 +1107,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 					client.socket.emit('add activity',{'action': 'PlayCard', 'played': played[i]});		
 					i++;
 				}
-				//client.socket.emit('add activity',{'action': 'NextPhase'});	
+
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
@@ -1377,7 +1404,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 								});
 							
 								$("#gandalf-selector").remove();
-								client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-5});
+								client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token':'shield', 'amount':-5, 'gandalf':true});
 								client.socket.emit('resolve activity');
 								popup.close();
 							});

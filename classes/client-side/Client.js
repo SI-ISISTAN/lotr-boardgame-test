@@ -12,6 +12,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		this.ringUsed=false;
 		this.turnPhase = "inactive";
 		this.currentActivity = null;
+		this.cancelResolve = false;
 		this.asyncInput = []; //guarda el estado de los inputs cuando alguna accion interrumpe el flujo de turno
 	}
 
@@ -495,7 +496,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 		var self=this;
 		if (this.isActivePlayer()){
 			if (!this.ringUsed){
-				if (data.phase == "drawTiles" || data.phase == "playCards" || data.phase=="cleanUp"){
+				if (data.phase == "drawTiles" || data.phase=="cleanUp"){
 					$("#use-ring-button").prop('disabled', false);
 				}
 				else{

@@ -829,7 +829,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				popup.close();	
 			});
 			popup.addListener("lose", function(){
-				//por ahora no hago anda porque no esta decidido que pasa cuando pierde 1 hobbit
+				client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No cumplió con los requisitos de un Evento cuya penalización era la muerte."});
 				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
 				client.socket.emit('resolve activity');
 				popup.close();	
@@ -1183,7 +1183,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			//falta hacer la derrota
+			client.socket.emit('update game', {'action' : 'EndGame', 'success':false, 'reason': "Los aventureros llegaron al último evento del escenario final, que concluye con la muerte de todos ellos."});
 			client.socket.emit('resolve activity');
 
 		}
