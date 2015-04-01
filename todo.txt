@@ -1,5 +1,6 @@
 Proximo commit:
 - Cambiod e fase en cards phase ANTES de jugar als cartas de movimiento, si no dps
+--se rompio despues de usar el anillo wht wave (?)
 
 
 En testing:
@@ -19,4 +20,3 @@ Bugs:
 Todo:
 -Chequear descarte en evento de heml (?)
 -despues del cambio de anillo tiro doble turno (?)
--se rompio despues de usar el anillo wht wave (?)
