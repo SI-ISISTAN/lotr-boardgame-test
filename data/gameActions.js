@@ -1287,6 +1287,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	"ChangeRingBearer" : {
 		apply : function(game, player,data){
 			game.ringBearer = game.changeRingBearer();
+			game.turnedPlayer = game.ringBearer.number;
 			game.activePlayer = game.ringBearer;
 			data['ringBearer'] = game.ringBearer.alias;
 

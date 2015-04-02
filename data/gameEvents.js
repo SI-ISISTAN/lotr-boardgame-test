@@ -28,9 +28,11 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						//cuando me dan ok envio cada carta al jugador correspondiente
 						popup.addListener("advance", function(){
 								$(".player-selector").each(function(){
+									console.log($(this).val());
 									var to = $(this).val();
 									client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : to, 'amount' : 2});
 								});
+								$(".player-selector").remove();
 								client.socket.emit('resolve activity');
 								popup.close(); 
 						});

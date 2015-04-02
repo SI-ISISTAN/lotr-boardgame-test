@@ -15,11 +15,11 @@
           <h1> LotR Lobby</h1>
           <h2 id="username-header"> </h2>
           <br> 
-          
-          <div class="col-md-4">
+          <div class="col-md-1">
+
           </div>
-          <div class="col-md-4" >
-              <h3> Usuarios conectados </h3>
+          <div class="col-md-3">
+            <h3> Usuarios en espera </h3>
               <div class = "client-list-div">
                 <ul id="connected-list"  class="list-group client-list">
                 </ul>
@@ -27,8 +27,27 @@
               <br>
               <button type="button" class="btn btn-primary" id="ready-button">¡Estoy listo!</button>
           </div>
+          <div class="col-md-3" >
+              <h3> Partidas en curso </h3>
+              <div class = "client-list-div">
+                <ul id="games-list"  class="list-group games-list">
+                </ul>
+              </div>
+              <br>
+              <button type="button" class="btn btn-primary" id="newgame-button">Crear nueva partida</button><br><br>
+              <button type="button" class="btn btn-primary" id="join-button" disabled="disabled">Unirse a partida</button><br><br>
+              <button type="button" class="btn btn-primary" id="join-button" disabled="disabled">Salir de partida</button>
+          </div>
           
-          <div class="col-md-4">
+          <div class="col-md-3">
+              <h3> Usuarios en partida </h3>
+             <div class = "client-list-div">
+                <ul id="joined-list"  class="list-group joined-list">
+                </ul>
+              </div>
+          </div>
+          <div class="col-md-1">
+
           </div>
       </div>
     

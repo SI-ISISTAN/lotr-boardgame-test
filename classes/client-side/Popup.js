@@ -107,7 +107,9 @@ define([], function () {
 			var name = "#"+this.buttons[i].id;
 			$(name).off('click');
 		}
-		this.popup.dialog('close');
+		this.popup.dialog('close', function(){
+			$(this).remove();
+		});
 		$( ".popup-dialog" ).show();
 
 	}

@@ -42,7 +42,7 @@ define([], function () {
 		
 	exports.worldPositions=[{x:110, y:0},{x:93, y:-38},{x:93, y:0},{x:70, y:28},{x:70, y:-38},{x:50, y:-20}];
 
-	exports.storyTiles = ["Friendship","Friendship","Friendship","Travelling","Travelling","Travelling","Hiding","Hiding","Hiding","Fighting","Fighting","Fighting","Next Event","Next Event","Next Event","Next Event","Next Event","Next Event","Ring Influence","Ring Influence","Sauron Will","Out Of Options","Losing Ground"];
+	exports.storyTiles = ["Friendship","Friendship","Friendship","Travelling","Travelling","Travelling","Hiding","Hiding","Hiding","Fighting","Fighting","Fighting","Next Event","Next Event","Next Event","Next Event","Next Event","Next Event","Ring Influence","Ring Influence","Sauron Will"];
 
 	exports.hobbitCards = [];
 
