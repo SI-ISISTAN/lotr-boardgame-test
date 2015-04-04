@@ -22,6 +22,26 @@
 	padding-right: 2px;
 }
 
+.games-list-div{
+	color: white;
+	border-style: inset;
+	border-width: 2px;
+	border-color: #6a3b44;
+	background-color: #4d4d4a;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+.joined-list-div{
+	color: white;
+	border-style: inset;
+	border-width: 2px;
+	border-color: #6a3b44;
+	background-color: #4d4d4a;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
 .client-list{
 	list-style-type:none;
 }
@@ -39,8 +59,16 @@
 	background-color: #4d4d4a;
 }
 
+.games-list-item{
+	background-color: #4d4d4a;
+}
+
 .client-list-item-highlighted{
 	background-color: #6a3b44;
+}
+
+.game-list-item-highlighted{
+	background-color: #32610E;
 }
 
 /*  GAME.HTML  */

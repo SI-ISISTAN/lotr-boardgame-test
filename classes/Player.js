@@ -10,6 +10,7 @@ define([], function () {
 		this.chat_color = null;
 		this.number=number;
 		this.ready=false;
+		this.playing = false;
 		this.turn = false;
 		this.lifeTokens = 0;
 		this.sunTokens = 0;

@@ -18,12 +18,31 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 		//Se conecta un nuevo usuario
 	    socket.on('send connection data', function(res){
+	    	console.log(res.connected);
 	    		client.connected=true;
 	    		client.alias = res.alias;
 	    		client.id = res.id;
 	    		$("#username-header").append("Se te ha asignado el alias: "+client.alias+"");
-	            $("#connected-list").append("<li class='client-list-item-highlighted'> <span class='client-list-name'> <b>"+client.alias+"</b> </span> <span class='client-list-state'> (Esperando) </span> </li>");
-	            socket.emit('find game',{'alias' : client.alias, 'id':client.id});
+	            $("#connected-list").append("<li class='client-list-item-highlighted'> <span class='client-list-name'> <b>"+client.alias+"</b> </span> </li>");
+	            for (i in res.connected){
+	            	if (res.connected[i].alias != client.alias){
+	            		$("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.connected[i].alias+"</b> </span> </li>");
+					}	            
+	            }
+	            for (j in res.games){
+	            	var item = $("<li class='games-list-item'> <span class='game-list-name'> <b>"+res.games[j].gameID+"</b> </span> </li>");
+	            	//agrego un listener para que me de los datos del game
+					$(item).data('id',res.games[j].gameID);
+					$(item).on('click', function(){
+					    if ($( ".client-list-name:contains('"+client.alias+"')" ).length > 0){
+							$(".game-list-item-highlighted").removeClass("game-list-item-highlighted");
+							$(this).addClass("game-list-item-highlighted");
+				    		socket.emit('refresh game info', {'gameID' : $(this).data('id')});
+						}
+					});
+					$("#games-list").append(item);
+	            }
+	            socket.emit('user connected');
       	});
 
       	socket.on('game found', function(res){
@@ -48,16 +67,111 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	        }
       	});
 
+      	//He creado un juego
+	    socket.on('new game', function(res){
+	    	if (res.creator==client.alias){
+	    		$(".game-list-item-highlighted").removeClass("game-list-item-highlighted");
+	    	}
+			$( ".client-list-name:contains('"+res.creator+"')" ).parent().remove();
+			var item = null;
+			if (res.creator != client.alias){
+				item = $("<li class='games-list-item'> <span class='game-list-name'> <b>"+res.gameID+"</b> </span> </li>");
+			}
+			else{
+				socket.emit('refresh game info', {'gameID' : res.gameID});
+				item = $("<li class='games-list-item game-list-item-highlighted'> <span class='game-list-name'> <b>"+res.gameID+"</b> </span> </li>");
+				$("#join-button").prop('disabled',true);
+	    		$("#newgame-button").prop('disabled',true);
+	    		$("#ready-button").prop('disabled',false);
+	    		$("#quit-button").prop('disabled',false);
+			}
+			//agrego un listener para que me de los datos del game
+			$(item).data('id',res.gameID);
+			$(item).on('click', function(){
+				if ($( ".client-list-name:contains('"+client.alias+"')" ).length > 0){
+					$(".game-list-item-highlighted").removeClass("game-list-item-highlighted");
+					$(this).addClass("game-list-item-highlighted");
+				    socket.emit('refresh game info', {'gameID' : $(this).data('id')});
+				}
+			});
+			$("#games-list").append(item);
+
+      	});
+
+      	//Me envian informacion sobre un juego seleccionado
+	    socket.on('refresh game info', function(res){
+	    	if (res.success){
+		    	$("#joined-list").children().remove();
+		    	for (i in res.players){
+		    		var state="";
+		    		if (!res.players[i].ready){
+		    			state="Esperando";
+		    		}else{
+		    			state="¡Listo!";
+		    		}
+		    		if (res.players[i].alias != client.alias){
+		    			$("#joined-list").append("<li class='joined-list-item'> <span class='joined-list-name'> <b>"+res.players[i].alias+"</b> </span>  <span class='joined-list-state'>("+state+")  </span></li>");
+		    		}
+		    		else{
+		    			$("#joined-list").append("<li class='client-list-item-highlighted joined-list-item'> <span class='joined-list-name'> <b>"+res.players[i].alias+"</b> </span> <span class='joined-list-state'>("+state+")  </span> </li>");
+		    		}
+		    	}
+		    	if (res.players.length < 5 && $( ".client-list-name:contains('"+client.alias+"')" ).length > 0){
+		    		$("#join-button").prop('disabled',false);
+		    	}
+		    	else{
+		    		$("#join-button").prop('disabled',true);
+		    	}
+	    	}
+	    	else{
+	    		$("#joined-list").children().remove();
+	    	}
+
+	    });
+
+	    //Se conecta un nuevo usuario
+	    socket.on('join game', function(res){
+	    	$( ".client-list-name:contains('"+res.alias+"')" ).parent().remove();
+	    	socket.emit('refresh game info', {'gameID' : $(".game-list-item-highlighted").data('id')});
+	    	if (res.alias==client.alias){
+		    	$("#join-button").prop('disabled',true);
+		    	$("#newgame-button").prop('disabled',true);
+		    	$("#ready-button").prop('disabled',false);
+		    	$("#quit-button").prop('disabled',false);
+		    }
+      	});
+
+      	//Se conecta un nuevo usuario
+	    socket.on('quit game', function(res){
+	    	var item = $("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.alias+"</b> </span> </li>");
+	    	if (res.alias == client.alias){
+	    		$("#newgame-button").prop('disabled',false);
+	    		$("#ready-button").prop('disabled',true);
+		    	$("#quit-button").prop('disabled',true);
+	    		item.addClass("client-list-item-highlighted");
+	    	}
+	    	$("#connected-list").append(item);
+	    	socket.emit('refresh game info', {'gameID' : $(".game-list-item-highlighted").data('id')});
+      	});
+
 	    //Se conecta un nuevo usuario
 	    socket.on('user connected', function(res){
-	    		$("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.player.alias+"</b> </span> <span class='client-list-state'>(Esperando)  </span> </li>");
+	    		$("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.alias+"</b> </span> </li>");
       	});
 
 
 	    //Se desconecta un usuario (no éste, otro que haya estado conectado)
 	    socket.on('user disconnect', function(res){
-		        console.log("Se desconecto un fulano, "+res.alias);
 			    $( ".client-list-name:contains('"+res.alias+"')" ).parent().remove();
+	    });
+
+	    //Por x o por y se elimina una partida
+	    socket.on('game finished', function(res){
+			 $( ".game-list-name:contains('"+res.gameID+"')" ).parent().remove();
+	    });
+
+	    socket.on('ready to start', function(res){
+			 socket.emit('ready to start', {});
 	    });
 
 	    //Comienza un juego
@@ -145,8 +259,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			if (res.player.ready){
 				var text = "(¡Listo!)";
 			}
-
-			$( ".client-list-name:contains('"+alias+"')" ).parent().find(".client-list-state").text(text);
+			$( ".joined-list-name:contains('"+alias+"')" ).parent().find(".joined-list-state").text(text);
 	    });
 
 	    //Pasar al siguiente escenario
@@ -214,6 +327,26 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	socket.emit('toggle ready',{});
 			    });
 
+			    //clicqueo en un juego par obtener la info
+			    
+
+			    //Crear nueva partida
+			    $('#newgame-button').on('click', function(){
+			    	socket.emit('new game',{'alias' : client.alias, 'id':client.id});
+			    	$(this).prop('disabled', true);
+			    });
+
+			    //Crear nueva partida
+			    $('#join-button').on('click', function(){
+			    	socket.emit('join game', {'gameID' : $(".game-list-item-highlighted").data('id')});
+			    });
+
+			    //Salir de una partida y volver a la lista de clientes
+			    $('#quit-button').on('click', function(){
+			    	console.log("game id "+$(".game-list-item-highlighted").data('id'));
+			    	socket.emit('quit game', {'gameID' : $(".game-list-item-highlighted").data('id')});
+			    });
+
 			    //Botón de sacar tile
 			    $("#draw-tile-button").on('click', function(){
 			    	$(".popup-dialog").dialog('close'); //cierro el popup informativo
@@ -247,9 +380,11 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	client.disableInput();
 					client.socket.emit('update game', {'action' : 'PlaySpecialCard'});
 					
-				});
+				});			
+	}
 
-				
+	function showGameInfo(){
+		
 	}
   
 	    

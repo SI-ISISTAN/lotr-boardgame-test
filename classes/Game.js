@@ -120,6 +120,17 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		return start;
 	}
 
+	//Chequeo si estan dadas las condiciones minimas para que arranque un juego
+	Game.prototype.isReady= function(){
+		var start = true;
+		for (i in this.players){
+			if (!this.players[i].playing){
+				start=false;
+			}
+		}
+		return start;
+	}
+
 	Game.prototype.shuffleArray = function(array) {
 	  var currentIndex = array.length, temporaryValue, randomIndex ;
 

@@ -6,6 +6,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 	//Clase que maneja los jugadores conectados en el lobby
 	function ClientManager (){
+		this.waitingList = [];
 		this.connectedClients = [];
 		this.activeGames = [];
 		this.loadedData = loadedData;
@@ -63,7 +64,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			var game = new Game(io);
 			game.addPlayer(client);
 			var i=0;
-			this.connectedClients=[];
 			this.activeGames[game.gameID] = game;
 			return {'id' : game.gameID};
 	};
@@ -88,7 +88,65 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//Envio de mensaje
 			client.on('connect user', function (data){
-				io.to(client.id).emit('send connection data', {'alias': client.alias, 'id' : client.id});	//avisar a los demás clientes
+				//Recorro el array de juegos activos
+				var activeGames = [];
+				Object.keys(self.activeGames).forEach(function(key, index) {
+						if (!this[key].isActive){	//si no esta ya jugandose
+					  		activeGames.push({'gameID': this[key].gameID, 'players': this[key].players})
+						}
+				}, self.activeGames);
+
+				io.to(client.id).emit('send connection data', {'alias': client.alias, 'id' : client.id, 'connected': self.connectedClients, 'games':activeGames});	//avisar a los demás clientes
+			});
+
+
+			//El cliente crea una partida nueva
+			client.on('new game', function (data){
+					var client_obj = {'id' : data.id, 'alias': data.alias};
+					var game_to_join = self.createNewGame(client_obj).id;
+					self.disconnectClient(client.id);
+					io.to('waiting').emit('new game',{'gameID' : game_to_join, 'creator':data.alias});				
+					//client.leave('waiting');	//Dejar la lista de espera
+					client.room = game_to_join;	//Setear la room del juego
+					client.player = self.activeGames[client.room].getPlayerByID(client.id);		
+					//client.join(client.room);	//Unirse a la room del juego		
+			});
+
+			//Me piden la informacion de una partida
+			client.on('refresh game info', function (data){
+				if (typeof(self.activeGames[data.gameID])!='undefined'){
+					io.to(client.id).emit('refresh game info',{'players' : self.activeGames[data.gameID].players, 'success':true});					
+				}
+				else{
+					io.to(client.id).emit('refresh game info',{'success':false});
+				}
+			});
+
+			//El cliente pide unirse a una partida
+			client.on('join game', function (data){
+				if (data.gameID!='undefined'){
+					var client_obj = {'id' : client.id, 'alias': client.alias};
+					self.activeGames[data.gameID].addPlayer(client_obj);
+					self.disconnectClient(client.id);
+					io.to('waiting').emit('join game',{'gameID' : data.gameID, 'alias':client.alias});				
+					client.room = data.gameID;	//Setear la room del juego
+					client.player = self.activeGames[data.gameID].getPlayerByID(client.id);		
+				}		
+			});
+
+			//El cliente pide unirse a una partida
+			client.on('quit game', function (data){
+				if (typeof(data.gameID) != 'undefined'){
+						self.activeGames[data.gameID].removePlayer(client.id);
+						self.connectedClients.push({'id' : client.id, 'alias' : client.alias});
+						if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
+							io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });
+							delete self.activeGames[client.room];
+						}
+						client.room = 'waiting';	//Setear la room del juego
+						client.player = null;
+						io.to('waiting').emit('quit game',{'gameID' : data.gameID, 'alias':client.alias});	
+				}								
 			});
 
 			//El cliente pide que lo ubique en un juego
@@ -130,11 +188,13 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			});
 
 
+			//Envio de mensaje
+			client.on('user connected', function (data){
+				client.in(client.room).broadcast.emit('user connected', {'alias' : client.alias, 'id': client.id});	
+			});
+
 			//Comenzar el juego cuando haya los jugadores minimos y todos esten listos
 			client.on('toggle ready', function (data){
-
-				
-
 				var player = self.activeGames[client.room].getPlayerByID(client.id);
 				if (player!=null){
 					if (player.ready){
@@ -144,21 +204,33 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						player.ready = true;
 					}
 				}
-
-				io.to(client.room).emit('toggle ready', {'player': client.player });	//repetir el evento a los otros clientes
+				io.to('waiting').emit('toggle ready', {'player': client.player });	//repetir el evento a los otros clientes
 
 				if (self.activeGames[client.room].canGameStart()){
 					self.activeGames[client.room].isActive = true;
 					self.activeGames[client.room].start();
+					var players = self.activeGames[client.room].players;
+					for (i in players){
+						io.to(players[i].id).emit('ready to start');
+					}
+
+				}
+			});
+	
+			client.on('ready to start', function (data){ 
+				client.leave('waiting');	//Dejar la lista de espera	
+				client.join(client.room);	//Unirse a la room del juego
+				self.activeGames[client.room].getPlayerByID(client.id).playing = true;
+				if (self.activeGames[client.room].isReady()){
+					io.to('waiting').emit('game finished',{'gameID' : client.room});
 					io.to(client.room).emit('start game',{'game' : {'sauronPosition': self.activeGames[client.room].sauronPosition, 'players' : self.activeGames[client.room].players}});		
 					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!", 'mode':'alert'});
-					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". ", 'mode':'alert'});
+					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". ", 'mode':'alert'});	
 				}
 			});
 
 			//Cambiar el escernario e inicializarlo (act. especial)
-			client.on('change location', function (data){ 
-				
+			client.on('change location', function (data){ 			
 				if (!self.activeGames[client.room].currentLocation.isConflict){
 					self.activeGames[client.room].currentLocation.currentActivity = new Activity({'action' : self.activeGames[client.room].currentLocation.currentActivity.name}, self.activeGames[client.room].currentLocation.currentActivity.subactivities, null);
 					io.to(client.id).emit('next activity');	//enviar siguiente actividad
@@ -207,13 +279,16 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('disconnect', function (){
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
+					//reveer todo esto
 					self.activeGames[client.room].removePlayer(client.id);
-					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});
-					
+					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
 					if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
-						console.log("Juego eliminado por falta de usuarios.");
+						io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });
 						delete self.activeGames[client.room];
 					}
+				}
+				else{
+					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});
 				}
 			});
 
