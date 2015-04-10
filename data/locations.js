@@ -6,7 +6,7 @@ define(['../classes/Activity'], function (Activity) {
 
 	exports.BagEnd = {
 		"name" : "Bag End",
-		"image" : null,
+		"image" : "BagEndBoard",
 		"tracks" : null,
 		"events" : null,
 		"isConflict" : false,
@@ -28,7 +28,7 @@ define(['../classes/Activity'], function (Activity) {
 	/////////////////////////////////////////////////////// Rivendell //////////////////////////////////////////////////////////////////////////////
 	exports.Rivendell = {
 		"name" : "Rivendell",
-		"image" : null,
+		"image" : "RivendellBoard",
 		"tracks" : null,
 		"events" : null,
 		"isConflict" : false,
@@ -100,7 +100,7 @@ define(['../classes/Activity'], function (Activity) {
 
 	exports.Lothlorien = {
 		"name" : "Lothlorien",
-		"image" : null,
+		"image" : "LothlorienBoard",
 		"tracks" : null,
 		"events" : null,
 		"isConflict" : false,

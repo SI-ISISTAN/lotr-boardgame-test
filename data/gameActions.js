@@ -536,6 +536,8 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						}
 				}
 				else{
+					$("#location-board-img-container").children().remove();
+					$("#location-board-img-container").append('<img src="./assets/img/ripped/'+data.image+'.jpg" alt="Tablero maestro" class="location-board-img">');
 					if (client.isActivePlayer()){
 						client.turnPhase = "inactive";	
 					}
