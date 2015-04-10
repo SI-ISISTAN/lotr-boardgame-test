@@ -19,7 +19,7 @@ requirejs.config({
 });
 //Requerimientos de Require.js
 var ClientManager = requirejs('./classes/ClientManager');
-var schema = require('./routes/schemas.js');
+//var schema = require('./routes/schemas.js');
 
 
 /*
