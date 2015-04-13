@@ -1,15 +1,18 @@
+
+
 define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activity) {
 	
 	var socket_io = require('socket.io');
 	var io;
-
+	
 
 	//Clase que maneja los jugadores conectados en el lobby
-	function ClientManager (){
+	function ClientManager (schemas){
 		this.waitingList = [];
 		this.connectedClients = [];
 		this.activeGames = [];
 		this.loadedData = loadedData;
+		this.gameSchema = schemas.gameSchema;
 		console.log("Creado manager de clientes.");
 	};
 
@@ -222,6 +225,23 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				client.join(client.room);	//Unirse a la room del juego
 				self.activeGames[client.room].getPlayerByID(client.id).playing = true;
 				if (self.activeGames[client.room].isReady()){
+					//creo el nuevo juego en la db
+					var newGame =  new self.gameSchema();
+					newGame.gameID = self.activeGames[client.room].gameID;
+					newGame.created = new Date();
+					newGame.complete = false;
+					var playersList = self.activeGames[client.room].players;
+					for (i in playersList){
+						newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character });
+					}
+					
+					newGame.save(function(err) {
+                            if (err){
+                                throw err;
+                            }
+                    });
+
+					//emito los mensajes correspondientes
 					io.to('waiting').emit('game finished',{'gameID' : client.room});
 					io.to(client.room).emit('start game',{'game' : {'sauronPosition': self.activeGames[client.room].sauronPosition, 'players' : self.activeGames[client.room].players}});		
 					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!", 'mode':'alert'});
@@ -249,7 +269,33 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					self.activeGames[client.room].currentLocation.currentActivity = update;
 				}
 				self.activeGames[client.room].update(update, client, data);
-				
+				//guardo la acicon en la DB
+				self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
+					if (err){
+						return err;
+					}
+					if (game){
+							//evitar el guardado de informacion redundante (lista de players, etc)
+							var newData = {};
+							Object.keys(data).forEach(function(key, index) {
+						  	if (key != "players" && key != "spaces"){
+								  newData[key] = this[key];
+							}
+							}, data);
+							game.gameActions.push({'player' : client.alias, 'action': data.action, 'data' : newData});
+							//si la accion es "end game" hago un guardado especial: el del resultado del juego
+							if (data.action=="EndGame"){
+								game.result.victory = data.success;
+								game.result.reason = data.reason;
+								game.result.score = data.score;
+							}
+							game.save(function(err) {
+	                            if (err){
+	                                throw err;
+	                            }
+	                    	});
+					}
+				});
 			});
 
 			//e agrega una subactividad a la actividad que está en curso en ese momento, que se ejecutará cuando se resuelva la actividad en curso

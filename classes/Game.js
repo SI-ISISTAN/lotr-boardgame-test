@@ -2,6 +2,8 @@
 
 define(['./Player','./Card', '../data/data', '../data/locations','./Location','./Activity'], function (Player, Card, gameData, locations, Location, Activity) {
 	
+	
+
 	function Game (io){
 		console.log("Se ha creado un nuevo juego.");
 		this.gameID = Math.random().toString(36).substring(7);	//Nombre random

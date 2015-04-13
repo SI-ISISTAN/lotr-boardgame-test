@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <title>Página de Perfil</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./style/lobby.css" media="screen" />
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  </head>
+  <body class="main-div">
+        <div class="row" id="auth-row">
+       
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-3">
+         <center> <h3> Información de perfil </h3> </center>
+           <div class="row">
+
+          <!-- FACEBOOK INFORMATION -->
+            <div class="default-div">
+              <h3 class="text-primary"><span class="fa fa-facebook"></span> Facebook</h3>
+
+              <!-- check if the user has this token (is the user authenticated with this social account) -->
+              <% if (user.facebook.token) { %>
+                <p>
+                  <strong>id</strong>: <%= user.facebook.id %><br>
+                  <strong>email</strong>: <%= user.facebook.email %><br>
+                  <strong>name</strong>: <%= user.facebook.name %><br>
+                </p>
+
+                <a href="/unlink/facebook" class="btn btn-primary">Unlink</a>
+              <% } else { %>
+                <a href="/connect/facebook" class="btn btn-primary">Connect Facebook</a>
+              <% } %>
+              <br><br>
+            </div>
+            <br>
+
+          <!-- TWITTER INFORMATION -->
+            <div class="default-div">
+              <h3 class="text-info"><span class="fa fa-twitter"></span> Twitter</h3>
+
+              <% if (user.twitter.token) { %>
+                <p>
+                  <strong>id</strong>: <%= user.twitter.id %><br>
+                  <strong>display name</strong>: <%= user.twitter.displayName %><br>
+                  <strong>username</strong>: <%= user.twitter.username %>
+                </p>
+
+                <a href="/unlink/twitter" class="btn btn-info">Unlink</a>
+              <% } else { %>
+                <a href="/connect/twitter" class="btn btn-info">Connect Twitter</a>
+              <% } %>
+              <br><br>
+            </div>
+
+          <br>
+          <!-- GOOGLE INFORMATION -->
+            <div class="default-div">
+              <h3 class="text-danger"><span class="fa fa-google-plus"></span> Google+</h3>
+
+              <% if (user.google.token) { %>
+                <p>
+                  <strong>id</strong>: <%= user.google.id %><br>
+                  <strong>token</strong>: <%= user.google.token %><br>
+                  <strong>email</strong>: <%= user.google.email %><br>
+                  <strong>name</strong>: <%= user.google.name %>
+                </p>
+
+                <a href="/unlink/google" class="btn btn-danger">Unlink</a>
+              <% } else { %>
+                <a href="/connect/google" class="btn btn-danger">Connect Google</a>
+              <% } %>
+              <br><br>
+            </div>
+        </div>
+        </div>
+        <div class="col-md-4">
+          <center> <h3> Encuesta </h3> </center>
+          <div class="default-div">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <center> <h3> Recomendaciones </h3> </center>
+          <div class="default-div">
+          </div>
+        </div>
+        <div class="col-md-1">
+        </div>
+      </div>
+      <br><br>
+      <div class = "row">
+      <center> <a href="/lotr"> <button type="button" class="btn btn-primary" >  ¡Ir al lobby! </button></a><br><br> </center>
+      </div>
+</html>

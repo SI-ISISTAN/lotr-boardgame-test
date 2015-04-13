@@ -1170,7 +1170,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null, amount: 7}]});
+			client.socket.emit('add activity',{'action' : 'CommonDiscard', 'elements' : [{element : 'card', symbol: null, color:null, amount: 7}], 'defaultAction' : {'action' : 'MoveSauron', 'amount' : 3}});
 			client.socket.emit('resolve activity');
 
 		}

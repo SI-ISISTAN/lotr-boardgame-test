@@ -4,10 +4,7 @@ var passport = require('passport');
 
 var express  = require('express');
 var app      = express();
-
-
-//var passport = require('passport');
-//var flash    = require('connect-flash');
+var flash    = require('connect-flash');
 var requirejs = require('requirejs');
 var server = http.createServer(app);
 
@@ -19,10 +16,9 @@ requirejs.config({
 });
 //Requerimientos de Require.js
 var ClientManager = requirejs('./classes/ClientManager');
-//var schema = require('./routes/schemas.js');
+var schemas = require('./routes/schemas.js');
 
 
-/*
 var flash    = require('connect-flash');
 
 var morgan       = require('morgan');
@@ -30,6 +26,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
+require('./routes/passport')(passport); // pass passport for configuration
 
 
 
@@ -45,8 +42,9 @@ app.use(session({ secret: 'walterwayarnolehacenfaltapromesas' })); // session se
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
+app.set('view engine', 'ejs'); // set up ejs for templating
 
-*/
+
 
 //////// Direccionamiento ////////
 
@@ -56,28 +54,149 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/views/index.html');
 });
 
-app.get('/lotr', function(req, res){
-	res.sendFile(__dirname + '/views/main.html');
-});
 
-/*
+app.get('/lotr', isLoggedIn, function(req, res) {
+        res.render('main.ejs', {
+            user : req.user
+        });
+    });
 
-	// =====================================
-	// FACEBOOK ROUTES =====================
-	// =====================================
-	// route for facebook authentication and login
+app.get('/profile', isLoggedIn, function(req, res) {
+		res.render('profile.ejs', {
+			user : req.user
+		});
+	});
+
+// =============================================================================
+// AUTHENTICATE (NOT LOGGED IN) =============
+// =============================================================================
+
+// facebook --------------------------------
 app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
 
 	// handle the callback after facebook has authenticated the user
 app.get('/auth/facebook/callback',
 		passport.authenticate('facebook', {
-			successRedirect : '/lotr',
+			successRedirect : '/profile',
 			failureRedirect : '/'
 }));
 
-	// =====================================
-	// LOGOUT ==============================
-	// =====================================
+// twitter --------------------------------
+
+		// send to twitter to do the authentication
+		app.get('/auth/twitter', passport.authenticate('twitter', { scope : 'email' }));
+
+		// handle the callback after twitter has authenticated the user
+		app.get('/auth/twitter/callback',
+			passport.authenticate('twitter', {
+				successRedirect : '/profile',
+				failureRedirect : '/'
+			}));
+// google ---------------------------------
+
+		// send to google to do the authentication
+		app.get('/auth/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+		// the callback after google has authenticated the user
+		app.get('/auth/google/callback',
+			passport.authenticate('google', {
+				successRedirect : '/profile',
+				failureRedirect : '/'
+			}));
+
+// =============================================================================
+// AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
+// =============================================================================
+
+    // locally --------------------------------
+        app.get('/connect/local', function(req, res) {
+            res.render('connect-local.ejs', { message: req.flash('loginMessage') });
+        });
+        app.post('/connect/local', passport.authenticate('local-signup', {
+            successRedirect : '/profile', // redirect to the secure profile section
+            failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
+            failureFlash : true // allow flash messages
+        }));
+
+    // facebook -------------------------------
+
+        // send to facebook to do the authentication
+        app.get('/connect/facebook', passport.authorize('facebook', { scope : 'email' }));
+
+        // handle the callback after facebook has authorized the user
+        app.get('/connect/facebook/callback',
+            passport.authorize('facebook', {
+                successRedirect : '/profile',
+                failureRedirect : '/'
+            }));
+
+    // twitter --------------------------------
+
+        // send to twitter to do the authentication
+        app.get('/connect/twitter', passport.authorize('twitter', { scope : 'email' }));
+
+        // handle the callback after twitter has authorized the user
+        app.get('/connect/twitter/callback',
+            passport.authorize('twitter', {
+                successRedirect : '/profile',
+                failureRedirect : '/'
+            }));
+
+
+    // google ---------------------------------
+
+        // send to google to do the authentication
+        app.get('/connect/google', passport.authorize('google', { scope : ['profile', 'email'] }));
+
+        // the callback after google has authorized the user
+        app.get('/connect/google/callback',
+            passport.authorize('google', {
+                successRedirect : '/profile',
+                failureRedirect : '/'
+            }));
+
+// =============================================================================
+// UNLINK ACCOUNTS =============================================================
+// =============================================================================
+
+    // local -----------------------------------
+    app.get('/unlink/local', function(req, res) {
+        var user            = req.user;
+        user.local.email    = undefined;
+        user.local.password = undefined;
+        user.save(function(err) {
+            res.redirect('/profile');
+        });
+    });
+
+    // facebook -------------------------------
+    app.get('/unlink/facebook', function(req, res) {
+        var user            = req.user;
+        user.facebook.token = undefined;
+        user.save(function(err) {
+            res.redirect('/profile');
+        });
+    });
+
+    // twitter --------------------------------
+    app.get('/unlink/twitter', function(req, res) {
+        var user           = req.user;
+        user.twitter.token = undefined;
+        user.save(function(err) {
+           res.redirect('/profile');
+        });
+    });
+
+    // google ---------------------------------
+    app.get('/unlink/google', function(req, res) {
+        var user          = req.user;
+        user.google.token = undefined;
+        user.save(function(err) {
+           res.redirect('/profile');
+        });
+    });
+
+// LOGOUT ==============================
 	app.get('/logout', function(req, res) {
 		req.logout();
 		res.redirect('/');
@@ -94,14 +213,14 @@ function isLoggedIn(req, res, next) {
 	res.redirect('/');
 }
 
-*/
+
 //////// VARIABLES GENERALES ////////////
 var clients = [];
 
 ///////////////////////////////////////////////////       GESTIÓN DE MENSAJES SOCKET.IO            /////////////////////////////////////////////////////////////
 
 //Creo un client manager que se encarga de detalles de conexión
-var clientManager = new ClientManager();
+var clientManager = new ClientManager(schemas);
 clientManager.listen(server);
 
 //Setup server listening on port

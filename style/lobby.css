@@ -32,6 +32,16 @@
 	padding-right: 2px;
 }
 
+.default-div{
+	color: white;
+	border-style: inset;
+	border-width: 2px;
+	border-color: #6a3b44;
+	background-color: #4d4d4a;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
 .joined-list-div{
 	color: white;
 	border-style: inset;

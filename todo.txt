@@ -1,5 +1,5 @@
 Proximo commit:
--Agregue las imagenes de los safe havens
+- login con google, face, twitter
 
 
 En testing:
@@ -12,7 +12,12 @@ En testing:
 
 Bugs:
 
-- cuando la actividad "recovery" de lothlorien arranca por el 2º jugador no da toda la vuelta. que onda??. se taro despues de "la prueba".
+- cuando lleog a lothlorien hay un bug medio raro, puede deberse al cambio de anillo (investigate)
+- un gandalf evitar evento no evito el evento
+- un rolldie que se suponia deberia ir en ronda en el evetno "incendio en la torre" fue dos veces para el mismo player
+- la fcha se mueve como el ojete cuando va a mordor
+-despues de jugar la carta especial deberia cerrar la ventanita
 
 
-Todo:
+Fixed:
+-Faltaba default action en "sorrounded". solucionado (?)
