@@ -6,6 +6,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
     var socket = io();  //habilito el socketo
     var client = new Client();
     client.socket = socket;
+    var userID = "";
 
 	////////////////////////////// MANEJO DE MENSAJES ////////////////////////////// 
 
@@ -13,7 +14,8 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
         //Me conecto
 		if (!client.connected){
-			socket.emit('connect user', {});
+			socket.emit('connect user', {'userID' : userID});
+			
 		}
 
 		//Se conecta un nuevo usuario
@@ -389,16 +391,12 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
   
 	    
         $(document).ready(function(){	
-
+        	userID = $("body").data("user");
         	console.log("JQuery Init");
         	//tooltip (title fachero)
         	$(document).tooltip();
         	//MAIN LOOP DEL CLIENTE (no es un loop porque esta todo implementado con listeners)
         	message_listen();
         	input_listen();
-	       
-		   
-
-	    
 	    });
   });

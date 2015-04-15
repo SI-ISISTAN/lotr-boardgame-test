@@ -20,9 +20,10 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.gandalfCards = [];
 		this.currentLocation = null;
 		this.locationNumber = 0;
-		this.sauronPosition = 15;		//Cargar de un file
+		this.sauronPosition = 15;		//Valores por defecto
 		this.ringUsed = false;
 		this.specialEvents=[];
+		//cosas que se cargan desde la Config en la DB
 		this.score = 0;
 	};
 
@@ -152,10 +153,12 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	  return array;
 	}
 
-	//iniciar juego
-	Game.prototype.start = function(){
+	//iniciar juego. se le cargan los valores definidos en la configuracion elegida
+	Game.prototype.start = function(config){
+		this.sauronPosition = config.sauronPosition;
 		//asigno a cada player un personaje
 		for (var i = 0; i < this.players.length; i++) {
+			this.players[i].corruption = config.hobbitPosition;
 			this.players[i].character = gameData.characters[i];
 		};
 		this.turnedPlayer=0;
@@ -164,35 +167,41 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.ringBearer.turn = true;
 
 		//Cargo cartas y tiles y mezclo cada pilon
-		for (i in gameData.storyTiles){
-			this.storyTiles.push(gameData.storyTiles[i]);
+		var p=0;
+		while (p<config.storyTiles.length){
+			this.storyTiles.push(config.storyTiles[p]);
+			p++;
 		}
 		this.storyTiles = this.shuffleArray(this.storyTiles);
 
-		for (i in gameData.hobbitCards){
-			var card = new Card(gameData.hobbitCards[i]);
-			//card.id = i;
-			this.hobbitCards.push(card);
+		for (j in config.hobbitCards){
+			var count = 0;
+			while (count<config.hobbitCards[j].amount){
+				var card = new Card(config.hobbitCards[j].card);
+				this.hobbitCards.push(card);
+				count++;
+			}
 		}
 		this.hobbitCards = this.shuffleArray(this.hobbitCards);
 
 		//Cargo cartas de Gandalf
-		for (i in gameData.gandalfCards){
-			this.gandalfCards.push(gameData.gandalfCards[i]); 
+		var f = 0;
+
+		while (f < config.gandalfCards.length){
+			this.gandalfCards.push(config.gandalfCards[f]); 
+			f++;
 		}
 
 		//Cargo escenarios
-		
-		this.locations.push(locations.BagEnd);
-		this.locations.push(locations.Rivendell);
-		this.locations.push(locations.Moria);
-		this.locations.push(locations.Lothlorien);
-		this.locations.push(locations.Helm);
-		this.locations.push(locations.Shelob);
+		for (t in config.locations){
+			this.locations.push(locations[config.locations[t]]);
+		}
+
 		this.locations.push(locations.Mordor);
 
 		//inicio en la 1º location
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
+
 	}
 
 	Game.prototype.rollDie = function(){

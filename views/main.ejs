@@ -5,10 +5,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" type="text/css" href="./style/lobby.css" media="screen" />
-    
     <script data-main="/client.js" src="/node_modules/requirejs/require.js"></script>
   </head>
-  <body class="main-div">
+  <body class="main-div" data-user= <%= user.local.userID %> >
 
       <!-- LOBBY -->
       <div class="row" id="main-lobby-div">
@@ -131,6 +130,7 @@
              <div class="chat-div">
                  <div class="chat-title-div">
                      <h4> Chat </h4>
+
                   </div>
 
                   <div class="chat-messages-div" id="chat-msg-div">
