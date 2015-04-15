@@ -186,7 +186,6 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 		//Cargo cartas de Gandalf
 		var f = 0;
-
 		while (f < config.gandalfCards.length){
 			this.gandalfCards.push(config.gandalfCards[f]); 
 			f++;
