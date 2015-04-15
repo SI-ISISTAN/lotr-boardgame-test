@@ -41,6 +41,11 @@ define(['../data/activities'], function (activities) {
 		this.subactivities.push(subactivity);
 	}
 
+	//agregar subactividad como primera
+	Activity.prototype.addSubActivityFirst = function(subactivity){
+		this.subactivities.splice(this.currentSubActivity,0,subactivity);
+	}
+
 	Activity.prototype.setParent = function(parent){
 		this.parent = parent;
 	}

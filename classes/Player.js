@@ -6,6 +6,7 @@ define([], function () {
 
 		this.id = client.id;
 		this.alias = client.alias;
+		this.userID = client.userID;
 		this.character = null;
 		this.chat_color = null;
 		this.number=number;

@@ -13,6 +13,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 		this.activeGames = [];
 		this.loadedData = loadedData;
 		this.gameSchema = schemas.gameSchema;
+		this.configSchema = schemas.configSchema;
 		console.log("Creado manager de clientes.");
 	};
 
@@ -92,6 +93,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//Envio de mensaje
 			client.on('connect user', function (data){
 				//Recorro el array de juegos activos
+				client.userID = data.userID;
 				var activeGames = [];
 				Object.keys(self.activeGames).forEach(function(key, index) {
 						if (!this[key].isActive){	//si no esta ya jugandose
@@ -105,7 +107,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//El cliente crea una partida nueva
 			client.on('new game', function (data){
-					var client_obj = {'id' : data.id, 'alias': data.alias};
+					var client_obj = {'id' : data.id, 'alias': data.alias, 'userID':client.userID};
 					var game_to_join = self.createNewGame(client_obj).id;
 					self.disconnectClient(client.id);
 					io.to('waiting').emit('new game',{'gameID' : game_to_join, 'creator':data.alias});				
@@ -128,7 +130,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//El cliente pide unirse a una partida
 			client.on('join game', function (data){
 				if (data.gameID!='undefined'){
-					var client_obj = {'id' : client.id, 'alias': client.alias};
+					var client_obj = {'id' : client.id, 'alias': client.alias, 'userID':client.userID};
 					self.activeGames[data.gameID].addPlayer(client_obj);
 					self.disconnectClient(client.id);
 					io.to('waiting').emit('join game',{'gameID' : data.gameID, 'alias':client.alias});				
@@ -211,12 +213,35 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 				if (self.activeGames[client.room].canGameStart()){
 					self.activeGames[client.room].isActive = true;
-					self.activeGames[client.room].start();
-					var players = self.activeGames[client.room].players;
-					for (i in players){
-						io.to(players[i].id).emit('ready to start');
-					}
+					//encuentro el esquema de juego en la DB y lo cargo al juego
+					var currentConfig = {};
+					self.configSchema.findOne({}, function(err, config){
+						if (err){
+							return err;
 
+						}
+						if (config){
+								//evitar el guardado de informacion redundante (lista de players, etc)
+									var configs = config.configs;
+									var found = false;
+									var i=0;
+									while (!found && i<configs.length){
+										if (configs[i].configName == config.currentConfig){
+											found = true;			
+										}
+										else{
+											i++;
+										}
+									}
+									if (found){
+										self.activeGames[client.room].start(configs[i]);
+										var players = self.activeGames[client.room].players;
+										for (i in players){
+											io.to(players[i].id).emit('ready to start');
+										}
+									}
+						}
+					});
 				}
 			});
 	
@@ -232,7 +257,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					newGame.complete = false;
 					var playersList = self.activeGames[client.room].players;
 					for (i in playersList){
-						newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character });
+						newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character, userID: playersList[i].userID });
 					}
 					
 					newGame.save(function(err) {
@@ -303,6 +328,14 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				if (typeof self.activeGames[client.room].currentLocation.currentActivity != 'undefined'){
 					self.activeGames[client.room].currentLocation.currentActivity.addSubActivity(new_act);
+				}
+			});
+
+			//e agrega una subactividad a la actividad que está en curso en ese momento, que se ejecutará cuando se resuelva la actividad en curso
+			client.on('add activity first', function (data){
+				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
+				if (typeof self.activeGames[client.room].currentLocation.currentActivity != 'undefined'){
+					self.activeGames[client.room].currentLocation.currentActivity.addSubActivityFirst(new_act);
 				}
 			});
 

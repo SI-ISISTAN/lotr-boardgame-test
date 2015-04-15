@@ -1,23 +1,28 @@
 Proximo commit:
-- login con google, face, twitter
+- se carga la configuracion desde la DB (parece andar pero habia que testearla mas)
+- bug de end scenario solucionado (aparentemente solucionado con un parche horrendo)
+-agrego el id de usuario en la db (solucionado)
+-- un gandalf evitar evento no evito el evento (solucionado)
+- cargar otros datos desde la DB (posiciones, cartas, etc) listo. agregar a db de mongolab
 
 
 En testing:
--Si mato a un peoaje en meido de una roll de acciones estas continuan. che qUE AR VIEJO
--reworkee el popu de draw tile para que aparezca solo cuando debe y parece que quedo medio mocho. en fin (reimplementar el chequeo)
--si tiro un remove despues del close del popup (rompo todo???)
--agregue un "fase=inactive" cuando no es conflicto
--agregue un activeplayer=ringbearer en change ring bearer
--volvi a meter el cambio en cardsphase despues de jugar ls cartas y agregue un muteador de botones durante play cards. a ver q ondis (MAL)
+-Si mato a un peoaje en meido de una roll de acciones estas continuan. che qUE AR VIEJO (probablemente sea preciso agregar un add activity prioritario, porque un update jode la estructura. lo agregue y anda parcialmente como el reverendo ojete. ay mama)
+- un rolldie que se suponia deberia ir en ronda en el evetno "incendio en la torre" fue dos veces para el mismo player QUE ONDA (solucion pa testear)
+-Faltaba default action en "sorrounded". solucionado (?)
 
 Bugs:
 
 - cuando lleog a lothlorien hay un bug medio raro, puede deberse al cambio de anillo (investigate)
-- un gandalf evitar evento no evito el evento
-- un rolldie que se suponia deberia ir en ronda en el evetno "incendio en la torre" fue dos veces para el mismo player
+
+- un rolldie que se suponia deberia ir en ronda en el evetno "incendio en la torre" fue dos veces para el mismo player QUE ONDA (solucion pa testear)
 - la fcha se mueve como el ojete cuando va a mordor
 -despues de jugar la carta especial deberia cerrar la ventanita
 
 
 Fixed:
--Faltaba default action en "sorrounded". solucionado (?)
+
+
+Falta:
+
+- manejar la desconexion

@@ -706,6 +706,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		'description' : "El jugador activo debe sacar una carta del mazo y descartar dos símbolos coincidentes con el de la carta que saca (o Comodines). De no poder o querer hacerlo todos los jugadores, en orden, deben lanzar el dado.",
 		apply : function(game, player,data){
 			var dealt =game.dealHobbitCard(game.hobbitCards.length-1);
+			data['playerNumber'] = 	game.activePlayer.number;
 			data['card'] = {color: null, symbol: dealt.symbol, image: dealt.image};
 			if (game.getPlayerByAlias(game.activePlayer.alias).hasCards([data.card,data.card])){
 				data['canDiscard']=true;
@@ -731,7 +732,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			});
 			popup.addListener("dont-discard", function(){
 				client.socket.emit('add activity', {'action' : 'RollDie'});	
-				client.roundTransmission({'action' : 'RollDie'}, client.player.number);
+				client.roundTransmission({'action' : 'RollDie'}, data.playerNumber);
 				popup.close();
 				client.socket.emit('resolve activity');
 			});
@@ -831,7 +832,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				popup.close();	
 			});
 			popup.addListener("lose", function(){
-				client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No cumplió con los requisitos de un Evento cuya penalización era la muerte."});
+				client.socket.emit('add activity first', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No cumplió con los requisitos de un Evento cuya penalización era la muerte."});
 				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
 				client.socket.emit('resolve activity');
 				popup.close();	

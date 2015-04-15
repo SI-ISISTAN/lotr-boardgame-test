@@ -66,7 +66,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			phases : [],
 			apply : function (game,player,data){
 				if (this.name == "Magia"){
-					game.specialEvents.push("PreventEvent");
+					game.specialEvents.push({'event' : "PreventEvent"});
 				}
 			},
 			draw : function(client, data){
