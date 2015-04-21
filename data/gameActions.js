@@ -252,7 +252,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			//si debo matar la personaje por no tener las cartas minimas
 			if (data.dead){
 				if (client.alias == data.alias){
-					client.socket.emit('add activity first', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No tenía suficientes cartas para hacer un descarte obligatorio."});
+					client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No tenía suficientes cartas para hacer un descarte obligatorio."});
 					client.socket.emit('resolve activity');
 				}
 			}else{
@@ -390,7 +390,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 				},800, function(){
 					if (client.isActivePlayer()){
 						if (data.dead){
-							client.socket.emit('add activity first', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
+							client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
 							}	
 						}
 				});
@@ -424,7 +424,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			},800, function(){
 				if (client.isActivePlayer()){
 					for (i in data.dead){
-						client.socket.emit('add activity first', {'action' : 'KillPlayer', 'alias':data.dead[i], 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
+						client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.dead[i], 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
 					}
 					client.socket.emit('resolve activity');
 				}
@@ -616,8 +616,8 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						}
 						data['reward'] = game.currentLocation.tracks[data.trackName].spaces[game.currentLocation.tracks[data.trackName].position-1];
 						if (game.currentLocation.tracks[data.trackName].position == game.currentLocation.tracks[data.trackName].spaces.length){
-							if (game.currentLocation.tracks[data.trackName].isMain){	
-								data['ender'] = player.alias;
+							if (game.currentLocation.tracks[data.trackName].isMain){
+								data['ender'] = player.alias;	
 								data['endScenario'] = true;
 							}
 							else{
@@ -650,9 +650,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						//si es el ultimo espacio de la main track cambio de escenario
 						if (client.isActivePlayer()){
 							client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
-							//if (data.endScenario){	
-							//	client.socket.emit('add activity', {'action' : 'EndScenario'});				
-							//}
+							if (data.endScenario){	
+								client.socket.emit('add activity', {'action' : 'EndScenario'});				
+							}
 							client.socket.emit('resolve activity');
 						}
 					});
@@ -666,7 +666,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 						//si es el ultimo espacio de la main track cambio de escenario
 						if (client.isActivePlayer()){
 							client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
-							if (data.endScenario){
+							if (data.endScenario){	
 								if (data.ender == client.alias){
 									client.socket.emit('add activity', {'action' : 'EndScenario'});
 								}				
@@ -900,11 +900,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.nextPhase(data);
 			if (typeof(data.phase) == 'undefined'){
 				data['phase'] = game.turnPhase;
-				console.log("indefindoi");
 			}
 			else{
 				game.turnPhase = data.phase;
-				console.log("definido con "+data.phase);
 			}
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
@@ -1007,7 +1005,6 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 							client.socket.emit('add activity', {'action' : data.newEvent.name});
 						}
 						if (data.end){
-							console.log("EMIT END SCENARIOOOOOO, DESDE NEXT EVENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!1111111");
 							client.socket.emit('add activity', {'action' : 'EndScenario'});		
 						}
 						client.socket.emit('resolve activity');
@@ -1224,11 +1221,9 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 		},
 		draw : function(client, data){
 			//chequeo tokens faltantes y aplico las sanciones correspondientes
-			if (client.isActivePlayer()){
-				client.socket.emit('add activity',{'action' : 'TokenCheck'});
-				client.socket.emit('add activity',{'action' : 'ChangeRingBearer'});
-				client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
-			}
+			client.socket.emit('add activity',{'action' : 'TokenCheck'});
+			client.socket.emit('add activity',{'action' : 'ChangeRingBearer'});
+			
 			client.socket.emit('resolve activity');
 		}
 	},
@@ -1332,7 +1327,8 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			$(".is-active").removeClass("is-active");
 			$("#"+data.ringBearer+"-state-div").addClass("is-active");
 			if (client.isActivePlayer()){
-				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : data.ringBearer});	
+				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 2, 'player' : data.ringBearer});
+				client.socket.emit('add activity', {'action' : 'AdvanceLocation'});	
 				client.socket.emit('resolve activity');
 			}
 		}

@@ -23,6 +23,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.sauronPosition = 15;		//Valores por defecto
 		this.ringUsed = false;
 		this.specialEvents=[];
+		this.blockResolve = false;
 		//cosas que se cargan desde la Config en la DB
 		this.score = 0;
 	};
@@ -215,6 +216,9 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 	Game.prototype.resolveActivity = function(client){
 		if (typeof(this.currentLocation.currentActivity)!='undefined'){
+			if (this.blockResolve){
+				this.blockResolve=false;
+			}
 			var new_act = this.currentLocation.currentActivity.next();
 			if (new_act != null){
 					this.currentLocation.currentActivity = new_act;

@@ -276,18 +276,22 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//Cambiar el escernario e inicializarlo (act. especial)
 			client.on('change location', function (data){ 			
+				
 				if (!self.activeGames[client.room].currentLocation.isConflict){
+					self.activeGames[client.room].currentLocation.currentActivity = self.activeGames[client.room].currentLocation.activities[0];
 					self.activeGames[client.room].currentLocation.currentActivity = new Activity({'action' : self.activeGames[client.room].currentLocation.currentActivity.name}, self.activeGames[client.room].currentLocation.currentActivity.subactivities, null);
+					self.activeGames[client.room].blockResolve=true;
 					io.to(client.id).emit('next activity');	//enviar siguiente actividad
 				}
 				else{
 					io.to(client.room).emit('next turn', {activePlayer : self.activeGames[client.room].activePlayer.alias});	//enviar siguiente actividad
 				}
+
 			});
 
 			//Updatear juego con activity
 			client.on('update game', function (data){
-				console.log("Llego a colient manager un update de actividad: "+data.action);
+				console.log("Llego a client manager un update de actividad: "+data.action);
 				var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				if (update.name!="ChangeLocation"){
 					console.log("Setee como nueva act: "+update.name);
@@ -345,8 +349,11 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			});
 
 			//Se resuleve una actividad
-			client.on('resolve activity', function (){		
-				self.activeGames[client.room].resolveActivity(client);
+			client.on('resolve activity', function (data){
+				if (!self.activeGames[client.room].blockResolve || (typeof(data)!= 'undefined' && typeof(data.unblockable)!= 'undefined' && data.unblockable)){
+					self.activeGames[client.room].resolveActivity(client);
+				}
+
 			});
 
 			//Se resuleve una actividad

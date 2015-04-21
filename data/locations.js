@@ -71,7 +71,7 @@ define(['../classes/Activity'], function (Activity) {
 				startX : 180,
 				startY : 116,
 				isMain : true,
-				spaces :  [{x: 35, y:-12, reward : "shield"}, {x: 40, y:10, reward : "shield"}, {x: 38, y:8, reward : "ring"}, {x: 37, y:8, reward : "shield"}, {x: 42, y:13, reward : "shield"}, {x: 37, y:-1, reward : "ring"}, {x: 34, y:-7, reward : "die"}, {x: 22, y:-32, reward : "shield"}, {x: 13, y:-28, reward : "die"}, {x: 7, y:-35, reward : "big-shield"} ]
+				spaces :  [{x: 35, y:-12, reward : "shield"}, {x: 40, y:10, reward : "shield"}, {x: 38, y:8, reward : "ring"}, {x: 37, y:8, reward : "shield"}, {x: 42, y:13, reward : "shield"}, {x: 37, y:-1, reward : "ring"}, {x: 34, y:-7, reward : "die"}, {x: 22, y:-32, reward : "shield"}, {x: 13, y:-28, reward : "die"}, {x: 7, y:-35, reward : "big-shield"}]
 			},
 			"Hiding" : {
 				position : 0,

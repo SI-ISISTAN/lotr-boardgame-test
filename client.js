@@ -266,7 +266,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 	    //Pasar al siguiente escenario
 	    socket.on('next activity', function(res){
-	    	socket.emit('resolve activity');	//repetir el evento a los otros clientes
+	    	socket.emit('resolve activity', {'unblockable' : true});	//repetir el evento a los otros clientes
 	    });
 
 	    //Aplicar un update del lado de cliente

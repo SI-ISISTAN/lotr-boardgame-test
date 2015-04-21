@@ -1,14 +1,16 @@
 Proximo commit:
 - se carga la configuracion desde la DB (parece andar pero habia que testearla mas)
-- bug de end scenario solucionado (aparentemente solucionado con un parche horrendo. en testeo)
+- bug de end scenario solucionado (aparentemente solucionado con un parche horrendo)
 -agrego el id de usuario en la db (solucionado)
 -- un gandalf evitar evento no evito el evento (solucionado)
 - cargar otros datos desde la DB (posiciones, cartas, etc) listo. agregar a db de mongolab
--agregado block resolve en ciertos casos
 
 
 En testing:
-- TENGO QUE VOLVER A ARREGLAR EL QUE TIRA END SCNEARIO 2 VECES LA CONCHA DE MI VIEJA
+-Si mato a un peoaje en meido de una roll de acciones estas continuan. che qUE AR VIEJO (probablemente sea preciso agregar un add activity prioritario, porque un update jode la estructura. lo agregue y anda parcialmente como el reverendo ojete. ay mama)
+- un rolldie que se suponia deberia ir en ronda en el evetno "incendio en la torre" fue dos veces para el mismo player QUE ONDA (solucion pa testear)
+-Faltaba default action en "sorrounded". solucionado (?)
+-movi "advance location" de conflicts a "change ring bearer" (estbaa en "end scenario") para q llegue ultimo. TES TE AR. no
 
 Bugs:
 

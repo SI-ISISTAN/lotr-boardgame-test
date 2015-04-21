@@ -28,7 +28,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						//cuando me dan ok envio cada carta al jugador correspondiente
 						popup.addListener("advance", function(){
 								$(".player-selector").each(function(){
-									console.log($(this).val());
 									var to = $(this).val();
 									client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : to, 'amount' : 2});
 								});
@@ -84,7 +83,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			popup.addListener("ok", function(){
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 6, 'player' : null});	
-				client.socket.emit('resolve activity');
+				client.socket.emit('resolve activity',{'unblockable' : true});
 			});
 
 			popup.draw(client);
@@ -186,7 +185,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			popup.addListener("ok", function(){
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'DealFeatureCards'});	
-				client.socket.emit('resolve activity');
+				client.socket.emit('resolve activity',{'unblockable' : true});
 			});
 
 			popup.draw(client);
@@ -483,7 +482,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			popup.addListener("ok", function(){
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'DealFeatureCards'});	
-				client.socket.emit('resolve activity');
+				client.socket.emit('resolve activity', {'unblockable' : true});
 			});
 
 			popup.draw(client);
