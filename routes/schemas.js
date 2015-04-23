@@ -1,6 +1,6 @@
 
     var mongoose = require('mongoose');
-    mongoose.connect('mongodb://matanegui:patrite0@ds061611.mongolab.com:61611/lotr-test');
+    mongoose.connect('mongodb://localhost/test');
 
     //Ejemplo ser eliminado de forma impiadosa
 
@@ -26,6 +26,14 @@
             token        : String,
             email        : String,
             name         : String
+        },
+        survey: {
+            complete:Boolean,
+            result : {
+                up_down : Number,
+                positive_negative : Number,
+                forward_backward : Number
+            }
         },
         recomendations : Array
     });
@@ -61,6 +69,15 @@
         }]
     });
 
+     var chatSchema = mongoose.Schema({
+        gameID : String,
+        chats : [{
+            from : String,
+            time: Date,
+            text: String
+        }]
+    });
+
 
 
     // generating a hash
@@ -77,6 +94,7 @@
     module.exports.userSchema = mongoose.model('User', userSchema);
     module.exports.gameSchema = mongoose.model('Game', gameSchema);
     module.exports.configSchema = mongoose.model('Config', configSchema);
+    module.exports.chatSchema = mongoose.model('Chat', chatSchema);
 
     /*
     var newConfig =  new module.exports.configSchema();

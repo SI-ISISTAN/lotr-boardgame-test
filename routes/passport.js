@@ -67,7 +67,7 @@ module.exports = function(passport) {
                         newUser.facebook.id    = profile.id;
                         newUser.facebook.token = token;
                         newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
-
+                        newUser.survey.complete= false;
                         newUser.save(function(err) {
                             if (err)
                                 throw err;
@@ -143,7 +143,7 @@ module.exports = function(passport) {
                         newUser.twitter.token       = token;
                         newUser.twitter.username    = profile.username;
                         newUser.twitter.displayName = profile.displayName;
-
+                        newUser.survey.complete= false;
                         newUser.save(function(err) {
                             if (err)
                                 return done(err);
@@ -222,7 +222,7 @@ module.exports = function(passport) {
                         newUser.google.token = token;
                         newUser.google.name  = profile.displayName;
                         newUser.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
+                        newUser.survey.complete= false;
                         newUser.save(function(err) {
                             if (err)
                                 return done(err);

@@ -35,7 +35,7 @@ require('./routes/passport')(passport); // pass passport for configuration
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser()); // get information from html forms
 
-//app.set('view engine', 'ejs'); // set up ejs for templating
+app.set('view engine', 'ejs'); // set up ejs for templating
 
 // required for passport
 app.use(session({ secret: 'walterwayarnolehacenfaltapromesas' })); // session secret
@@ -66,6 +66,13 @@ app.get('/profile', isLoggedIn, function(req, res) {
 			user : req.user
 		});
 	});
+
+app.get('/survey', isLoggedIn, function(req, res) {
+        res.render('survey.ejs', {
+            user : req.user,
+            sch : schemas
+        });
+    });
 
 // =============================================================================
 // AUTHENTICATE (NOT LOGGED IN) =============

@@ -13,6 +13,8 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 		this.activeGames = [];
 		this.loadedData = loadedData;
 		this.gameSchema = schemas.gameSchema;
+		this.userSchema = schemas.userSchema;
+		this.chatSchema = schemas.chatSchema;
 		this.configSchema = schemas.configSchema;
 		console.log("Creado manager de clientes.");
 	};
@@ -190,6 +192,26 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//Envio de mensaje
 			client.on('send message', function (data){
 				io.to(client.room).emit('recieve message', {'player': client.player, 'msg' : data.msg});	//avisar a los demás clientes
+				//guardar en la DB
+				self.chatSchema.findOne({'gameID' : client.room}, function(err, chat){
+					if (err){
+						return err;
+					}
+					if (chat){
+						var newmsg = {};
+						newmsg.from = client.alias;
+						newmsg.time = new Date();
+						newmsg.text = data.msg;
+						chat.chats.push(newmsg);
+
+						chat.save(function(err) {
+                            if (err){
+                                throw err;
+                            }
+                    	});
+					}
+				});
+
 			});
 
 
@@ -262,6 +284,16 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					
 					newGame.save(function(err) {
                             if (err){
+                                throw err;
+                            }
+                    });
+
+                    //creo el chat en la db
+                    var newChat =  new self.chatSchema();
+					newChat.gameID = self.activeGames[client.room].gameID;
+					newChat.save(function(err) {
+                            if (err){
+                            	console.log("aiaaaaa");
                                 throw err;
                             }
                     });
@@ -359,6 +391,32 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//Se resuleve una actividad
 			client.on('log message', function (data){		
 				io.to(client.room).emit('log message', {'msg' : data.msg, 'mode':data.mode});
+			});
+
+			client.on('user connected', function (data){
+				client.in(client.room).broadcast.emit('user connected', {'alias' : client.alias, 'id': client.id});	
+			});
+
+			//Llenar encuesta
+			client.on('fill survey', function (data){		
+				self.userSchema.findOne({ 'local.userID' : client.userID }, function(err, user){
+					if (err){
+						return err;
+					}
+					if (user){
+						//guardar resultado de la encuesta
+						user.survey.complete = true;
+						user.survey.result.up_down = data.result[0];
+						user.survey.result.positive_negative =data.result[1];
+						user.survey.result.forward_backward= data.result[2];
+
+						user.save(function(err) {
+	                            if (err){
+	                                throw err;
+	                            }
+	                    });
+					}
+				});
 			});
 
 			//Se desconecto un usuario

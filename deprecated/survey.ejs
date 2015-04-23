@@ -1,0 +1,229 @@
+<html>
+  <head>
+    <title>Encuesta</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./style/lobby.css" media="screen" />
+    <script>
+    		var schemas = require('./routes/schemas.js');
+
+	$(document).ready(function(){
+
+			$("input").on('click', function(){
+				if (!$('div.question-div:not(:has(:radio:checked))').length) {
+				    $("#send-survey-button").prop('disabled',false);
+				}
+			});
+
+			$("#send-survey-button").on('click', function(){
+				var result = [0,0,0];
+				$('input:checked').each(function(){
+						var val = JSON.parse($(this).val());
+						var i=0;
+						while (i < 3){
+							result[i] += val[i];
+							i++;
+						}
+				});
+				console.log(result);
+			});
+	});
+    </script>
+ </head>
+ <body class="main-div" data-schemas= <%= sch %> data-user= <%= user.local.userID %> >
+ 	<center><h3> Encuesta </h3></center>
+ 	<center><h4> En general, ¿qué tan seguido cree que muestra los valores de cada ítem en su conducta, relaciones sociales y forma de vida? </h4></center>
+ 	<br>
+ 		<div class="col-md-2">
+        </div>
+        <div class="col-md-8" style="text-align : left">
+        	<ol>
+        		<li> Éxito financiero individual, prominencia y poder personal </li>
+		 		<div class="question-div">
+					<input type="radio" name="q1" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q1" value="[1,0,0]"> A veces <br>
+					<input type="radio" name="q1" value="[2,0,0]"> Frecuentemente
+				</div><br>
+
+				<li> Popularidad y éxito social, gustar y ser admirado </li>
+		 		<div class="question-div">
+					<input type="radio" name="q2" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q2" value="[1,1,0]"> A veces <br>
+					<input type="radio" name="q2" value="[2,2,0]"> Frecuentemente
+				</div><br>
+
+				<li> Trabajo en equipo activo para lograr metas comunes, unidad grupal </li>
+		 		<div class="question-div">
+					<input type="radio" name="q3" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q3" value="[1,1,1]"> A veces <br>
+					<input type="radio" name="q3" value="[2,2,2]"> Frecuentemente
+				</div><br>
+
+				<li> Eficiencia, liderazgo fuerte e imparcial </li>
+		 		<div class="question-div">
+					<input type="radio" name="q4" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q4" value="[1,0,1]"> A veces <br>
+					<input type="radio" name="q4" value="[2,0,2]"> Frecuentemente
+				</div><br>
+
+				<li> Aplicación dogmática de autoridad, reglas y regulaciones  </li>
+		 		<div class="question-div">
+					<input type="radio" name="q5" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q5" value="[1,-1,1]"> A veces <br>
+					<input type="radio" name="q5" value="[2,-2,2]"> Frecuentemente
+				</div><br>
+
+				<li> Asertividad inflexible y orientada hacia sí mismo </li>
+		 		<div class="question-div">
+					<input type="radio" name="q6" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q6" value="[1,-1,0]"> A veces <br>
+					<input type="radio" name="q6" value="[2,-2,0]"> Frecuentemente
+				</div><br>
+
+				<li> Individualismo fuerte y orientado hacia sí mismo, resistencia a la autoridad </li>
+		 		<div class="question-div">
+					<input type="radio" name="q7" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q7" value="[1,-1,-1]"> A veces <br>
+					<input type="radio" name="q7" value="[2,-2,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Persecución activa del cambio, ideas nuevas y poco ortodoxas  </li>
+		 		<div class="question-div">
+					<input type="radio" name="q8" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q8" value="[1,0,-1]"> A veces <br>
+					<input type="radio" name="q8" value="[2,0,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Liderazgo en esfuerzos grupales para lograr cambios y encontrar nuevas soluciones </li>
+		 		<div class="question-div">
+					<input type="radio" name="q9" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q9" value="[1,1,-1]"> A veces <br>
+					<input type="radio" name="q9" value="[2,2,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Amistad, placer mutuo, recreación </li>
+		 		<div class="question-div">
+					<input type="radio" name="q10" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q10" value="[0,1,0]"> A veces <br>
+					<input type="radio" name="q10" value="[0,2,0]"> Frecuentemente
+				</div><br>
+
+				<li> Idealismo responsable, actividad colaborativa </li>
+		 		<div class="question-div">
+					<input type="radio" name="q11" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q11" value="[0,1,1]"> A veces <br>
+					<input type="radio" name="q11" value="[0,2,2]"> Frecuentemente
+				</div><br>
+
+				<li> Forma "correcta", conservadora, establecida de hacer las cosas </li>
+		 		<div class="question-div">
+					<input type="radio" name="q12" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q12" value="[0,0,1]"> A veces <br>
+					<input type="radio" name="q12" value="[0,0,2]"> Frecuentemente
+				</div><br>
+
+				<li> Adherencia rígida a las reglas y expectativas del grupo </li>
+		 		<div class="question-div">
+					<input type="radio" name="q13" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q13" value="[0,-1,1]"> A veces <br>
+					<input type="radio" name="q13" value="[0,-2,2]"> Frecuentemente
+				</div><br>
+
+				<li> Autoprotección, interés propio primero, autosuficiencia </li>
+		 		<div class="question-div">
+					<input type="radio" name="q14" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q14" value="[0,-1,0]"> A veces <br>
+					<input type="radio" name="q14" value="[0,-2,0]"> Frecuentemente
+				</div><br>
+
+				<li> Rechazo hacia los procedimientos establecidos, rechazo hacia la conformidad </li>
+		 		<div class="question-div">
+					<input type="radio" name="q15" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q15" value="[0,-1,-1]"> A veces <br>
+					<input type="radio" name="q15" value="[0,-2,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Cambio hacia nuevos procedimientos, ideas nuevas </li>
+		 		<div class="question-div">
+					<input type="radio" name="q16" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q16" value="[0,0,-1]"> A veces <br>
+					<input type="radio" name="q16" value="[0,0,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Acercamiento grupal hacia nuevas ideas y procedimientos </li>
+		 		<div class="question-div">
+					<input type="radio" name="q17" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q17" value="[0,1,-1]"> A veces <br>
+					<input type="radio" name="q17" value="[0,2,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Confianza en la bondad de otros </li>
+		 		<div class="question-div">
+					<input type="radio" name="q18" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q18" value="[-1,1,0]"> A veces <br>
+					<input type="radio" name="q18" value="[-2,2,0]"> Frecuentemente
+				</div><br>
+
+				<li> Dedicación, fidelidad, lealtad hacia el grupo </li>
+		 		<div class="question-div">
+					<input type="radio" name="q19" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q19" value="[-1,1,1]"> A veces <br>
+					<input type="radio" name="q19" value="[-2,2,2]"> Frecuentemente
+				</div><br>
+
+				<li> Obediencia a la cadena de comando, conformidad con la autoridad </li>
+		 		<div class="question-div">
+					<input type="radio" name="q20" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q20" value="[-1,0,1]"> A veces <br>
+					<input type="radio" name="q20" value="[-2,0,2]"> Frecuentemente
+				</div><br>
+
+				<li> Sacrificio exclusivamente propio para beneficiar al grupo </li>
+		 		<div class="question-div">
+					<input type="radio" name="q21" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q21" value="[-1,-1,1]"> A veces <br>
+					<input type="radio" name="q21" value="[-2,-2,2]"> Frecuentemente
+				</div><br>
+
+				<li> Rechazo pasivo a la popularidad, hacer cosas solo </li>
+		 		<div class="question-div">
+					<input type="radio" name="q22" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q22" value="[-1,-1,0]"> A veces <br>
+					<input type="radio" name="q22" value="[-2,-2,0]"> Frecuentemente
+				</div><br>
+
+				<li> Admisión de fracaso, retiro de los esfuerzos en el trabajo grupal </li>
+		 		<div class="question-div">
+					<input type="radio" name="q23" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q23" value="[-1,-1,-1]"> A veces <br>
+					<input type="radio" name="q23" value="[-2,-2,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Tolerancia hacia nuevas ideas y procedimientos </li>
+		 		<div class="question-div">
+					<input type="radio" name="q24" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q24" value="[-1,0,-1]"> A veces <br>
+					<input type="radio" name="q24" value="[-2,0,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Comodidad con las sugerencias de cambio e ideas nuevas de otros </li>
+		 		<div class="question-div">
+					<input type="radio" name="q25" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q25" value="[-1,1,-1]"> A veces <br>
+					<input type="radio" name="q25" value="[-2,2,-2]"> Frecuentemente
+				</div><br>
+
+				<li> Relegar necesidades y deseos personales, pasividad </li>
+		 		<div class="question-div">
+					<input type="radio" name="q26" value="[0,0,0]"> Poco frecuentemente<br>
+					<input type="radio" name="q26" value="[-1,0,0]"> A veces <br>
+					<input type="radio" name="q26" value="[-2,0,0]"> Frecuentemente
+				</div><br>
+			</ol>
+			<br>
+			<center> <button type="button" class="btn btn-primary" id="send-survey-button" disabled="disabled">¡Listo!</button> </center>
+			<br><br>
+		</div>
+		<div class="col-md-2">
+        </div>
+ </body>
+</html>

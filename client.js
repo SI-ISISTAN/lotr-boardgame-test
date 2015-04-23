@@ -7,6 +7,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
     var client = new Client();
     client.socket = socket;
     var userID = "";
+    var surveycomplete = false;
 
 	////////////////////////////// MANEJO DE MENSAJES ////////////////////////////// 
 
@@ -64,7 +65,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	                $("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.game.players[i].alias+"</b> </span> <span class='client-list-state'>("+state+") "+" </span> </li>");
 	              }
 	              else{
-	              	client.player = res.game.players[i];	//Me asigno elplayer
+	              	client.player = res.game.players[i];	//Me asigno el player
 	              }
 	        }
       	});
@@ -382,8 +383,37 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    	client.disableInput();
 					client.socket.emit('update game', {'action' : 'PlaySpecialCard'});
 					
+				});
+
+				//cosas de la survey
+
+				$("#survey-button").on('click', function(){
+					$("#main-lobby-div").hide();
+					$("#survey-div").show();
+				});
+
+	        	$("input:radio").on('click', function(){
+					if (!$('div.question-div:not(:has(:radio:checked))').length) {
+					    $("#send-survey-button").prop('disabled',false);
+					}
+				});
+
+				$("#send-survey-button").on('click', function(){
+					var result = [0,0,0];
+					$('input:checked').each(function(){
+							var val = JSON.parse($(this).val());
+							var i=0;
+							while (i < 3){
+								result[i] += val[i];
+								i++;
+							}
+					});
+					client.socket.emit('fill survey', {'result' : result});
+					$("#main-lobby-div").show();
+					$("#survey-div").hide();
+					$("#survey-button").hide();
 				});			
-	}
+		}
 
 	function showGameInfo(){
 		
@@ -392,9 +422,14 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    
         $(document).ready(function(){	
         	userID = $("body").data("user");
+        	surveycomplete = $("body").data("surveycomplete");
+        	if (!surveycomplete){
+        		$("#survey-button").show();
+        	}
         	console.log("JQuery Init");
         	//tooltip (title fachero)
         	$(document).tooltip();
+
         	//MAIN LOOP DEL CLIENTE (no es un loop porque esta todo implementado con listeners)
         	message_listen();
         	input_listen();

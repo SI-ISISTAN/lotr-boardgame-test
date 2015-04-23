@@ -1,10 +1,5 @@
 Proximo commit:
-- se carga la configuracion desde la DB (parece andar pero habia que testearla mas)
-- bug de end scenario solucionado (aparentemente solucionado con un parche horrendo. en testeo)
--agrego el id de usuario en la db (solucionado)
--- un gandalf evitar evento no evito el evento (solucionado)
-- cargar otros datos desde la DB (posiciones, cartas, etc) listo. agregar a db de mongolab
--agregado block resolve en ciertos casos
+- se agrego los chats a la db
 
 
 En testing:
