@@ -29,7 +29,9 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	            $("#connected-list").append("<li class='client-list-item-highlighted'> <span class='client-list-name'> <b>"+client.alias+"</b> </span> </li>");
 	            for (i in res.connected){
 	            	if (res.connected[i].alias != client.alias){
-	            		$("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.connected[i].alias+"</b> </span> </li>");
+	            		if ($( ".client-list-name:contains('"+res.connected[i].alias+"')" ).length < 1){
+	            			$("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.connected[i].alias+"</b> </span> </li>");
+	            		}
 					}	            
 	            }
 	            for (j in res.games){
@@ -159,7 +161,9 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 	    //Se conecta un nuevo usuario
 	    socket.on('user connected', function(res){
+	    	if ($( ".client-list-name:contains('"+res.alias+"')" ).length < 1){
 	    		$("#connected-list").append("<li class='client-list-item'> <span class='client-list-name'> <b>"+res.alias+"</b> </span> </li>");
+	    	}
       	});
 
 
@@ -173,13 +177,17 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			 $( ".game-list-name:contains('"+res.gameID+"')" ).parent().remove();
 	    });
 
+	    //El servidor le dice al cliente que agregue una actividad
+	    socket.on('add activity', function(res){
+			 client.socket.emit('add activity', res.action);
+	    });
+
 	    socket.on('ready to start', function(res){
 			 socket.emit('ready to start', {});
 	    });
 
 	    //Comienza un juego
 	    socket.on('start game', function(res){
-
 	    		//Dibujo el juego  
 		        $("#main-lobby-div").remove();
 		        $("#main-game-div").appendTo('body').show('slow');
@@ -299,6 +307,11 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    	
 	    });
 
+	    socket.on('connect_error', function(err) {
+		  // handle server error here
+		  $(location).attr('href','/');
+		});
+
 	}
 
     ////////////////////////////// MANEJO DE INPUT ////////////////////////////// 
@@ -337,16 +350,22 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    $('#newgame-button').on('click', function(){
 			    	socket.emit('new game',{'alias' : client.alias, 'id':client.id});
 			    	$(this).prop('disabled', true);
+			    	$("#tutorial-btn").prop('disabled', true);
+			    	$("#survey-button").prop('disabled', true);
 			    });
 
 			    //Crear nueva partida
 			    $('#join-button').on('click', function(){
 			    	socket.emit('join game', {'gameID' : $(".game-list-item-highlighted").data('id')});
+			    	$("#tutorial-btn").prop('disabled', true);
+			    	$("#survey-button").prop('disabled', true);
 			    });
 
 			    //Salir de una partida y volver a la lista de clientes
 			    $('#quit-button').on('click', function(){
 			    	console.log("game id "+$(".game-list-item-highlighted").data('id'));
+			    	$("#tutorial-btn").prop('disabled', false);
+			    	$("#survey-button").prop('disabled', false);
 			    	socket.emit('quit game', {'gameID' : $(".game-list-item-highlighted").data('id')});
 			    });
 
@@ -412,7 +431,11 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 					$("#main-lobby-div").show();
 					$("#survey-div").hide();
 					$("#survey-button").hide();
-				});			
+				});
+
+				$("#tutorial-btn").on('click', function(){
+					client.socket.emit('play tutorial', {'alias' : client.alias, 'id':client.id});
+				});				
 		}
 
 	function showGameInfo(){

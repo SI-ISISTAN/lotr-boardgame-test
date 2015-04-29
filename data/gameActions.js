@@ -1,4 +1,4 @@
-define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card) { 
+define(['../classes/client-side/Popup','../classes/client-side/Message','../classes/Card'], function (Popup, Message, Card) { 
 	
 	var exports = {
 	//////////////// Actividades genéricas ////////////////
@@ -929,27 +929,40 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 	//Pasar a la siguiente fase del turno
 	"NextTurn" : {
 		apply : function(game, player,data){
-			game.nextTurn(data);
+			if (game.isTutorial){	//si es tutorial no puedo dar siguiente turno porque el jguador 2 no existe
+				data['tutorial'] = true;
+			}
+			else{
+				game.nextTurn(data);
+				data['tutorial'] = false;
+			}
 			game.io.to(player.room).emit('log message', {'msg' : "Es el turno de " +game.activePlayer.alias+". ", 'mode':'good'});
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			client.players = data.players;
-			$(".is-active").removeClass("is-active");
-			$("#"+data.activePlayer.alias+"-state-div").addClass("is-active");
+			if (!data.tutorial){
+				client.players = data.players;
+				$(".is-active").removeClass("is-active");
+				$("#"+data.activePlayer.alias+"-state-div").addClass("is-active");
 
-			if (client.alias == data.activePlayer.alias){
-				client.player.turn=true;
-				client.turnPhase = "drawTiles";
-				$("#draw-tile-button").prop('disabled', false);
-			}
-			else{
-				client.player.turn=false;
-				client.turnPhase = "inactive";
+				if (client.alias == data.activePlayer.alias){
+					client.player.turn=true;
+					client.turnPhase = "drawTiles";
+					$("#draw-tile-button").prop('disabled', false);
+				}
+				else{
+					client.player.turn=false;
+					client.turnPhase = "inactive";
 
-				$("#use-ring-button").prop('disabled', true);
+					$("#use-ring-button").prop('disabled', true);
+				}
+				client.buttonCheck({phase : 'drawTiles'});
+			}else{
+				if (client.isActivePlayer()){
+					client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
+					client.socket.emit('resolve activity');	
+				}
 			}
-			client.buttonCheck({phase : 'drawTiles'});
 		}
 	},
 
@@ -1599,7 +1612,7 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
-			$("#main-game-div").fadeOut(300, function(){ $(this).remove();})
+			$("#main-game-div").fadeOut(300, function(){ $(this).remove();});
 			$("#end-game-div").appendTo('body').show('slow');
 			if (data.success){
 				$("#outcome-header").append("<span style='color: #2ECCFA;'> ¡Victoria! Los aventureros han completado el úlitmo escenario y triunfado sobre el Mal. </span>")
@@ -1610,8 +1623,37 @@ define(['../classes/client-side/Popup','../classes/Card'], function (Popup, Card
 			}
 			$("#score-header").append("El puntaje final de los aventureros es: "+data.score);
 		}
+	},
+
+	"ShowMessage" :  {
+		apply : function(game, player,data){
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			var msg = new Message({title: "Mensaje", text: data.msg});
+			msg.draw(client);
+		}
+	},
+
+	"StartConflict" :  {
+		apply : function(game, player,data){
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			client.socket.emit('next turn', {activePlayer : client.alias});	//enviar siguiente actividad
+		}
+	},
+
+	"AbortGame" :  {
+		apply : function(game, player,data){
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+		},
+		draw : function(client, data){
+			$("#main-game-div").fadeOut(300, function(){ $(this).remove();});
+			$("#end-game-div").appendTo('body').show('slow');
+		}
 	}
-	
+
 	}
 
 	return exports;
