@@ -172,6 +172,11 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    $( ".client-list-name:contains('"+res.alias+"')" ).parent().remove();
 	    });
 
+	    //Se desconecta un jugador
+	    socket.on('player disconnect', function(res){
+			    socket.emit('sudden update',  res.update);
+	    });
+
 	    //Por x o por y se elimina una partida
 	    socket.on('game finished', function(res){
 			 $( ".game-list-name:contains('"+res.gameID+"')" ).parent().remove();

@@ -1593,7 +1593,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 						client.socket.emit('resolve activity');
 					}
 					else{
-						client.socket.emit('update game', {'action' : 'EndGame', 'success':false, 'reason': "El Portador del Anillo encontró al Malvado en la Línea de Corrupción."});
+						client.socket.emit('update game', {'action' : 'EndGame', 'success':false, 'reason': "¡El Portador del Anillo ha muerto!"});
 					}
 					
 				}

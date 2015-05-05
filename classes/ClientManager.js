@@ -369,6 +369,44 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				});
 			});
 
+			//Updatea que no respeta la estructura (evento súbito, como la desconexion de un jugador)
+			client.on('sudden update', function (data){
+				console.log("Sudden update: "+data.action);	
+				if (!self.activeGames[client.room].asyncAck){
+					self.activeGames[client.room].asyncAck = true;
+					var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
+					self.activeGames[client.room].update(update, client, data);
+					//guardo la acicon en la DB
+					self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
+						if (err){
+							return err;
+						}
+						if (game){
+								//evitar el guardado de informacion redundante (lista de players, etc)
+								var newData = {};
+								Object.keys(data).forEach(function(key, index) {
+							  	if (key != "players" && key != "spaces"){
+									  newData[key] = this[key];
+								}
+								}, data);
+								game.gameActions.push({'player' : client.alias, 'action': data.action, 'data' : newData});
+								//si la accion es "end game" hago un guardado especial: el del resultado del juego
+								if (data.action=="EndGame"){
+									game.result.victory = data.success;
+									game.result.reason = data.reason;
+									game.result.score = data.score;
+								}
+								game.save(function(err) {
+		                            if (err){
+		                                throw err;
+		                            }
+		                    	});
+						}
+					});
+				}
+				else{console.log("el async es true");}
+			});
+
 			//e agrega una subactividad a la actividad que está en curso en ese momento, que se ejecutará cuando se resuelva la actividad en curso
 			client.on('add activity', function (data){
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
@@ -482,12 +520,18 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
 					//reveer todo esto
-					self.activeGames[client.room].removePlayer(client.id);
-					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
-					if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
-						io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });
-						delete self.activeGames[client.room];
-					}
+						if (self.activeGames[client.room].activePlayer.alias == client.alias){
+							client.in(client.room).broadcast.emit('player disconnect', { 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El jugador activo se ha desconectado!"}});
+							self.activeGames[client.room].asyncAck = false;
+						}
+						else if(self.activeGames[client.room].ringBearer.alias == client.alias){
+							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El portador del Anillo se ha desconectado!"}});
+							self.activeGames[client.room].asyncAck = false;
+						}
+						else{
+							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
+							self.activeGames[client.room].asyncAck = false;
+						}
 				}
 				else{
 					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});

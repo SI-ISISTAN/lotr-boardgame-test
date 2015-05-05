@@ -25,6 +25,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.specialEvents=[];
 		this.blockResolve = false;
 		this.isTutorial = false;	//todos los juegos son asi, salvo que se juegue el tutorial
+		this.asyncAck = true; //flag para controlar la recepcion de respuestas ante eventos asíncronos
 		//cosas que se cargan desde la Config en la DB
 		this.score = 0;
 	};
