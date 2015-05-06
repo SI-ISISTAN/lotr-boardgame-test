@@ -24,6 +24,8 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.ringUsed = false;
 		this.specialEvents=[];
 		this.blockResolve = false;
+		this.isTutorial = false;	//todos los juegos son asi, salvo que se juegue el tutorial
+		this.asyncAck = true; //flag para controlar la recepcion de respuestas ante eventos asíncronos
 		//cosas que se cargan desde la Config en la DB
 		this.score = 0;
 	};
@@ -157,6 +159,9 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	//iniciar juego. se le cargan los valores definidos en la configuracion elegida
 	Game.prototype.start = function(config){
 		this.sauronPosition = config.sauronPosition;
+		if (config.isTutorial){
+			this.isTutorial = true;
+		}
 		//asigno a cada player un personaje
 		for (var i = 0; i < this.players.length; i++) {
 			this.players[i].corruption = config.hobbitPosition;

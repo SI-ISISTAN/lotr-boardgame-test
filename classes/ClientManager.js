@@ -248,7 +248,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 									var found = false;
 									var i=0;
 									while (!found && i<configs.length){
-										if (configs[i].configName == config.currentConfig){
+										if (configs[i].configName == config.currentConfig){	
 											found = true;			
 										}
 										else{
@@ -256,7 +256,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 										}
 									}
 									if (found){
-										self.activeGames[client.room].start(configs[i]);
+										self.activeGames[client.room].start(configs[i]);	
 										var players = self.activeGames[client.room].players;
 										for (i in players){
 											io.to(players[i].id).emit('ready to start');
@@ -267,48 +267,50 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				}
 			});
 	
-			client.on('ready to start', function (data){ 
+			client.on('ready to start', function (data){
+
 				client.leave('waiting');	//Dejar la lista de espera	
 				client.join(client.room);	//Unirse a la room del juego
 				self.activeGames[client.room].getPlayerByID(client.id).playing = true;
 				if (self.activeGames[client.room].isReady()){
-					//creo el nuevo juego en la db
-					var newGame =  new self.gameSchema();
-					newGame.gameID = self.activeGames[client.room].gameID;
-					newGame.created = new Date();
-					newGame.complete = false;
-					var playersList = self.activeGames[client.room].players;
-					for (i in playersList){
-						newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character, userID: playersList[i].userID });
-					}
-					
-					newGame.save(function(err) {
-                            if (err){
-                                throw err;
-                            }
-                    });
+					if (!self.activeGames[client.room].isTutorial){
+						//creo el nuevo juego en la db
+						var newGame =  new self.gameSchema();
+						newGame.gameID = self.activeGames[client.room].gameID;
+						newGame.created = new Date();
+						newGame.complete = false;
+						var playersList = self.activeGames[client.room].players;
+						for (i in playersList){
+							newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character, userID: playersList[i].userID });
+						}
+						
+						newGame.save(function(err) {
+	                            if (err){
+	                                throw err;
+	                            }
+	                    });
 
-                    //creo el chat en la db
-                    var newChat =  new self.chatSchema();
-					newChat.gameID = self.activeGames[client.room].gameID;
-					newChat.save(function(err) {
-                            if (err){
-                            	console.log("aiaaaaa");
-                                throw err;
-                            }
-                    });
+	                    //creo el chat en la db
+	                    var newChat =  new self.chatSchema();
+						newChat.gameID = self.activeGames[client.room].gameID;
+						newChat.save(function(err) {
+	                            if (err){
+	                                throw err;
+	                            }
+	                    });
+	                }
 
 					//emito los mensajes correspondientes
+									
 					io.to('waiting').emit('game finished',{'gameID' : client.room});
 					io.to(client.room).emit('start game',{'game' : {'sauronPosition': self.activeGames[client.room].sauronPosition, 'players' : self.activeGames[client.room].players}});		
 					io.to(client.room).emit('log message', {'msg' : "¡El juego ha comenzado!", 'mode':'alert'});
-					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". ", 'mode':'alert'});	
+					io.to(client.room).emit('log message', {'msg' : "Es el turno de " +self.activeGames[client.room].activePlayer.alias+". ", 'mode':'alert'});
 				}
 			});
 
 			//Cambiar el escernario e inicializarlo (act. especial)
 			client.on('change location', function (data){ 			
-				
 				if (!self.activeGames[client.room].currentLocation.isConflict){
 					self.activeGames[client.room].currentLocation.currentActivity = self.activeGames[client.room].currentLocation.activities[0];
 					self.activeGames[client.room].currentLocation.currentActivity = new Activity({'action' : self.activeGames[client.room].currentLocation.currentActivity.name}, self.activeGames[client.room].currentLocation.currentActivity.subactivities, null);
@@ -316,7 +318,15 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					io.to(client.id).emit('next activity');	//enviar siguiente actividad
 				}
 				else{
-					io.to(client.room).emit('next turn', {activePlayer : self.activeGames[client.room].activePlayer.alias});	//enviar siguiente actividad
+					if (self.activeGames[client.room].currentLocation.activities.length == 0){
+						io.to(client.room).emit('update game', {'action' : "StartConflict"});
+					}
+					else{
+						self.activeGames[client.room].currentLocation.currentActivity = self.activeGames[client.room].currentLocation.activities[0];
+						self.activeGames[client.room].currentLocation.currentActivity = new Activity({'action' : self.activeGames[client.room].currentLocation.currentActivity.name}, self.activeGames[client.room].currentLocation.currentActivity.subactivities, null);
+						self.activeGames[client.room].blockResolve=true;
+						io.to(client.id).emit('next activity');	//enviar siguiente actividad
+					}
 				}
 
 			});
@@ -357,6 +367,44 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 	                    	});
 					}
 				});
+			});
+
+			//Updatea que no respeta la estructura (evento súbito, como la desconexion de un jugador)
+			client.on('sudden update', function (data){
+				console.log("Sudden update: "+data.action);	
+				if (!self.activeGames[client.room].asyncAck){
+					self.activeGames[client.room].asyncAck = true;
+					var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
+					self.activeGames[client.room].update(update, client, data);
+					//guardo la acicon en la DB
+					self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
+						if (err){
+							return err;
+						}
+						if (game){
+								//evitar el guardado de informacion redundante (lista de players, etc)
+								var newData = {};
+								Object.keys(data).forEach(function(key, index) {
+							  	if (key != "players" && key != "spaces"){
+									  newData[key] = this[key];
+								}
+								}, data);
+								game.gameActions.push({'player' : client.alias, 'action': data.action, 'data' : newData});
+								//si la accion es "end game" hago un guardado especial: el del resultado del juego
+								if (data.action=="EndGame"){
+									game.result.victory = data.success;
+									game.result.reason = data.reason;
+									game.result.score = data.score;
+								}
+								game.save(function(err) {
+		                            if (err){
+		                                throw err;
+		                            }
+		                    	});
+						}
+					});
+				}
+				else{console.log("el async es true");}
 			});
 
 			//e agrega una subactividad a la actividad que está en curso en ese momento, que se ejecutará cuando se resuelva la actividad en curso
@@ -419,17 +467,71 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				});
 			});
 
+			//jugar el tuto
+			client.on('play tutorial', function (data){
+					var client_obj = {'id' : data.id, 'alias': data.alias, 'userID':client.userID};
+					var game_to_join = self.createNewGame(client_obj).id;
+					self.disconnectClient(client.id);
+					//io.to('waiting').emit('new game',{'gameID' : game_to_join, 'creator':data.alias});				
+					//client.leave('waiting');	//Dejar la lista de espera
+					client.room = game_to_join;	//Setear la room del juego
+					client.player = self.activeGames[client.room].getPlayerByID(client.id);
+					self.activeGames[client.room].isActive = true;
+					//encuentro el esquema de juego en la DB y lo cargo al juego
+					var currentConfig = {};
+					for (i in self.activeGames[client.room].players){
+						self.activeGames[client.room].players[i].ready = true;
+						self.activeGames[client.room].players[i].playing = true;
+					}
+					self.configSchema.findOne({}, function(err, config){
+						if (err){
+							return err;
+
+						}
+						if (config){
+								//evitar el guardado de informacion redundante (lista de players, etc)
+									var configs = config.configs;
+									var found = false;
+									var i=0;
+									while (!found && i<configs.length){
+										if (configs[i].configName == "tutorial"){	//hardcodeo test "tutorial" = config.currentConfig
+											found = true;			
+										}
+										else{
+											i++;
+										}
+									}
+									if (found){
+										self.activeGames[client.room].start(configs[i]);	
+										var players = self.activeGames[client.room].players;
+										for (i in players){
+											io.to(players[i].id).emit('ready to start');
+										}
+									}
+						}
+					});
+
+					client.in('waiting').broadcast.emit('user disconnect',{ 'alias' : client.alias});
+
+			});
+
 			//Se desconecto un usuario
 			client.on('disconnect', function (){
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
 					//reveer todo esto
-					self.activeGames[client.room].removePlayer(client.id);
-					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
-					if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
-						io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });
-						delete self.activeGames[client.room];
-					}
+						if (self.activeGames[client.room].activePlayer.alias == client.alias){
+							client.in(client.room).broadcast.emit('player disconnect', { 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El jugador activo se ha desconectado!"}});
+							self.activeGames[client.room].asyncAck = false;
+						}
+						else if(self.activeGames[client.room].ringBearer.alias == client.alias){
+							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El portador del Anillo se ha desconectado!"}});
+							self.activeGames[client.room].asyncAck = false;
+						}
+						else{
+							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
+							self.activeGames[client.room].asyncAck = false;
+						}
 				}
 				else{
 					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});

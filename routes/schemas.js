@@ -60,6 +60,7 @@
         currentConfig : String,
         configs : [{
             configName : String,
+            isTutorial : Boolean,
             sauronPosition : Number,
             hobbitPosition : Number,
             locations : Array,
