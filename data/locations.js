@@ -131,7 +131,7 @@ define(['../classes/Activity'], function (Activity) {
 		name: 'Tutorial',
 		draw : null,
 		subactivities : [ {'action' : "ShowMessage", 'msg': "Terminado tu turno se pasará al jugador siguiente, y así en ronda hasta temrinar el escenario. Como este es un tutorial individual, no hay otro jugador; pero la idea es que vayan jugando en ronda."},
-						{'action' : "ShowMessage", 'msg':"Como habrás visto, la primera parte del turno consiste en sacar un Tile de Evento. Estos pueen contener varias acciones: avanzar por una pista, tirar el dado, ejecutar el siguiente evento, y muchos más."},
+						{'action' : "ShowMessage", 'msg':"Como habrás visto, la primera parte del turno consiste en sacar un Tile de Evento. Estos pueden contener varias acciones: avanzar por una pista, tirar el dado, ejecutar el siguiente evento, y muchos más."},
 						{'action' : "ShowMessage", 'msg':"Durante el juego, recibirás ciertas cartas amarillas, o Cartas Especiales. Si el momento del juego es adecuado, se habilitará el botón 'Jugar Cartas Especiales', para que puedas ejecutar sus eventos."},
 						{'action' : "ShowMessage", 'msg':"También, a cambio de 5 fichas de Escudo, el jugador activo puede llamar al Mago. Éste tiene varios hechizos que te sacarás de un momento complicado."},
 						{'action' : "ShowMessage", 'msg':"Por último, el Portador del Anillo puede utilizarlo una vez por escenario. Usar el Anillo le permitirá avanzar algunos espacios en una Pista de Actividad seleccionada, pero primero deberá tirar el Dado y afrontar las consecuencias."},
