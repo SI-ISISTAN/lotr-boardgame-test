@@ -1,0 +1,585 @@
+2015-05-11T17:20:56.393441+00:00 app[web.1]: Cliente agregado.
+2015-05-11T17:22:46.126287+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T17:22:46.127038+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T17:24:25.355989+00:00 app[web.1]: Cliente agregado.
+2015-05-11T17:24:35.612780+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T17:24:35.612979+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T17:24:37.219888+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:37.219593+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:43.314457+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:43.314490+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:44.881282+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:44.881324+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:46.429472+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:46.429445+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:47.368438+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:47.368469+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:48.356047+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:48.356029+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:49.248968+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:49.248959+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:50.197309+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:50.197358+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:51.719962+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:51.719991+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:53.336034+00:00 app[web.1]: Llego a client manager un update de actividad: Gandalf
+2015-05-11T17:24:53.336097+00:00 app[web.1]: Setee como nueva act: Gandalf
+2015-05-11T17:24:54.298876+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T17:24:54.298912+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T17:24:54.717507+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:54.717639+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:56.374456+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:56.374409+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:57.437462+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:24:57.437558+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:24:58.532316+00:00 app[web.1]: Setee como nueva act: Preparations
+2015-05-11T17:24:58.532276+00:00 app[web.1]: Llego a client manager un update de actividad: Preparations
+2015-05-11T17:24:59.766870+00:00 app[web.1]: Setee como nueva act: RollDie
+2015-05-11T17:24:59.766857+00:00 app[web.1]: Llego a client manager un update de actividad: RollDie
+2015-05-11T17:25:07.038551+00:00 app[web.1]: createCredentials() is deprecated, use tls.createSecureContext instead
+2015-05-11T17:25:09.222978+00:00 app[web.1]: Setee como nueva act: DieRoll
+2015-05-11T17:25:09.222914+00:00 app[web.1]: Llego a client manager un update de actividad: DieRoll
+2015-05-11T17:25:13.680295+00:00 app[web.1]: Llego a client manager un update de actividad: MoveSauron
+2015-05-11T17:25:13.680346+00:00 app[web.1]: Setee como nueva act: MoveSauron
+2015-05-11T17:25:14.884328+00:00 app[web.1]: Llego a client manager un update de actividad: PlayerDealCards
+2015-05-11T17:25:14.884412+00:00 app[web.1]: Setee como nueva act: PlayerDealCards
+2015-05-11T17:25:17.583833+00:00 app[web.1]: Cliente agregado.
+2015-05-11T17:25:19.495888+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T17:25:19.495929+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T17:25:19.911882+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T17:25:19.911819+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T17:25:20.321906+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T17:25:20.321604+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T17:25:20.721850+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T17:25:20.721811+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T17:25:21.129663+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:21.129714+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:23.019803+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:23.019832+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:24.652956+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:24.652984+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:26.932538+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:26.932476+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:28.750837+00:00 app[web.1]: Setee como nueva act: AdvanceLocation
+2015-05-11T17:25:28.750773+00:00 app[web.1]: Llego a client manager un update de actividad: AdvanceLocation
+2015-05-11T17:25:29.421642+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:29.421873+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:31.882828+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:31.882861+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:33.241718+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:33.241856+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:34.669069+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:34.669055+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:36.082315+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:36.082370+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:37.849490+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:37.849616+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:39.269339+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:39.269384+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:40.652065+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:40.652655+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:41.050135+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T17:25:41.736689+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:41.736737+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:43.603794+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T17:25:43.603842+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T17:25:45.218176+00:00 app[web.1]: Llego a client manager un update de actividad: StartConflict
+2015-05-11T17:25:45.218215+00:00 app[web.1]: Setee como nueva act: StartConflict
+2015-05-11T17:25:45.784065+00:00 app[web.1]: Cliente agregado.
+2015-05-11T17:26:18.769380+00:00 app[web.1]: Llego a client manager un update de actividad: Gandalf
+2015-05-11T17:26:18.769415+00:00 app[web.1]: Setee como nueva act: Gandalf
+2015-05-11T17:26:29.983320+00:00 app[web.1]:     at Socket.emit (events.js:107:17)
+2015-05-11T17:26:29.983321+00:00 app[web.1]:     at Socket.onevent (/app/node_modules/socket.io/lib/socket.js:327:8)
+2015-05-11T17:26:29.983328+00:00 app[web.1]:     at Decoder.add (/app/node_modules/socket.io/node_modules/socket.io-parser/index.js:247:12)
+2015-05-11T17:26:29.983330+00:00 app[web.1]:     at Client.ondata (/app/node_modules/socket.io/lib/client.js:175:18)
+2015-05-11T17:26:29.983331+00:00 app[web.1]:     at Socket.emit (events.js:107:17)
+2015-05-11T17:26:29.983332+00:00 app[web.1]:     at Socket.onPacket (/app/node_modules/socket.io/node_modules/engine.io/lib/socket.js:99:14)
+2015-05-11T17:26:29.983314+00:00 app[web.1]:             ^
+2015-05-11T17:26:29.983317+00:00 app[web.1]:     at Socket.<anonymous> (/app/classes/ClientManager.js:136:35)
+2015-05-11T17:26:29.983324+00:00 app[web.1]:     at Client.ondecoded (/app/node_modules/socket.io/lib/client.js:193:14)
+2015-05-11T17:26:29.983307+00:00 app[web.1]: events.js:85
+2015-05-11T17:26:29.983312+00:00 app[web.1]:       throw er; // Unhandled 'error' event
+2015-05-11T17:26:29.983315+00:00 app[web.1]: TypeError: Cannot read property 'addPlayer' of undefined
+2015-05-11T17:26:29.983323+00:00 app[web.1]:     at Socket.onpacket (/app/node_modules/socket.io/lib/socket.js:287:12)
+2015-05-11T17:26:29.983326+00:00 app[web.1]:     at Decoder.Emitter.emit (/app/node_modules/socket.io/node_modules/socket.io-parser/node_modules/component-emitter/index.js:134:20)
+2015-05-11T17:26:37.037773+00:00 app[web.1]: Detected 512 MB available memory, 512 MB limit per process (WEB_MEMORY)
+2015-05-11T17:26:37.037795+00:00 app[web.1]: Recommending WEB_CONCURRENCY=1
+2015-05-11T17:26:39.124577+00:00 app[web.1]: Mon, 11 May 2015 17:26:39 GMT body-parser deprecated bodyParser: use individual json/urlencoded middlewares at index.js:36:9
+2015-05-11T17:26:39.287226+00:00 app[web.1]: Creado manager de clientes.
+2015-05-11T17:26:39.268770+00:00 app[web.1]: Mon, 11 May 2015 17:26:39 GMT express-session deprecated undefined resave option; provide resave option at index.js:41:9
+2015-05-11T17:26:39.443974+00:00 app[web.1]: Server funcional en puerto 46747
+2015-05-11T17:26:39.205634+00:00 app[web.1]: Mon, 11 May 2015 17:26:39 GMT body-parser deprecated undefined extended: provide extended option at node_modules/body-parser/index.js:85:29
+2015-05-11T17:26:39.273565+00:00 app[web.1]: Mon, 11 May 2015 17:26:39 GMT express-session deprecated undefined saveUninitialized option; provide saveUninitialized option at index.js:41:9
+2015-05-11T17:26:40.391708+00:00 app[web.1]: Cliente agregado.
+2015-05-11T17:26:40.482135+00:00 app[web.1]: Cliente agregado.
+2015-05-11T17:26:40.462820+00:00 app[web.1]: Cliente agregado.
+2015-05-11T17:26:40.919400+00:00 app[web.1]: events.js:85
+2015-05-11T17:26:40.919407+00:00 app[web.1]:             ^
+2015-05-11T17:26:40.919409+00:00 app[web.1]: TypeError: Cannot read property 'currentLocation' of undefined
+2015-05-11T17:26:40.919411+00:00 app[web.1]:     at Socket.<anonymous> (/app/classes/ClientManager.js:412:69)
+2015-05-11T17:26:40.919406+00:00 app[web.1]:       throw er; // Unhandled 'error' event
+2015-05-11T17:26:40.919412+00:00 app[web.1]:     at Socket.emit (events.js:107:17)
+2015-05-11T17:26:40.919414+00:00 app[web.1]:     at Socket.onevent (/app/node_modules/socket.io/lib/socket.js:327:8)
+2015-05-11T17:26:40.919418+00:00 app[web.1]:     at Decoder.Emitter.emit (/app/node_modules/socket.io/node_modules/socket.io-parser/node_modules/component-emitter/index.js:134:20)
+2015-05-11T17:26:40.919420+00:00 app[web.1]:     at Decoder.add (/app/node_modules/socket.io/node_modules/socket.io-parser/index.js:247:12)
+2015-05-11T17:26:40.919422+00:00 app[web.1]:     at Client.ondata (/app/node_modules/socket.io/lib/client.js:175:18)
+2015-05-11T17:26:40.919423+00:00 app[web.1]:     at Socket.emit (events.js:107:17)
+2015-05-11T17:26:40.919425+00:00 app[web.1]:     at Socket.onPacket (/app/node_modules/socket.io/node_modules/engine.io/lib/socket.js:99:14)
+2015-05-11T17:26:40.919415+00:00 app[web.1]:     at Socket.onpacket (/app/node_modules/socket.io/lib/socket.js:287:12)
+2015-05-11T17:26:40.919417+00:00 app[web.1]:     at Client.ondecoded (/app/node_modules/socket.io/lib/client.js:193:14)
+2015-05-11T18:47:06.843857+00:00 app[web.1]: Recommending WEB_CONCURRENCY=1
+2015-05-11T18:47:06.843823+00:00 app[web.1]: Detected 512 MB available memory, 512 MB limit per process (WEB_MEMORY)
+2015-05-11T18:47:08.079077+00:00 app[web.1]: Creado manager de clientes.
+2015-05-11T18:47:08.023200+00:00 app[web.1]: Mon, 11 May 2015 18:47:08 GMT body-parser deprecated bodyParser: use individual json/urlencoded middlewares at index.js:36:9
+2015-05-11T18:47:08.074125+00:00 app[web.1]: Mon, 11 May 2015 18:47:08 GMT express-session deprecated undefined resave option; provide resave option at index.js:41:9
+2015-05-11T18:47:08.074452+00:00 app[web.1]: Mon, 11 May 2015 18:47:08 GMT express-session deprecated undefined saveUninitialized option; provide saveUninitialized option at index.js:41:9
+2015-05-11T18:47:08.089159+00:00 app[web.1]: Server funcional en puerto 22990
+2015-05-11T18:47:08.063572+00:00 app[web.1]: Mon, 11 May 2015 18:47:08 GMT body-parser deprecated undefined extended: provide extended option at node_modules/body-parser/index.js:85:29
+2015-05-11T18:53:36.088736+00:00 app[web.1]: createCredentials() is deprecated, use tls.createSecureContext instead
+2015-05-11T18:54:06.996813+00:00 app[web.1]: Cliente agregado.
+2015-05-11T18:54:20.804683+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T18:54:20.805374+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T18:54:21.700665+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T18:54:21.700567+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T18:54:25.339223+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T18:54:25.339316+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T18:54:28.610698+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T18:54:28.611022+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T18:54:29.580576+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T18:54:29.580610+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T18:54:30.556940+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T18:54:30.556619+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:03:00.288928+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:03:00.288970+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:22.964752+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:05:24.867724+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:05:24.866998+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:05:25.709656+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:25.709597+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:27.699557+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:27.699593+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:29.509629+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:29.509931+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:30.988793+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:30.988781+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:31.884287+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:31.884328+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:32.817456+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:32.817339+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:33.687875+00:00 app[web.1]: Setee como nueva act: ShowMess
+age
+2015-05-11T19:05:33.687834+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:34.675369+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:34.675162+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:36.069309+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:36.073140+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:37.448362+00:00 app[web.1]: Setee como nueva act: Gandalf
+2015-05-11T19:05:37.448279+00:00 app[web.1]: Llego a client manager un update de actividad: Gandalf
+2015-05-11T19:05:38.480224+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:05:38.480264+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:05:38.891317+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:38.891364+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:40.332787+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:40.332889+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:41.264742+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:05:41.264756+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:05:42.166866+00:00 app[web.1]: Setee como nueva act: Preparations
+2015-05-11T19:05:42.166829+00:00 app[web.1]: Llego a client manager un update de actividad: Preparations
+2015-05-11T19:05:43.126778+00:00 app[web.1]: Setee como nueva act: RollDie
+2015-05-11T19:05:43.126742+00:00 app[web.1]: Llego a client manager un update de actividad: RollDie
+2015-05-11T19:05:46.190985+00:00 app[web.1]: Setee como nueva act: DieRoll
+2015-05-11T19:05:46.190944+00:00 app[web.1]: Llego a client manager un update de actividad: DieRoll
+2015-05-11T19:05:50.653341+00:00 app[web.1]: Llego a client manager un update de actividad: ForceDiscard
+2015-05-11T19:05:50.653386+00:00 app[web.1]: Setee como nueva act: ForceDiscard
+2015-05-11T19:05:55.223287+00:00 app[web.1]: Llego a client manager un update de actividad: PlayerDiscard
+2015-05-11T19:05:55.223326+00:00 app[web.1]: Setee como nueva act: PlayerDiscard
+2015-05-11T19:05:55.624286+00:00 app[web.1]: Llego a client manager un update de actividad: PlayerDealCards
+2015-05-11T19:05:55.624463+00:00 app[web.1]: Setee como nueva act: PlayerDealCards
+2015-05-11T19:05:59.024391+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:05:59.024328+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:05:59.425279+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:05:59.425647+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:05:59.826379+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:05:59.826392+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:06:00.226444+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:06:00.226429+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:06:00.628739+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:00.628778+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:02.582320+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:02.582363+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:03.706570+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:03.706607+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:06.535155+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:06.535193+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:08.153276+00:00 app[web.1]: Llego a client manager un update de actividad: AdvanceLocation
+2015-05-11T19:06:08.153305+00:00 app[web.1]: Setee como nueva act: AdvanceLocation
+2015-05-11T19:06:08.772358+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:08.772219+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:10.986143+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:10.986181+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:11.933122+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:11.933153+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:12.941704+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:12.941332+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:13.924902+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:13.924869+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:15.441599+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:15.441604+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:16.568669+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:16.568718+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:17.628202+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:17.626519+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:18.489784+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:18.489813+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:19.306130+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:06:19.306159+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:06:20.229070+00:00 app[web.1]: Setee como nueva act: StartConflict
+2015-05-11T19:06:20.229034+00:00 app[web.1]: Llego a client manager un update de actividad: StartConflict
+2015-05-11T19:06:25.655431+00:00 app[web.1]: Llego a client manager un update de actividad: UseRing
+2015-05-11T19:06:25.655518+00:00 app[web.1]: Setee como nueva act: UseRing
+2015-05-11T19:06:28.195499+00:00 app[web.1]: Llego a client manager un update de actividad: DieRoll
+2015-05-11T19:06:28.195545+00:00 app[web.1]: Setee como nueva act: DieRoll
+2015-05-11T19:06:32.670633+00:00 app[web.1]: Llego a client manager un update de actividad: MoveSauron
+2015-05-11T19:06:32.671328+00:00 app[web.1]: Setee como nueva act: MoveSauron
+2015-05-11T19:06:33.877402+00:00 app[web.1]: Llego a client manager un update de actividad: MoveTrack
+2015-05-11T19:06:33.877450+00:00 app[web.1]: Setee como nueva act: MoveTrack
+2015-05-11T19:06:35.094774+00:00 app[web.1]: Llego a client manager un update de actividad: ClaimReward
+2015-05-11T19:06:35.094809+00:00 app[web.1]: Setee como nueva act: ClaimReward
+2015-05-11T19:06:35.531168+00:00 app[web.1]: Setee como nueva act: ChangeTokens
+2015-05-11T19:06:35.531130+00:00 app[web.1]: Llego a client manager un update de actividad: ChangeTokens
+2015-05-11T19:06:35.971869+00:00 app[web.1]: Llego a client manager un update de actividad: MoveTrack
+2015-05-11T19:06:35.971906+00:00 app[web.1]: Setee como nueva act: MoveTrack
+2015-05-11T19:06:37.090275+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:06:37.101374+00:00 app[web.1]: Setee como nueva act: DrawTile
+2015-05-11T19:06:37.223077+00:00 app[web.1]: Llego a client manager un update de actividad: ClaimReward
+2015-05-11T19:06:37.223194+00:00 app[web.1]: Setee como nueva act: ClaimReward
+2015-05-11T19:06:37.090225+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:06:37.101337+00:00 app[web.1]: Llego a client manager un update de actividad: DrawTile
+2015-05-11T19:06:37.670628+00:00 app[web.1]: Setee como nueva act: ChangeTokens
+2015-05-11T19:06:37.670614+00:00 app[web.1]: Llego a client manager un update de actividad: ChangeTokens
+2015-05-11T19:06:37.486695+00:00 app[web.1]: Llego a client manager un update de actividad: MoveTrack
+2015-05-11T19:06:37.486734+00:00 app[web.1]: Setee como nueva act: MoveTrack
+2015-05-11T19:06:37.960563+00:00 app[web.1]: No mas actividades!
+2015-05-11T19:06:38.708003+00:00 app[web.1]: Llego a client manager un update de actividad: ClaimReward
+2015-05-11T19:06:38.708278+00:00 app[web.1]: Setee como nueva act: ClaimReward
+2015-05-11T19:06:39.208712+00:00 app[web.1]: Llego a client manager un update de actividad: ChangeTokens
+2015-05-11T19:06:39.417566+00:00 app[web.1]: No mas actividades!
+2015-05-11T19:06:39.208772+00:00 app[web.1]: Setee como nueva act: ChangeTokens
+2015-05-11T19:06:40.566797+00:00 app[web.1]: Llego a client manager un update de actividad: MovePlayer
+2015-05-11T19:06:40.566847+00:00 app[web.1]: Setee como nueva act: MovePlayer
+2015-05-11T19:06:41.163017+00:00 app[web.1]: No mas actividades!
+2015-05-11T19:06:40.963023+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:06:40.962989+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:06:45.247446+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:06:45.247476+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:06:45.249548+00:00 app[web.1]: Llego a client manager un update de actividad: DrawTile
+2015-05-11T19:06:45.249575+00:00 app[web.1]: Setee como nueva act: DrawTile
+2015-05-11T19:06:45.444916+00:00 app[web.1]: No mas actividades!
+2015-05-11T19:06:48.729113+00:00 app[web.1]: Setee como nueva act: MoveTrack
+2015-05-11T19:06:48.729084+00:00 app[web.1]: Llego a client manager un update de actividad: MoveTrack
+2015-05-11T19:06:49.979492+00:00 app[web.1]: Setee como nueva act: ClaimReward
+2015-05-11T19:06:49.979459+00:00 app[web.1]: Llego a client manager un update de actividad: ClaimReward
+2015-05-11T19:06:50.384252+00:00 app[web.1]: Llego a client manager un update de actividad: ChangeTokens
+2015-05-11T19:06:50.384280+00:00 app[web.1]: Setee como nueva act: ChangeTokens
+2015-05-11T19:06:50.779516+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:06:50.778853+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:06:51.225050+00:00 app[web.1]: Llego a client manager un update de actividad: CardsPhase
+2015-05-11T19:06:51.225405+00:00 app[web.1]: Setee como nueva act: CardsPhase
+2015-05-11T19:06:54.526806+00:00 app[web.1]: Llego a client manager un update de actividad: CallGandalf
+2015-05-11T19:06:54.527188+00:00 app[web.1]: Setee como nueva act: CallGandalf
+2015-05-11T19:06:56.794538+00:00 app[web.1]: Llego a client manager un update de actividad: PlayGandalfCard
+2015-05-11T19:06:56.794584+00:00 app[web.1]: Setee como nueva act: PlayGandalfCard
+2015-05-11T19:06:57.236138+00:00 app[web.1]: Llego a client manager un update de actividad: RearrangeTiles
+2015-05-11T19:06:57.236259+00:00 app[web.1]: Setee como nueva act: RearrangeTiles
+2015-05-11T19:11:09.238235+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:11:12.592659+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:11:16.567417+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:11:17.485645+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:11:17.485723+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:11:19.944190+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:11:20.388100+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:11:20.883003+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:20.883097+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:21.218917+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:21.218930+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:27.483691+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:27.483697+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:29.200674+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:29.201571+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:30.648700+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:30.648656+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:32.831402+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:32.831761+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:
+11:34.290416+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:34.290450+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:35.143395+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:35.143409+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:36.120152+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:36.120103+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:37.077400+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:37.077387+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:38.002133+00:00 app[web.1]: Setee como nueva act: Gandalf
+2015-05-11T19:11:38.002090+00:00 app[web.1]: Llego a client manager un update de actividad: Gandalf
+2015-05-11T19:11:39.006128+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:11:39.006142+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:11:39.447401+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:39.447444+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:40.349308+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:40.349344+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:41.307954+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:41.308003+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:43.342542+00:00 app[web.1]: Llego a client manager un update de actividad: Preparations
+2015-05-11T19:11:43.342583+00:00 app[web.1]: Setee como nueva act: Preparations
+2015-05-11T19:11:46.411696+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:46.411627+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:47.808261+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:47.807874+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:49.196487+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:49.196596+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:50.270898+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:50.270884+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:51.736179+00:00 app[web.1]: Llego a client manager un update de actividad: AdvanceLocation
+2015-05-11T19:11:51.736215+00:00 app[web.1]: Setee como nueva act: AdvanceLocation
+2015-05-11T19:11:52.414476+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:52.414490+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:53.705142+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:53.705119+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:54.976469+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:54.976483+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:56.369004+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:11:56.369050+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:57.673727+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:11:57.673690+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:00.805460+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:00.805500+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:02.581433+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:02.581447+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:04.052204+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:04.052190+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:05.103544+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:05.103555+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:06.088590+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:06.088619+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:07.456891+00:00 app[web.1]: Llego a client manager un update de actividad: StartConflict
+2015-05-11T19:12:07.456934+00:00 app[web.1]: Setee como nueva act: StartConflict
+2015-05-11T19:12:14.250841+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:12:14.250963+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:12:14.464822+00:00 app[web.1]: No mas actividades!
+2015-05-11T19:12:14.265386+00:00 app[web.1]: Llego a client manager un update de actividad: DrawTile
+2015-05-11T19:12:14.265569+00:00 app[web.1]: Setee como nueva act: DrawTile
+2015-05-11T19:12:17.890169+00:00 app[web.1]: Setee como nueva act: MoveTrack
+2015-05-11T19:12:17.890155+00:00 app[web.1]: Llego a client manager un update de actividad: MoveTrack
+2015-05-11T19:12:19.837481+00:00 app[web.1]: Llego a client manager un update de actividad: ClaimReward
+2015-05-11T19:12:19.837515+00:00 app[web.1]: Setee como nueva act: ClaimReward
+2015-05-11T19:12:20.257933+00:00 app[web.1]: Llego a client manager un update de actividad: DealFeatureCardByName
+2015-05-11T19:12:20.257967+00:00 app[web.1]: Setee como nueva act: DealFeatureCardByName
+2015-05-11T19:12:21.308464+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:12:21.308447+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:12:22.525791+00:00 app[web.1]: Setee como nueva act: CardsPhase
+2015-05-11T19:12:22.525754+00:00 app[web.1]: Llego a client manager un update de actividad: CardsPhase
+2015-05-11T19:12:24.725474+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:12:24.725434+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:12:25.171049+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:12:25.171226+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:12:26.138610+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:12:26.138624+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:12:26.600665+00:00 app[web.1]: Llego a client manager un update de actividad: CleanUpPhase
+2015-05-11T19:12:26.600678+00:00 app[web.1]: Setee como nueva act: CleanUpPhase
+2015-05-11T19:12:28.923797+00:00 app[web.1]: Llego a client manager un update de actividad: NextTurn
+2015-05-11T19:12:28.923957+00:00 app[web.1]: Setee como nueva act: NextTurn
+2015-05-11T19:12:29.407057+00:00 app[web.1]: Llego a client manager un update de actividad: AdvanceLocation
+2015-05-11T19:12:29.407095+00:00 app[web.1]: Setee como nueva act: AdvanceLocation
+2015-05-11T19:12:30.117305+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:30.116988+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:31.907186+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:31.907245+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:32.940249+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:32.940263+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:34.034857+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:34.034870+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:35.916753+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:35.916768+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:37.955762+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:12:37.955798+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:12:44.441380+00:00 app[web.1]: Setee como nueva act: AbortGame
+2015-05-11T19:12:44.441345+00:00 app[web.1]: Llego a client manager un update de actividad: AbortGame
+2015-05-11T19:20:00.781342+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:20:03.998025+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:20:03.998124+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:20:49.153610+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:20:49.153554+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:20:50.212612+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:20:50.212425+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:20:51.784947+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:20:51.785847+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:20:53.265317+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:20:53.265309+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:20:55.275910+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:20:55.275882+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:20:56.256932+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:20:56.256992+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:01.057871+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:01.057960+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:02.503205+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:02.503240+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:04.557168+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:04.557150+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:06.589901+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:06.589887+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:31.978617+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:21:32.654520+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:21:32.654637+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:21:34.417948+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:21:35.346058+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:35.346543+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:37.811117+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:37.811134+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:42.667713+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:42.667616+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:45.200397+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:45.200289+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:46.425267+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:46.425281+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:49.685016+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:49.684739+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:51.713075+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:21:51.713089+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:55.893878+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:21:55.892951+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:22:01.656677+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:22:01.656088+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:22:02.479914+00:00 app[web.1]: Llego a client manager un update de actividad: Gandalf
+2015-05-11T19:22:02.480081+00:00 app[web.1]: Setee como nueva act: Gandalf
+2015-05-11T19:22:07.577190+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:22:07.577200+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:22:08.022313+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:22:08.021938+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:22:15.237742+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:22:15.237791+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:22:23.061504+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:22:23.061620+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:22:39.782126+00:00 app[web.1]: Setee como nueva act: Preparations
+2015-05-11T19:22:39.782120+00:00 app[web.1]: Llego a client manager un update de actividad: Preparations
+2015-05-11T19:22:55.604516+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:22:55.604528+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:01.150355+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:01.150399+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:08.671876+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:08.671958+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:13.097742+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:13.097704+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:36.928621+00:00 app[web.1]: Llego a client manager un update de actividad: AdvanceLocation
+2015-05-11T19:23:36.928680+00:00 app[web.1]: Setee como nueva act: AdvanceLocation
+2015-05-11T19:23:37.703417+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:37.703320+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:43.350203+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:43.350129+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:46.735122+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:46.735082+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:50.257776+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:50.257810+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:53.783806+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:53.783819+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:23:58.724992+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:23:58.725049+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:24:08.296644+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:24:08.296776+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:24:18.952737+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:24:18.952751+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:24:19.529204+00:00 app[web.1]: Setee como nueva act: DrawTile
+2015-05-11T19:24:19.529073+00:00 app[web.1]: Llego a client manager un update de actividad: DrawTile
+2015-05-11T19:24:19.512123+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:24:19.512166+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:24:19.932934+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:24:19.933002+00:00 app[
+web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:24:22.999536+00:00 app[web.1]: Llego a client manager un update de actividad: MoveTrack
+2015-05-11T19:24:22.999572+00:00 app[web.1]: Setee como nueva act: MoveTrack
+2015-05-11T19:24:23.064557+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:24:23.064715+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:24:23.512318+00:00 app[web.1]: Setee como nueva act: CardsPhase
+2015-05-11T19:24:23.512285+00:00 app[web.1]: Llego a client manager un update de actividad: CardsPhase
+2015-05-11T19:24:24.520294+00:00 app[web.1]: Llego a client manager un update de actividad: ClaimReward
+2015-05-11T19:24:24.520350+00:00 app[web.1]: Setee como nueva act: ClaimReward
+2015-05-11T19:24:25.212376+00:00 app[web.1]: Llego a client manager un update de actividad: ChangeTokens
+2015-05-11T19:24:25.212432+00:00 app[web.1]: Setee como nueva act: ChangeTokens
+2015-05-11T19:24:25.672037+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:24:25.672098+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:24:26.125510+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:24:26.125559+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:24:30.244396+00:00 app[web.1]: Llego a client manager un update de actividad: StartConflict
+2015-05-11T19:24:30.244408+00:00 app[web.1]: Setee como nueva act: StartConflict
+2015-05-11T19:24:33.274682+00:00 app[web.1]: Llego a client manager un update de actividad: NextPhase
+2015-05-11T19:24:33.274696+00:00 app[web.1]: Setee como nueva act: NextPhase
+2015-05-11T19:24:34.538327+00:00 app[web.1]: Llego a client manager un update de actividad: CleanUpPhase
+2015-05-11T19:24:34.538375+00:00 app[web.1]: Setee como nueva act: CleanUpPhase
+2015-05-11T19:24:38.074595+00:00 app[web.1]: Llego a client manager un update de actividad: NextTurn
+2015-05-11T19:24:38.074612+00:00 app[web.1]: Setee como nueva act: NextTurn
+2015-05-11T19:24:39.122435+00:00 app[web.1]: Llego a client manager un update de actividad: AdvanceLocation
+2015-05-11T19:24:39.122482+00:00 app[web.1]: Setee como nueva act: AdvanceLocation
+2015-05-11T19:24:41.210809+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:24:41.210860+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:24:50.176052+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:24:50.176219+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:25:03.943490+00:00 app[web.1]: Llego a client manager un update de actividad: ShowMessage
+2015-05-11T19:25:03.943519+00:00 app[web.1]: Setee como nueva act: ShowMessage
+2015-05-11T19:27:37.526873+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:27:45.939379+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:27:45.939289+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:28:37.435518+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:28:59.650632+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:29:00.962480+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:29:11.345262+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:29:26.829953+00:00 app[web.1]: Llego a client manager un update de actividad: Gandalf
+2015-05-11T19:29:26.830011+00:00 app[web.1]: Setee como nueva act: Gandalf
+2015-05-11T19:29:39.783774+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:29:39.783733+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:29:40.234177+00:00 app[web.1]: Llego a client manager un update de actividad: Preparations
+2015-05-11T19:29:40.234190+00:00 app[web.1]: Setee como nueva act: Preparations
+2015-05-11T19:30:40.414404+00:00 app[web.1]: Llego a client manager un update de actividad: RollDie
+2015-05-11T19:30:40.414435+00:00 app[web.1]: Setee como nueva act: RollDie
+2015-05-11T19:30:48.225462+00:00 app[web.1]: Llego a client manager un update de actividad: DieRoll
+2015-05-11T19:30:48.225476+00:00 app[web.1]: Setee como nueva act: DieRoll
+2015-05-11T19:30:52.796410+00:00 app[web.1]: Llego a client manager un update de actividad: MovePlayer
+2015-05-11T19:30:52.796458+00:00 app[web.1]: Setee como nueva act: MovePlayer
+2015-05-11T19:30:53.334496+00:00 app[web.1]: Llego a client manager un update de actividad: PlayerDealCards
+2015-05-11T19:30:53.334535+00:00 app[web.1]: Setee como nueva act: PlayerDealCards
+2015-05-11T19:31:15.050743+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:31:15.050729+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:31:16.240110+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:31:16.240229+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:31:16.709279+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:31:16.709265+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:31:17.140987+00:00 app[web.1]: Setee como nueva act: DealHobbitCards
+2015-05-11T19:31:17.140973+00:00 app[web.1]: Llego a client manager un update de actividad: DealHobbitCards
+2015-05-11T19:31:17.620523+00:00 app[web.1]: Llego a client manager un update de actividad: Nazgul Appears
+2015-05-11T19:31:17.620537+00:00 app[web.1]: Setee como nueva act: Nazgul Appears
+2015-05-11T19:32:26.500537+00:00 app[web.1]: Llego a client manager un update de actividad: ForceDiscard
+2015-05-11T19:32:26.500548+00:00 app[web.1]: Setee como nueva act: ForceDiscard
+2015-05-11T19:32:35.989157+00:00 app[web.1]: Llego a client manager un update de actividad: PlayerDiscard
+2015-05-11T19:32:35.989171+00:00 app[web.1]: Setee como nueva act: PlayerDiscard
+2015-05-11T19:32:36.483020+00:00 app[web.1]: Setee como nueva act: AdvanceLocation
+2015-05-11T19:32:36.406008+00:00 app[web.1]: No mas actividades!
+2015-05-11T19:32:36.482779+00:00 app[web.1]: Llego a client manager un update de actividad: AdvanceLocation
+2015-05-11T19:32:37.149746+00:00 app[web.1]: Llego a client manager un update de actividad: Elrond
+2015-05-11T19:32:37.149889+00:00 app[web.1]: Setee como nueva act: Elrond
+2015-05-11T19:32:47.160456+00:00 app[web.1]: Llego a client manager un update de actividad: DealFeatureCards
+2015-05-11T19:32:47.160492+00:00 app[web.1]: Setee como nueva act: DealFeatureCards
+2015-05-11T19:32:47.646335+00:00 app[web.1]: Setee como nueva act: Council
+2015-05-11T19:32:47.646320+00:00 app[web.1]: Llego a client manager un update de actividad: Council
+2015-05-11T19:32:50.270809+00:00 app[web.1]: Sudden update: EndGame
+2015-05-11T19:32:50.469389+00:00 app[web.1]: el async es true
+2015-05-11T19:32:50.469061+00:00 app[web.1]: Sudden update: EndGame
+2015-05-11T19:32:51.366510+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:33:01.972731+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:33:03.606808+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:33:12.388577+00:00 app[web.1]: Setee como nueva act: ForceDiscard
+2015-05-11T19:33:12.388562+00:00 app[web.1]: Llego a client manager un update de actividad: ForceDiscard
+2015-05-11T19:33:18.965144+00:00 app[web.1]: Sudden update: EndGame
+2015-05-11T19:33:19.760718+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:33:23.007797+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:33:55.994587+00:00 app[web.1]: Cliente agregado.
+2015-05-11T19:34:06.714603+00:00 app[web.1]: Cliente desconectado.
+2015-05-11T19:34:06.714521+00:00 app[web.1]: Se ha creado un nuevo juego.
+2015-05-11T19:35:44.955794+00:00 app[web.1]: Cliente desconectado.

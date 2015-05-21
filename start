@@ -1,0 +1,30 @@
+{ [Error: Cannot find module '../build/Release/bson'] code: 'MODULE_NOT_FOUND' }
+Creado manager de clientes.
+Server funcional en puerto 3000
+Cliente agregado.
+{ [Error: Cannot find module '../build/Release/bson'] code: 'MODULE_NOT_FOUND' }
+Creado manager de clientes.
+Server funcional en puerto 3000
+Cliente agregado.
+{ [Error: Cannot find module '../build/Release/bson'] code: 'MODULE_NOT_FOUND' }
+Creado manager de clientes.
+Server funcional en puerto 3000
+Cliente agregado.
+{ [Error: Cannot find module '../build/Release/bson'] code: 'MODULE_NOT_FOUND' }
+Creado manager de clientes.
+Server funcional en puerto 3000
+Cliente agregado.
+{ [Error: Cannot find module '../build/Release/bson'] code: 'MODULE_NOT_FOUND' }
+Creado manager de clientes.
+Server funcional en puerto 3000
+Cliente agregado.
+Se ha creado un nuevo juego.
+Cliente desconectado.
+Cliente agregado.
+Cliente desconectado.
+Llego a client manager un update de actividad: Gandalf
+Setee como nueva act: Gandalf
+Llego a client manager un update de actividad: DealHobbitCards
+Setee como nueva act: DealHobbitCards
+Llego a client manager un update de actividad: Preparations
+Setee como nueva act: Preparations

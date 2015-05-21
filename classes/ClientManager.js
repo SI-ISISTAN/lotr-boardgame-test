@@ -131,9 +131,9 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//El cliente pide unirse a una partida
 			client.on('join game', function (data){
-				if (data.gameID!='undefined'){
+				if (typeof(data.gameID)!='undefined'){
 					var client_obj = {'id' : client.id, 'alias': client.alias, 'userID':client.userID};
-					self.activeGames[data.gameID].addPlayer(client_obj);
+					self.activeGames[data.gameID].addPlayer(client_obj);			
 					self.disconnectClient(client.id);
 					io.to('waiting').emit('join game',{'gameID' : data.gameID, 'alias':client.alias});				
 					client.room = data.gameID;	//Setear la room del juego
@@ -356,6 +356,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							game.gameActions.push({'player' : client.alias, 'action': data.action, 'data' : newData});
 							//si la accion es "end game" hago un guardado especial: el del resultado del juego
 							if (data.action=="EndGame"){
+								game.complete = true;
 								game.result.victory = data.success;
 								game.result.reason = data.reason;
 								game.result.score = data.score;
@@ -466,6 +467,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					}
 				});
 			});
+
 
 			//jugar el tuto
 			client.on('play tutorial', function (data){

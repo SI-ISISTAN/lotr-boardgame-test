@@ -12,11 +12,16 @@ requirejs.config({
     //Pass the top-level main.js/index.js require
     //function to requirejs so that node modules
     //are loaded relative to the top-level JS file.
-    nodeRequire: require
+    nodeRequire: require,
+    paths : {
+        'mangosta' : 'moongoose'
+    }
 });
-//Requerimientos de Require.js
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/test');
+
 var ClientManager = requirejs('./classes/ClientManager');
-var schemas = require('./routes/schemas.js');
+var schemas = requirejs('./routes/schemas');
 
 
 var flash    = require('connect-flash');
@@ -26,7 +31,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
-require('./routes/passport')(passport); // pass passport for configuration
+
+
+require('./routes/passport')(passport, schemas); // pass passport for configuration
 
 
 
@@ -59,12 +66,26 @@ app.get('/lotr', isLoggedIn, function(req, res) {
         res.render('main.ejs', {
             user : req.user
         });
+
+    });
+
+app.get('/admin', isLoggedIn, function(req, res) {
+        res.render('admin.ejs', {
+            user : req.user,
+            holu : "je"
+        });
+
     });
 
 app.get('/profile', isLoggedIn, function(req, res) {
-		res.render('profile.ejs', {
-			user : req.user
-		});
+        if (req.user.facebook.token == undefined && req.user.twitter.token == undefined && req.user.google.token == undefined){
+                res.redirect('/');
+        }
+        else{
+    		res.render('profile.ejs', {
+    			user : req.user
+    		});
+        }
 	});
 
 app.get('/survey', isLoggedIn, function(req, res) {
@@ -79,7 +100,7 @@ app.get('/survey', isLoggedIn, function(req, res) {
 // =============================================================================
 
 // facebook --------------------------------
-app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
+app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['email','user_friends'] }));
 
 	// handle the callback after facebook has authenticated the user
 app.get('/auth/facebook/callback',
@@ -172,7 +193,7 @@ app.get('/auth/facebook/callback',
         user.local.email    = undefined;
         user.local.password = undefined;
         user.save(function(err) {
-            res.redirect('/profile');
+
         });
     });
 
@@ -181,7 +202,12 @@ app.get('/auth/facebook/callback',
         var user            = req.user;
         user.facebook.token = undefined;
         user.save(function(err) {
-            res.redirect('/profile');
+            if (user.facebook.token == undefined && user.twitter.token == undefined && user.google.token == undefined){
+                res.redirect('/');
+            }
+            else{
+             res.redirect('/profile');
+            }
         });
     });
 
@@ -190,7 +216,12 @@ app.get('/auth/facebook/callback',
         var user           = req.user;
         user.twitter.token = undefined;
         user.save(function(err) {
-           res.redirect('/profile');
+            if (user.facebook.token == undefined && user.twitter.token == undefined && user.google.token == undefined){
+                res.redirect('/');
+            }
+            else{
+                res.redirect('/profile');
+            }
         });
     });
 
@@ -199,7 +230,12 @@ app.get('/auth/facebook/callback',
         var user          = req.user;
         user.google.token = undefined;
         user.save(function(err) {
-           res.redirect('/profile');
+            if (user.facebook.token == undefined && user.twitter.token == undefined && user.google.token == undefined){
+                    res.redirect('/');
+            }
+            else{
+                res.redirect('/profile');
+            }
         });
     });
 
