@@ -1,7 +1,7 @@
 
    ////////////////////////////////////////// FUNCIONES VARIAS /////////////////////////////////////////////////////
 
-require(['./data/activities','./data/gameActions','./classes/client-side/Client','https://code.jquery.com/jquery-1.8.3.js','https://cdn.socket.io/socket.io-1.2.0.js', 'https://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity'], function(activities, gameActions, Client, jquery, io, jqueryui, Activity){
+require(['./data/activities','./data/gameActions','./classes/client-side/Client','https://code.jquery.com/jquery-1.8.3.js','/socket.io/socket.io.js', 'https://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity','./classes/client-side/Poll'], function(activities, gameActions, Client, jquery, io, jqueryui, Activity, Poll){
 
     var socket = io();  //habilito el socketo
     var client = new Client();
@@ -233,7 +233,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 		        if (client.player.turn){
 
-		        	socket.emit('change location');	//repetir el evento a los otros clientes
+		        	socket.emit('change location');	
 		        }
 		        
 	    });
@@ -262,6 +262,12 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    	else if (res.mode=='tip'){
 	    		$("#chat-msg-div").append('<p style= "color: #58D3F7" class="chat-message"> '+ res.msg+' </p>');
 	    	}
+	    	else if (res.mode=='upvote'){
+	    		$("#chat-msg-div").append('<p style= "color: #81DAF5" class="chat-message"> '+ res.msg+' </p>');
+	    	}
+	    	else if (res.mode=='downvote'){
+	    		$("#chat-msg-div").append('<p style= "color: #F78181" class="chat-message"> '+ res.msg+' </p>');
+	    	}
 	    	else if (res.mode=='death'){
 	    		$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #FF0000;"> '+ res.msg+' </p>');
 	    	}
@@ -280,7 +286,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 	    //Pasar al siguiente escenario
 	    socket.on('next activity', function(res){
-	    	socket.emit('resolve activity', {'unblockable' : true});	//repetir el evento a los otros clientes
+	    	socket.emit('resolve activity', {'unblockable' : true});	
 	    });
 
 	    //Aplicar un update del lado de cliente
@@ -295,7 +301,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 	    //Resolver una actividad
 	    socket.on('resolve activity', function(res){
-	    	socket.emit('update game', res);	//repetir el evento a los otros clientes
+	    	socket.emit('update game', res);	
 	    });
 
 	    //Turno siguiente
@@ -312,11 +318,50 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    	
 	    });
 
+	    //Mensajes de poll
+	    socket.on('new poll', function(res){
+	    	//Armar texto para mostrar a los demases
+	    	//Se podria parametrizar en funcion a desde que actividad me llaman para generar un mensaje coherente
+
+	    	var texto = "Es preciso tomar una decisión en equipo. El jugador "+res.activePlayer+" propone el siguiente sacrificio:";
+	    	var poll = new Poll({title: "Decisión", text: texto});
+	    	var div = $("<div>  </div>");
+	    	var discards = res.data;
+	    	console.log(discards);
+	    	for (i in discards){
+	    		if (typeof(discards[i].text) != 'undefined'){
+	    			div.append("<p>"+discards[i].text+": "+discards[i].player+"</p>");
+	    		}
+	    		else if (typeof(discards[i].image) != 'undefined'){
+	    			var el = $("<div id='deal-card-div'>  </div> ");
+					el.append("<img src='./assets/img/ripped/"+discards[i].image+".png' class='player-card-img img-responsive'>");
+					el.append("<span>"+discards[i].player+"</span>")
+					div.append(el);
+	    		}
+	    	}
+	    	poll.popup.append(div);
+			poll.draw(client);
+
+	    });
+
+	    //El server envia al cliente una accion para que emita y resuelva
+	    socket.on('emit and resolve', function(res){
+	    	for (i in res.actions){
+	    		socket.emit('add activity', res.actions[i]);	//voy dando las cartas de a una
+	    	}
+			socket.emit('resolve activity');
+	    });
+
+	     socket.on('repeat activity', function(){
+	    	socket.emit('repeat activity');
+	    });
+
 	    socket.on('connect_error', function(err) {
 		  // handle server error here
 		  $(location).attr('href','/');
 		});
 
+		
 	}
 
     ////////////////////////////// MANEJO DE INPUT ////////////////////////////// 

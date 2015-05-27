@@ -439,11 +439,12 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 		apply : function(game, player,data){
 			data.cards = [];
 			for (var i=0; i<data.amount; i++){
-				data.cards.push(game.dealHobbitCard(game.hobbitCards.length-1));
+				data.cards.push(game.hobbitCards[game.hobbitCards.length-1-i]);
 			}
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
+			var pollData = [];
 			var popup = new Popup({title: "Repartir cartas", text: "Distribuye las cartas como desees. ",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
 			//pongo los elementos de reparto de cada carta
 			var div = $("<div>  </div>");
@@ -452,7 +453,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 			for (i in data.cards){
 				var el = $("<div id='deal-card-div'>  </div> ");
 				el.append("<img src='./assets/img/ripped/"+data.cards[i].image+".png' class='player-card-img img-responsive'>");
-
+				pollData.push({'image': data.cards[i].image, 'player':null});
 				var listbox = $("<select class='card-to-selector'> </select>");
 				
 				for (j in people){
@@ -467,16 +468,28 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 			popup.append(div);
 
 			//cuando me dan ok envio cada carta al jugador correspondiente
+			//armar el discard bundle para poll y de acciones
+			
+			var actions = [];
 			popup.addListener("ok", function(){
+					var index = 0;
 					$(".card-to-selector").each(function(){
 						var to = $(this).val();
-						client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});	//voy dando las cartas de a una
+						pollData[index].player = to;
+						index++;
+						actions.push({'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});
 					});
 				$(".card-to-selector").remove();
+
+				client.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': actions });
 				popup.close(); 
+
+				//chequear esto
+				/*
 				if (client.isActivePlayer()){
 					client.socket.emit('resolve activity');
 				}
+				*/
 			});
 
 			popup.draw(client);

@@ -26,14 +26,16 @@ define(['../classes/client-side/Popup'], function (Popup) {
 						div.append(el);	
 						popup.append(div);
 						//cuando me dan ok envio cada carta al jugador correspondiente
+						var pollData = [];
 						popup.addListener("advance", function(){
+							var to = null;
 								$(".player-selector").each(function(){
-									var to = $(this).val();
-									client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : to, 'amount' : 2});
+									to = $(this).val();
+									pollData.push({text: 'Avanzar 2 espacios hacia el Malvado', player: to});
 								});
 								$(".player-selector").remove();
-								client.socket.emit('resolve activity');
-								popup.close(); 
+								client.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': [{'action' : 'MovePlayer', 'alias' : to, 'amount' : 2}] });
+								popup.close();
 						});
 						popup.addListener("stay", function(){
 								client.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 1});
@@ -142,13 +144,12 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		draw : function(client, data){
 			var popup = new Popup({
 				title: "Un Monstruo Aparece", 
-				text: "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir por medio del chat quién lo hará, y en último termino el jugador activo lo señalará. Si ningún jugador quiere o puede hacerlo, el Malvado avanza un espacio hacia los aventureros. Cuando estés listo, elige un jugador de la siguiente lista, que contiene sólo a quienes pueden hacer este descarte:", 
+				text: "Algún jugador debe descartar dos símbolos de Esconderse (o comodines en su lugar). Deben decidir quién lo hará. Si ningún jugador quiere o puede hacerlo, el Malvado avanza un espacio hacia los aventureros. Cuando estés listo, elige un jugador de la siguiente lista, que contiene sólo a quienes pueden hacer este descarte:", 
 				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
 			});
 			popup.addListener("discard", function(){
-				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards, 'to':null});
-				client.socket.emit('add activity', {'action' : 'AdvanceLocation'});
-				client.socket.emit('resolve activity');
+				var pollData = [{text: 'Dos símbolos de Esconderse (o Comodines)', player: $(".discard-to-selector").val()}];
+				client.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': [{'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards, 'to':null},{'action' : 'AdvanceLocation'}] });
 				popup.close();	
 			});
 			popup.addListener("dont-discard", function(){
@@ -450,9 +451,10 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			popup.append($(listbox));
 
 			popup.addListener("advance", function(){
-				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : $(listbox).val(), 'amount' : 3});
-				popup.close();
-				client.socket.emit('resolve activity');
+				var pollData = [{text: 'Avanzar 3 espacios hacia el Malvado', player: $(listbox).val()}];
+				client.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': [{'action' : 'MovePlayer', 'alias' : $(listbox).val(), 'amount' : 3}] });
+				popup.close();	
+
 			});
 			popup.addListener("rolldie", function(){
 				var people2 = client.getAlivePlayers();
@@ -612,7 +614,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			}
 			data['candidates'] = candidates;
 			data['cards'] = cards;
-			console.log(this.description);
 
 			this.logEventInfo(game,player);
 			game.io.to(player.room).emit('update game', data);	
@@ -625,9 +626,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
 			});
 			popup.addListener("discard", function(){
-				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(".discard-to-selector").val(),'cards': data.cards, 'to':null});
-				client.socket.emit('resolve activity');
-				popup.close();	
+				var pollData = [{text: 'Un símbolo de Amistad y otro de Comodín', player: $(listbox).val()}];
+				client.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': [{'action' : 'ForceDiscard', 'amount' : data.cards.length, 'alias' : $(listbox).val(),'cards': data.cards, 'to':null}] });
+				popup.close();
 			});
 			popup.addListener("dont-discard", function(){
 				client.socket.emit('add activity', {'action' : 'DiscardFeatureCards'});
@@ -831,7 +832,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				popup.close();	
 			});
 			popup.addListener("lose", function(){
-				client.socket.emit('add activity first', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No cumplió con los requisitos de un Evento cuya penalización era la muerte."});
+				client.socket.emit('add activity first', {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "No cumplió con los requisitos de un Evento cuya penalización era la muerte."});
 				client.roundTransmission({'action' : "DeadFaces"}, data.playerNumber);	
 				client.socket.emit('resolve activity');
 				popup.close();	
@@ -874,10 +875,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 				buttons : [ {name : "Este jugador descartará", id:"discard"}, {name : "No descartar", id:"dont-discard"}] 
 			});
 			popup.addListener("discard", function(){
-				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :$(".discard-to-selector").val(), 'token':'shield', 'amount':-5});
-				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null});	
-				client.socket.emit('resolve activity');
-				popup.close();	
+				var pollData = [{text: '5 fichas de Escudo', player: $(listbox).val()}];
+				client.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': [{'action' : 'ChangeTokens', 'alias' :$(listbox).val(), 'token':'shield', 'amount':-5},{'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null}] });
+				popup.close();
 			});
 			popup.addListener("dont-discard", function(){
 				client.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 2});
@@ -1057,10 +1057,9 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		draw : function(client, data){
 			var popup = new Popup({title: "Evento: '"+this.title+"'", text: this.description, buttons : [ {name : "Este jugador descartará", id:"draw"}, {name : "No descartar", id:"dont"}], visibility : "active"});
 			popup.addListener("draw", function(){
-				client.socket.emit('add activity', {'action' : 'ForceDiscard', 'alias' : $(".discard-to-selector").val(), 'amount' : 3, 'card' : null, 'to':null });
-				client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null});	
-				client.socket.emit('resolve activity');
-				popup.close();	
+				var pollData = [{text: '3 cartas cualesquiera', player: $(listbox).val()}];
+				client.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': [{'action' : 'ForceDiscard', 'alias' : $(listbox).val(), 'amount' : 3, 'card' : null, 'to':null }, {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : null}] });
+				popup.close();
 			});
 			popup.addListener("dont", function(){
 				client.socket.emit('add activity', {'action' : 'RollDie'});

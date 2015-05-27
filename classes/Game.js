@@ -26,6 +26,12 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.blockResolve = false;
 		this.isTutorial = false;	//todos los juegos son asi, salvo que se juegue el tutorial
 		this.asyncAck = true; //flag para controlar la recepcion de respuestas ante eventos asíncronos
+		this.currentPoll = {
+			poller : null,
+			votes : [], 	//arreglo que guardan los votos de la poll actual
+			actions : []		//accion a tomar si la poll es positiva
+		};	
+		this.agreementFactor = 0.65;
 		//cosas que se cargan desde la Config en la DB
 		this.score = 0;
 	};
@@ -232,8 +238,11 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 			else{
 				console.log("No mas actividades!");
 			}
-		}
-		
+		}	
+	}
+
+	Game.prototype.repeatActivity = function(client){
+		this.io.to(client.id).emit('resolve activity', this.currentLocation.currentActivity.data);	//si no, emito que la termine
 	}
 
 	//Paso a la location siguiente

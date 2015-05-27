@@ -1,12 +1,19 @@
 Proximo commit:
 - arreglado tutorial que se podia llegar a romper; modifcado para ello advance location y startconflict
 -pasado schemas a un module de js, agregada la view para un sitio de admin
+-pasado todo lo que tenia que pasar a polls, creada la clase poll, repeat activity, etc.
+-cambiado el import de socket io
 
-
+	ojo:
+	-comente discard remove en linea 402 de Client. si anda algo mal puede ser por eso
+	-testear intensivamente las polls
+	-que pasa cuando alguien muiere? le sigue polleando? CHE QUE ARRRRRRRRR
+	-que pasa cuando queda uno solito? las polls no deberian hacerse (listo, pero CHE QUE AR)
 
 
 Bugs:
-
+- LA MORTE FLASHA GEDE
+- check discard a veces flasha, a veceeees no
 - cuando lleog a lothlorien hay un bug medio raro, puede deberse al cambio de anillo (investigate
 - un rolldie que se suponia deberia ir en ronda en el evetno "incendio en la torre" fue dos veces para el mismo player QUE ONDA (solucion pa testear)
 - la fcha se mueve como el ojete cuando va a mordor
