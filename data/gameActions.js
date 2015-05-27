@@ -439,11 +439,12 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 		apply : function(game, player,data){
 			data.cards = [];
 			for (var i=0; i<data.amount; i++){
-				data.cards.push(game.dealHobbitCard(game.hobbitCards.length-1));
+				data.cards.push(game.hobbitCards[game.hobbitCards.length-1-i]);
 			}
 			game.io.to(player.room).emit('update game', data);	
 		},
 		draw : function(client, data){
+			var pollData = [];
 			var popup = new Popup({title: "Repartir cartas", text: "Distribuye las cartas como desees. ",buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
 			//pongo los elementos de reparto de cada carta
 			var div = $("<div>  </div>");
@@ -452,7 +453,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 			for (i in data.cards){
 				var el = $("<div id='deal-card-div'>  </div> ");
 				el.append("<img src='./assets/img/ripped/"+data.cards[i].image+".png' class='player-card-img img-responsive'>");
-
+				pollData.push({'image': data.cards[i].image, 'player':null});
 				var listbox = $("<select class='card-to-selector'> </select>");
 				
 				for (j in people){
@@ -467,16 +468,28 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 			popup.append(div);
 
 			//cuando me dan ok envio cada carta al jugador correspondiente
+			//armar el discard bundle para poll y de acciones
+			
+			var actions = [];
 			popup.addListener("ok", function(){
+					var index = 0;
 					$(".card-to-selector").each(function(){
 						var to = $(this).val();
-						client.socket.emit('add activity', {'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});	//voy dando las cartas de a una
+						pollData[index].player = to;
+						index++;
+						actions.push({'action' : 'DealHobbitCards', 'amount' : 1, 'player' : to});
 					});
 				$(".card-to-selector").remove();
+
+				client.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': actions });
 				popup.close(); 
+
+				//chequear esto
+				/*
 				if (client.isActivePlayer()){
 					client.socket.emit('resolve activity');
 				}
+				*/
 			});
 
 			popup.draw(client);
@@ -496,6 +509,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				data['isConflict'] = game.currentLocation.isConflict;
 				data['events'] = game.currentLocation.events;
 				data['image'] = game.currentLocation.image;
+				//adicionalpara tutorial
+				data['isTutorial']=game.isTutorial;
 				game.io.to(player.room).emit('log message', {'msg' : "¡Los aventureros avanzan hacia la siguiente locación! ", 'mode':'good'});
 				data['victory'] = false;
 			}
@@ -525,14 +540,16 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 
 						//Agregar el div del anillo
 						if (client.isActivePlayer()){
-							client.turnPhase = "drawTiles";	
-							client.buttonCheck({phase: client.turnPhase});
-							$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Anillo"><br><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
-				        	
-				        	//debo agregar el chobi este acá
-				        	$("#use-ring-button").on('click', function(){
-						    	client.socket.emit('update game', {'action' : 'UseRing'});
-					    	});
+							if (!data.isTutorial){
+								client.turnPhase = "drawTiles";	
+								client.buttonCheck({phase: client.turnPhase});
+								$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Anillo"><br><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
+					        	
+					        	//debo agregar el chobi este acá
+					        	$("#use-ring-button").on('click', function(){
+							    	client.socket.emit('update game', {'action' : 'UseRing'});
+						    	});
+						    }
 						}
 				}
 				else{
@@ -1638,8 +1655,19 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 	"StartConflict" :  {
 		apply : function(game, player,data){
 			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+			data['isTutorial'] = game.isTutorial;
 		},
 		draw : function(client, data){
+			if (data.isTutorial){
+			client.turnPhase = "drawTiles";	
+								client.buttonCheck({phase: client.turnPhase});
+								$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Anillo"><br><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
+					        	
+					        	//debo agregar el chobi este acá
+					        	$("#use-ring-button").on('click', function(){
+							    	client.socket.emit('update game', {'action' : 'UseRing'});
+						    	});
+			}
 			client.socket.emit('next turn', {activePlayer : client.alias});	//enviar siguiente actividad
 		}
 	},

@@ -2,11 +2,13 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
 var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy;
 var LocalStrategy = require('passport-local').Strategy;
-var User = require('./schemas.js').userSchema;
+var User = {};
 // load the auth variables
 var configAuth = require('./auth');
 
-module.exports = function(passport) {
+module.exports = function(passport,schemas) {
+    User = schemas.userSchema;
+
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
         done(null, user.id);
@@ -40,7 +42,6 @@ module.exports = function(passport) {
 
             // check if the user is already logged in
             if (!req.user) {
-
                 User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
                     if (err)
                         return done(err);

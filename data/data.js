@@ -44,6 +44,36 @@ define([], function () {
 
 	exports.storyTiles = ["Friendship","Friendship","Friendship","Travelling","Travelling","Travelling","Hiding","Hiding","Hiding","Fighting","Fighting","Fighting","Next Event","Next Event","Next Event","Next Event","Next Event","Next Event","Ring Influence","Ring Influence","Sauron Will"];
 
+
+	//en la DB
+
+	/*
+	"storyTiles" : [ 
+                "Friendship", 
+                "Friendship", 
+                "Friendship", 
+                "Travelling", 
+                "Travelling", 
+                "Travelling", 
+                "Hiding", 
+                "Hiding", 
+                "Hiding", 
+                "Fighting", 
+                "Fighting", 
+                "Fighting", 
+                "Next Event", 
+                "Next Event", 
+                "Next Event", 
+                "Next Event", 
+                "Next Event", 
+                "Next Event", 
+                "Ring Influence", 
+                "Ring Influence", 
+                "Sauron Will", 
+                "Out Of Options", 
+                "Losing Ground"
+            ],
+	*/
 	exports.hobbitCards = [];
 
 	for (var i=0; i<7; i++){

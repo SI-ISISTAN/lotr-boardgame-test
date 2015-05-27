@@ -1,18 +1,20 @@
 Proximo commit:
-- se agrego los chats a la db
+-cambiado colores en consola
+-se guardan las polls en la actividad correspondiente en la DB
 
+	ojo:
+	-comente discard remove en linea 402 de Client. si anda algo mal puede ser por eso
+	-testear intensivamente las polls
+	-que pasa cuando alguien muiere? le sigue polleando? CHE QUE ARRRRRRRRR
+	-que pasa cuando queda uno solito? las polls no deberian hacerse (listo, pero CHE QUE AR)
 
-En testing:
-- TENGO QUE VOLVER A ARREGLAR EL QUE TIRA END SCNEARIO 2 VECES LA CONCHA DE MI VIEJA
 
 Bugs:
-
-- cuando lleog a lothlorien hay un bug medio raro, puede deberse al cambio de anillo (investigate)
-
+- LA MORTE FLASHA GEDE
+- check discard a veces flasha, a veceeees no
+- cuando lleog a lothlorien hay un bug medio raro, puede deberse al cambio de anillo (investigate
 - un rolldie que se suponia deberia ir en ronda en el evetno "incendio en la torre" fue dos veces para el mismo player QUE ONDA (solucion pa testear)
 - la fcha se mueve como el ojete cuando va a mordor
--despues de jugar la carta especial deberia cerrar la ventanita
--no se activo la carta especial para evitar el efecto de una tirada de dado. seguramente porque el jugador no era el active player
 
 
 Fixed:
@@ -21,3 +23,4 @@ Fixed:
 Falta:
 
 - manejar la desconexion
+- hay que agregar un campo loggedin y un campo linked en usuario. o algo así. qcyo

@@ -307,6 +307,8 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 
 	Client.prototype.commonDiscard = function(data){
 		var self = this;
+		//en este objeto guardo todo lo preciso para la poll
+		var pollData = [];
 		var popup = new Popup({
 					title: "Descarte común", 
 					text: "Debes elegir a los jugadores que harán los descartes.", 
@@ -361,6 +363,8 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						else if (data.elements[i].token == 'sun') texto+="de Sol";
 
 					}
+					//Guardo el texto en el objeto de la poll
+					pollData.push({'text' : texto, 'player':null});
 
 					//Fin de la instanciacion or contenido
 					el.append("<p>"+texto+"</p>");
@@ -381,15 +385,23 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 
 				popup.addListener("discard", function(){
 					var discards = [];
+					var index = 0;
 					$(".discard-selector").each(function(){
 						var name = $(this).val();
 						discards.push({'alias' : name, 'discard' : $(this).data("element")});
+						//agrego el user a descartar a la poll
+						pollData[index].player = name;
+						index++;
 					});
 					
-					self.socket.emit('add activity', {'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : data.defaultAction, 'discardActions' : data.discardActions});	//voy dando las cartas de a una
-					self.socket.emit('resolve activity');
-					$(".discard-selector").remove();	
-					popup.close();	
+					//si le doy el ok, tengo que hacer la poll. esto implica pollear a todos los que no sean el activo
+					//tambien tendria que guardar el discard propuesto en algun lado para tirar el evento check
+					self.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': [{'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : data.defaultAction, 'discardActions' : data.discardActions}] });
+					//po que?
+					$(".discard-selector").remove();
+					popup.close();
+
+
 				});
 				popup.addListener("dont-discard", function(){
 					//hay que ejecutar el siguiente evento. pajita

@@ -131,9 +131,9 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//El cliente pide unirse a una partida
 			client.on('join game', function (data){
-				if (data.gameID!='undefined'){
+				if (typeof(data.gameID)!='undefined'){
 					var client_obj = {'id' : client.id, 'alias': client.alias, 'userID':client.userID};
-					self.activeGames[data.gameID].addPlayer(client_obj);
+					self.activeGames[data.gameID].addPlayer(client_obj);			
 					self.disconnectClient(client.id);
 					io.to('waiting').emit('join game',{'gameID' : data.gameID, 'alias':client.alias});				
 					client.room = data.gameID;	//Setear la room del juego
@@ -231,7 +231,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						player.ready = true;
 					}
 				}
-				io.to('waiting').emit('toggle ready', {'player': client.player });	//repetir el evento a los otros clientes
+				io.to('waiting').emit('toggle ready', {'player': client.player });	
 
 				if (self.activeGames[client.room].canGameStart()){
 					self.activeGames[client.room].isActive = true;
@@ -336,7 +336,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				console.log("Llego a client manager un update de actividad: "+data.action);
 				var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				if (update.name!="ChangeLocation"){
-					console.log("Setee como nueva act: "+update.name);
 					self.activeGames[client.room].currentLocation.currentActivity = update;
 				}
 				self.activeGames[client.room].update(update, client, data);
@@ -356,6 +355,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							game.gameActions.push({'player' : client.alias, 'action': data.action, 'data' : newData});
 							//si la accion es "end game" hago un guardado especial: el del resultado del juego
 							if (data.action=="EndGame"){
+								game.complete = true;
 								game.result.victory = data.success;
 								game.result.reason = data.reason;
 								game.result.score = data.score;
@@ -404,7 +404,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						}
 					});
 				}
-				else{console.log("el async es true");}
 			});
 
 			//e agrega una subactividad a la actividad que está en curso en ese momento, que se ejecutará cuando se resuelva la actividad en curso
@@ -434,6 +433,10 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					self.activeGames[client.room].resolveActivity(client);
 				}
 
+			});
+
+			client.on('repeat activity', function (data){
+					self.activeGames[client.room].repeatActivity(client);
 			});
 
 			//Se resuleve una actividad
@@ -466,6 +469,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					}
 				});
 			});
+
 
 			//jugar el tuto
 			client.on('play tutorial', function (data){
@@ -514,6 +518,88 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					client.in('waiting').broadcast.emit('user disconnect',{ 'alias' : client.alias});
 
 			});
+
+			//Mensajes de poll
+			client.on('new poll', function (data){
+				io.to(client.room).emit('log message', {'msg' : client.alias+" ha elaborado una propuesta para la decisión común.", 'mode':'alert'});
+				self.activeGames[client.room].currentPoll.votes = [];
+				self.activeGames[client.room].currentPoll.actions = data.actions;
+				self.activeGames[client.room].currentPoll.poller = client.alias;
+				if (self.activeGames[client.room].getAlivePlayers().length>1){
+					self.activeGames[client.room].currentPoll.votes.push({'alias': client.alias, 'agree': true});
+					var alive = self.activeGames[client.room].getAlivePlayers();
+					for (i in alive){
+						io.to(alive[i].id).emit('new poll',data);
+					}
+					
+				}
+				else{
+					io.to(self.activeGames[client.room].activePlayer.id).emit('emit and resolve', {'actions': self.activeGames[client.room].currentPoll.actions});
+				}
+
+			});	
+
+			//Mensajes de poll
+			client.on('poll vote', function (data){
+				self.activeGames[client.room].currentPoll.votes.push({'alias': client.alias, 'agree': data.agree});
+				if (data.agree){
+					io.to(client.room).emit('log message', {'msg' : client.alias+" ha votado positivo a la propuesta de "+self.activeGames[client.room].currentPoll.poller+". ", 'mode':'upvote'});
+				}
+				else{
+					io.to(client.room).emit('log message', {'msg' : client.alias+" ha votado negativo a la propuesta de "+self.activeGames[client.room].currentPoll.poller+". ", 'mode':'downvote'});
+				}
+				
+				//Si ya se recabaron todos los votos, se ve que se hace
+				if (self.activeGames[client.room].currentPoll.votes.length == self.activeGames[client.room].getAlivePlayers().length){
+					var votes = self.activeGames[client.room].currentPoll.votes;
+					var yays = 0;
+					var nays = 0; 
+					var agreement =false;
+					for (i in votes){
+						if (votes[i].agree){
+							yays++;
+						}
+						else{
+							nays++;
+						}
+					}
+					if (yays >= Math.ceil(self.activeGames[client.room].agreementFactor*votes.length)){
+						agreement = true;
+						io.to(client.room).emit('log message', {'msg' : "La propuesta de "+self.activeGames[client.room].currentPoll.poller+" ha sido aprobada, por "+yays+" votos positivos contra "+nays+" negativos.", 'mode':'alert'});
+						io.to(self.activeGames[client.room].activePlayer.id).emit('emit and resolve', {'actions': self.activeGames[client.room].currentPoll.actions});
+					}
+					else{
+						io.to(client.room).emit('log message', {'msg' : "La propuesta de "+self.activeGames[client.room].currentPoll.poller+" no ha sido aprobada, por "+yays+" votos positivos contra "+nays+" negativos. Deberá elaborar otra propuesta. ", 'mode':'alert'});
+						io.to(self.activeGames[client.room].activePlayer.id).emit('repeat activity');
+					}
+
+				//guardo la poll en al accion en la db
+					self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
+						if (err){
+							return err;
+						}
+						if (game){
+								//guardo la poll en la actividad
+								var item = game.gameActions[game.gameActions.length-1];
+								game.gameActions.splice(game.gameActions.length-1,1);
+								item['poll'] = {
+									'poller' : self.activeGames[client.room].currentPoll.poller,
+									'votes' : self.activeGames[client.room].currentPoll.votes,
+									'agreement' : agreement
+								};
+
+								game.gameActions.push(item);
+								game.save(function(err) {
+		                            if (err){
+		                                throw err;
+		                            }
+		                    	});
+						}
+					});
+				}
+			});	
+
+
 
 			//Se desconecto un usuario
 			client.on('disconnect', function (){
