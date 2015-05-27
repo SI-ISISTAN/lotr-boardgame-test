@@ -396,7 +396,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 					
 					//si le doy el ok, tengo que hacer la poll. esto implica pollear a todos los que no sean el activo
 					//tambien tendria que guardar el discard propuesto en algun lado para tirar el evento check
-					self.socket.emit('new poll', {'data' : pollData, 'activePlayer': client.alias, 'actions': [{'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : data.defaultAction, 'discardActions' : data.discardActions}] });
+					self.socket.emit('new poll', {'data' : pollData, 'activePlayer': self.alias, 'actions': [{'action' : 'CheckDiscard', 'discards' : discards, 'defaultAction' : data.defaultAction, 'discardActions' : data.discardActions}] });
 					//po que?
 					$(".discard-selector").remove();
 					popup.close();
