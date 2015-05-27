@@ -1,8 +1,6 @@
 Proximo commit:
-- arreglado tutorial que se podia llegar a romper; modifcado para ello advance location y startconflict
--pasado schemas a un module de js, agregada la view para un sitio de admin
--pasado todo lo que tenia que pasar a polls, creada la clase poll, repeat activity, etc.
--cambiado el import de socket io
+-cambiado colores en consola
+-se guardan las polls en la actividad correspondiente en la DB
 
 	ojo:
 	-comente discard remove en linea 402 de Client. si anda algo mal puede ser por eso

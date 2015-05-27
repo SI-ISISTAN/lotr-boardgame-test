@@ -248,16 +248,16 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    //mensaje de log
 	    socket.on('log message', function(res){
 	    	if (res.mode=='alert'){
-	        	$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #BDBDBD;"> '+ res.msg+' </b> </p>');
+	        	$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #F3F781;"> '+ res.msg+' </b> </p>');
 	    	}
 	    	else if (res.mode=='info'){
-	    		$("#chat-msg-div").append('<p style= "color: #BDBDBD" class="chat-message"> '+ res.msg+' </p>');
+	    		$("#chat-msg-div").append('<p style= "color: #F3F781" class="chat-message"> '+ res.msg+' </p>');
 	    	}
 	    	else if (res.mode=='danger'){
 	    		$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #FE9A2E;"> '+ res.msg+' </b> </p>');
 	    	}
 	    	else if (res.mode=='good'){
-	    		$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #D8F781;"> '+ res.msg+' </b> </p>');
+	    		$("#chat-msg-div").append('<p class="chat-message"> <b style= "color: #58FA82;"> '+ res.msg+' </b> </p>');
 	    	}
 	    	else if (res.mode=='tip'){
 	    		$("#chat-msg-div").append('<p style= "color: #58D3F7" class="chat-message"> '+ res.msg+' </p>');

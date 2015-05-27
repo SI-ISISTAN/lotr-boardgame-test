@@ -554,6 +554,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					var votes = self.activeGames[client.room].currentPoll.votes;
 					var yays = 0;
 					var nays = 0; 
+					var agreement =false;
 					for (i in votes){
 						if (votes[i].agree){
 							yays++;
@@ -563,6 +564,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						}
 					}
 					if (yays >= Math.ceil(self.activeGames[client.room].agreementFactor*votes.length)){
+						agreement = true;
 						io.to(client.room).emit('log message', {'msg' : "La propuesta de "+self.activeGames[client.room].currentPoll.poller+" ha sido aprobada, por "+yays+" votos positivos contra "+nays+" negativos.", 'mode':'alert'});
 						io.to(self.activeGames[client.room].activePlayer.id).emit('emit and resolve', {'actions': self.activeGames[client.room].currentPoll.actions});
 					}
@@ -570,6 +572,30 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						io.to(client.room).emit('log message', {'msg' : "La propuesta de "+self.activeGames[client.room].currentPoll.poller+" no ha sido aprobada, por "+yays+" votos positivos contra "+nays+" negativos. Deberá elaborar otra propuesta. ", 'mode':'alert'});
 						io.to(self.activeGames[client.room].activePlayer.id).emit('repeat activity');
 					}
+
+				//guardo la poll en al accion en la db
+					self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
+						if (err){
+							return err;
+						}
+						if (game){
+								//guardo la poll en la actividad
+								var item = game.gameActions[game.gameActions.length-1];
+								game.gameActions.splice(game.gameActions.length-1,1);
+								item['poll'] = {
+									'poller' : self.activeGames[client.room].currentPoll.poller,
+									'votes' : self.activeGames[client.room].currentPoll.votes,
+									'agreement' : agreement
+								};
+
+								game.gameActions.push(item);
+								game.save(function(err) {
+		                            if (err){
+		                                throw err;
+		                            }
+		                    	});
+						}
+					});
 				}
 			});	
 
