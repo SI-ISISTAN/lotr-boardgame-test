@@ -7,7 +7,7 @@ var app      = express();
 var flash    = require('connect-flash');
 var requirejs = require('requirejs');
 var server = http.createServer(app);
-
+var bcrypt   = require('bcrypt-nodejs');
 requirejs.config({
     //Pass the top-level main.js/index.js require
     //function to requirejs so that node modules
@@ -18,6 +18,7 @@ requirejs.config({
     }
 });
 var mongoose = require('mongoose');
+
 mongoose.connect('mongodb://matanegui:patrite0@ds061611.mongolab.com:61611/lotr-test');
 
 var ClientManager = requirejs('./classes/ClientManager');
@@ -69,11 +70,12 @@ app.get('/lotr', isLoggedIn, function(req, res) {
 
     });
 
-app.get('/admin', isLoggedIn, function(req, res) {
-        res.render('admin.ejs', {
-            user : req.user,
-            holu : "je"
-        });
+app.get('/admin', isAdminLoggedIn, function(req, res) {  
+        res.render('admin.ejs', {});
+    });
+
+app.get('/login', function(req, res) {
+        res.render('login.ejs', { message: req.flash('loginMessage') });
 
     });
 
@@ -98,6 +100,12 @@ app.get('/survey', isLoggedIn, function(req, res) {
 // =============================================================================
 // AUTHENTICATE (NOT LOGGED IN) =============
 // =============================================================================
+ // process the login form
+    app.post('/login', passport.authenticate('local-login', {
+        successRedirect : '/admin', // redirect to the secure profile section
+        failureRedirect : '/login', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    }));
 
 // facebook --------------------------------
 app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['email','user_friends'] }));
@@ -136,12 +144,12 @@ app.get('/auth/facebook/callback',
 // AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============
 // =============================================================================
 
-    // locally --------------------------------
+     // locally --------------------------------
         app.get('/connect/local', function(req, res) {
             res.render('connect-local.ejs', { message: req.flash('loginMessage') });
         });
         app.post('/connect/local', passport.authenticate('local-signup', {
-            successRedirect : '/profile', // redirect to the secure profile section
+            successRedirect : '/login', // redirect to the secure profile section
             failureRedirect : '/connect/local', // redirect back to the signup page if there is an error
             failureFlash : true // allow flash messages
         }));
@@ -245,6 +253,89 @@ app.get('/auth/facebook/callback',
 		res.redirect('/');
 	});
 
+//Otras llamadas get y post
+
+//Obtengo todas las configuraciones para el sitio de admin
+app.get("/getconfigs", function(req, res){
+        //retornar esquemas
+        var configs = {};
+                    schemas.configSchema.findOne({}, function(err, config){
+                        if (err){
+                            return err;
+
+                        }
+                        if (config){
+                                configs = config.configs;
+                                res.json({ 'configs' : configs, 'default':config.currentConfig });
+                        }
+                    });
+    
+});
+
+app.post("/changeconfig", function(req, res){
+        schemas.configSchema.findOne({}, function(err, config){
+                        if (err){
+                            return err;
+
+                        }
+                        if (config){
+                                //debo encontrar la config y cambiarla
+                                var i=0;
+                                var found = false;
+                                while (!found && i<config.configs.length){
+                                    if (config.configs[i].configName == req.body.config){
+                                        found=true;
+                                        config.configs.splice(i,1);
+                                        config.configs.push(req.body.data);
+                                        config.save(function(err) {
+                                            if (err){
+                                                throw err;
+                                            }
+                                            else{
+                                                res.json({ 'success' : true });
+                                            }
+                                        });
+                                    }
+                                    i++;
+                                }
+                                if (!found){
+                                    config.configs.push(req.body.data);
+                                        config.save(function(err) {
+                                            if (err){
+                                                throw err;
+                                            }
+                                            else{
+                                                res.json({ 'success' : true });
+                                            }
+                                        });
+                                }
+                        }
+                    });
+    
+});
+
+app.post("/changedefault", function(req, res){
+        schemas.configSchema.findOne({}, function(err, config){
+                        if (err){
+                            return err;
+
+                        }
+                        if (config){
+                                //debo encontrar la config y cambiarla
+                                config.currentConfig = req.body.default;
+                                config.save(function(err) {
+                                            if (err){
+                                                throw err;
+                                            }
+                                            else{
+                                                res.json({ 'success' : true });
+                                            }
+                                });
+                        }
+                    });
+    
+});
+
 // route middleware to make sure
 function isLoggedIn(req, res, next) {
 
@@ -254,6 +345,15 @@ function isLoggedIn(req, res, next) {
 
 	// if they aren't redirect them to the home page
 	res.redirect('/');
+}
+
+function isAdminLoggedIn(req, res, next) {
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated() && typeof (req.user)!= 'undefined' &&  typeof(req.user.admin.username) != 'undefined')
+        return next();
+
+    // if they aren't redirect them to the home page
+    res.redirect('/');
 }
 
 

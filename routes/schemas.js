@@ -1,5 +1,4 @@
-define (['mongoose'], function(mongoose){
-
+define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
     //Ejemplo ser eliminado de forma impiadosa
     
     // define the schema for our user model
@@ -7,6 +6,10 @@ define (['mongoose'], function(mongoose){
 
         local            : {
             userID : String
+        },
+        admin : {
+            username : String,
+            password : String
         },
         facebook         : {
             id           : String,
@@ -34,6 +37,11 @@ define (['mongoose'], function(mongoose){
             }
         },
         recomendations : Array
+    });
+
+    var adminSchema = mongoose.Schema({
+        username : String,
+        password : String
     });
 
     var gameSchema = mongoose.Schema({
@@ -89,10 +97,23 @@ define (['mongoose'], function(mongoose){
         return bcrypt.compareSync(password, this.local.password);
     };
 
+    // generating a hash
+    adminSchema.methods.generateHash = function(password) {
+        return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+    };
+
+    // checking if password is valid
+    userSchema.methods.validPasswordAdmin = function(password) {
+        console.log(password);
+        console.log(this.admin.password)
+        return (password == this.admin.password);
+    };
+
 
     var schemas = {};
     // create the model for users and expose it to our app
     schemas.userSchema = mongoose.model('User', userSchema);
+    schemas.adminSchema = mongoose.model('Admin', adminSchema);
     schemas.gameSchema = mongoose.model('Game', gameSchema);
     schemas.configSchema = mongoose.model('Config', configSchema);
     schemas.chatSchema = mongoose.model('Chat', chatSchema);

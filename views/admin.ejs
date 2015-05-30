@@ -8,18 +8,42 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script data-main="/admin.js" src="/node_modules/requirejs/require.js"></script>
   </head>
-  <body class="main-div">
+  <body class="main-div" >
         <h3> Pagina de admin</h3>
+        <br>
         <div class="row" id="auth-row">
             <div class="col-md-1">
             </div>
             <div class="col-md-3">
+            <p> Configuracion por defecto: </p>
+            <p><select id="default-select" style="color : black">
+            </select></p>
+            <button class="btn btn-warning btn-sm" disabled="disabled" id="default-change-button">Guardar configuración por defecto</button>
+            <br><br>
+            <p> La configuracion por defecto es aquella que se usa por defecto para todas las partidas inciadas en la plataforma. </p>
+            <br><br>
+            <p> Ver configuracion: </p>
+            <p><select id="config-select" style="color : black">
+            </select></p>
+            <br>
+                <p> Seleccione una configuración de la lista para visualizarla y editarla en el panel derecho. Si desea guardarla, hágalo con el botón "Guardar cambios...". </p>
+                <br><br>
+                <button class="btn btn-warning btn-sm" id="new-config-button">Crear nueva configuración</button>
             </div>
             <div class="col-md-1">
             </div>
             <div class="col-md-6">
+            <p> Ver configuracion: </p>
+                <textarea id="json-area" cols="100" rows="20" style="color:#58FA82;  width:100%; height:100%; background-color: #4d4d4a">
+                </textarea>
+                <br><br>
+                <button class="btn btn-warning btn-lg" id="config-change-button">Guardar cambios en la configuración</button>
+                <br><br>
+                 <p>Volver al <a href="/">home</a>.</p>
             </div>
             <div class="col-md-1">
             </div>
+
         </div>
+    </body>
 </html>
