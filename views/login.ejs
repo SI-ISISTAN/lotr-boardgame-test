@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <title>LOtR - Administrador</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <style>
+        body        { padding-top:80px; }
+    </style>
+    <link rel="stylesheet" type="text/css" href="./style/lobby.css" media="screen" />
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <!--<script data-main="/admin.js" src="/node_modules/requirejs/require.js"></script>-->
+   </head>
+    <body class="main-div">
+    <div class="row">
+
+    <div class="col-sm-6 col-sm-offset-3">
+
+        <h1><span class="fa fa-sign-in"></span> Login de Administrador </h1>
+
+        <!-- show any messages that come back with authentication -->
+        <% if (message.length > 0) { %>
+            <div class="alert alert-danger"><%= message %></div>
+        <% } %>
+
+        <!-- LOGIN FORM -->
+        <form action="/login" method="post">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" class="form-control" name="username">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" class="form-control" name="password">
+            </div>
+
+            <button type="submit" class="btn btn-warning btn-lg">Login</button>
+        </form>
+
+        <hr>
+
+        <p>Volver al <a href="/">home</a>.</p>
+
+    </div>
+
+    </div>
+    </body>
+</html>
