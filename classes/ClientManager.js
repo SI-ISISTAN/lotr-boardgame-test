@@ -334,45 +334,48 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//Updatear juego con activity
 			client.on('update game', function (data){
 				console.log("Llego a client manager un update de actividad: "+data.action);
-				var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
-				if (update.name!="ChangeLocation"){
-					self.activeGames[client.room].currentLocation.currentActivity = update;
+				if (!self.activeGames[client.room].ended){
+					var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
+					if (update.name!="ChangeLocation"){
+						self.activeGames[client.room].currentLocation.currentActivity = update;
+					}
+					self.activeGames[client.room].update(update, client, data);
+					//guardo la acicon en la DB
+					self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
+						if (err){
+							return err;
+						}
+						if (game){
+								//evitar el guardado de informacion redundante (lista de players, etc)
+								var newData = {};
+								Object.keys(data).forEach(function(key, index) {
+							  	if (key != "players" && key != "spaces"){
+									  newData[key] = this[key];
+								}
+								}, data);
+								game.gameActions.push({'player' : client.alias, 'action': data.action, 'data' : newData});
+								//si la accion es "end game" hago un guardado especial: el del resultado del juego
+								if (data.action=="EndGame"){
+									game.complete = true;
+									game.result.victory = data.success;
+									game.result.reason = data.reason;
+									game.result.score = data.score;
+								}
+								game.save(function(err) {
+		                            if (err){
+		                                throw err;
+		                            }
+		                    	});
+						}
+					});
 				}
-				self.activeGames[client.room].update(update, client, data);
-				//guardo la acicon en la DB
-				self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
-					if (err){
-						return err;
-					}
-					if (game){
-							//evitar el guardado de informacion redundante (lista de players, etc)
-							var newData = {};
-							Object.keys(data).forEach(function(key, index) {
-						  	if (key != "players" && key != "spaces"){
-								  newData[key] = this[key];
-							}
-							}, data);
-							game.gameActions.push({'player' : client.alias, 'action': data.action, 'data' : newData});
-							//si la accion es "end game" hago un guardado especial: el del resultado del juego
-							if (data.action=="EndGame"){
-								game.complete = true;
-								game.result.victory = data.success;
-								game.result.reason = data.reason;
-								game.result.score = data.score;
-							}
-							game.save(function(err) {
-	                            if (err){
-	                                throw err;
-	                            }
-	                    	});
-					}
-				});
+				
 			});
 
 			//Updatea que no respeta la estructura (evento súbito, como la desconexion de un jugador)
 			client.on('sudden update', function (data){
 				console.log("Sudden update: "+data.action);	
-				if (!self.activeGames[client.room].asyncAck){
+				if (!self.activeGames[client.room].asyncAck || data.action=="KillPlayer"){
 					self.activeGames[client.room].asyncAck = true;
 					var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 					self.activeGames[client.room].update(update, client, data);

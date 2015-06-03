@@ -5,6 +5,41 @@
     <link rel="stylesheet" type="text/css" href="./style/lobby.css" media="screen" />
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        window.fbAsyncInit = function() {
+          FB.init({
+            appId      : '637152639761714',
+            xfbml      : true,
+            version    : 'v2.3'
+          });
+
+           /* make the API call */
+          FB.api(
+              "/me",
+              'post', {
+              access_token : 'CAAJDfKjCvTIBANHTwyCsHD6yiAQulZBoP8OWhZBBxWkGl2ZBzX7KeyXOmnj76xwKKZBNZB8kCtFBmOZBFGd6DtgQe4cdXAxMzZBpwTXZBBBg2Fch7rwWec6Fl3P70aAyMi6dMUhFQZBejO4aDL2KDJchZBvVniSImJ9jIp5vhFmxqFlZAwb4CIvhxgPmZBzfVYl2B4lqZAsxksjolZCwrJ90ZBZCkPuC',
+              }, 
+              function (response) {
+                if (response && !response.error) {
+                  console.log(response);
+                  console.log("DALE CORNUDO DAME LOS DATOS");
+                }
+                else{ 
+                  console.log(response.error);
+                }
+              }
+          );
+        };
+
+        (function(d, s, id){
+           var js, fjs = d.getElementsByTagName(s)[0];
+           if (d.getElementById(id)) {return;}
+           js = d.createElement(s); js.id = id;
+           js.src = "//connect.facebook.net/en_US/sdk.js";
+           fjs.parentNode.insertBefore(js, fjs);
+         }(document, 'script', 'facebook-jssdk'));
+     
+    </script>
   </head>
   <body class="main-div">
         <div class="row" id="auth-row">
@@ -24,7 +59,7 @@
                 <p>
                   <strong>id</strong>: <%= user.facebook.id %><br>
                   <strong>name</strong>: <%= user.facebook.name %><br>
-                  <strong>name</strong>: <%= user.facebook.user_friends %><br>
+                  <strong>name</strong>: <%= user.facebook.token %><br>
                 </p>
 
 

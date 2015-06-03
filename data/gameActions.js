@@ -252,7 +252,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 			//si debo matar la personaje por no tener las cartas minimas
 			if (data.dead){
 				if (client.alias == data.alias){
-					client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No tenía suficientes cartas para hacer un descarte obligatorio."});
+					client.socket.emit('sudden update', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "No tenía suficientes cartas para hacer un descarte obligatorio."});
 					client.socket.emit('resolve activity');
 				}
 			}else{
@@ -388,9 +388,9 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				$("#"+data.alias+"-chip").animate({
 					'left' : "+="+37*data.amount+"px" //moves right
 				},800, function(){
-					if (client.isActivePlayer()){
+					if (client.alias == data.alias){
 						if (data.dead){
-							client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
+							client.socket.emit('sudden update', {'action' : 'KillPlayer', 'alias':data.alias, 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
 							}	
 						}
 				});
@@ -424,7 +424,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 			},800, function(){
 				if (client.isActivePlayer()){
 					for (i in data.dead){
-						client.socket.emit('add activity', {'action' : 'KillPlayer', 'alias':data.dead[i], 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
+						client.socket.emit('sudden update', {'action' : 'KillPlayer', 'alias':data.dead[i], 'reason': "Se encontró con el Malvado en la Línea de Corrupción."});	
 					}
 					client.socket.emit('resolve activity');
 				}
@@ -928,22 +928,20 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				client.turnPhase = data.phase;
 				//activo y desactivo los botones de las cartas de acuerdo a en que fase del turno estoy
 				client.buttonCheck(data);
-					if (data.phase == 'playCards'){
-						$("#draw-tile-button").prop('disabled', true);
-						client.socket.emit('add activity', {'action' : 'CardsPhase'});
-						client.socket.emit('add activity', {'action' : 'NextPhase'});
-
-					}
-					else if (data.phase == 'cleanUp'){
-						client.socket.emit('add activity', {'action' : 'CleanUpPhase'});
-						
-					}
-					client.socket.emit('resolve activity');
+				if (data.phase == 'playCards'){
+					$("#draw-tile-button").prop('disabled', true);
+					client.socket.emit('add activity', {'action' : 'CardsPhase'});
+					client.socket.emit('add activity', {'action' : 'NextPhase'});
+				}
+				else if (data.phase == 'cleanUp'){
+					client.socket.emit('add activity', {'action' : 'CleanUpPhase'});
+				}
+				client.socket.emit('resolve activity');
 			}
 		}
 	},
 
-	//Pasar a la siguiente fase del turno
+	//Pasar al siguiente turno
 	"NextTurn" : {
 		apply : function(game, player,data){
 			if (game.isTutorial){	//si es tutorial no puedo dar siguiente turno porque el jguador 2 no existe
@@ -1587,6 +1585,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 			dead_player.sunTokens = 0;
 			dead_player.ringTokens = 0;
 			data['dead_player'] = dead_player;
+			data['active']=game.activePlayer.alias;
 			//si el muerto es el ring bearer temrina el juego
 			if (dead_player.alias == game.ringBearer.alias){
 				data['lose']=true;
@@ -1606,10 +1605,16 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				$("#"+data.dead_player.alias+"-state-div").append("<div class='dead-player-overlay'> </div>");
 				if (client.alias == data.alias){
 					client.player.dead = true;
+					client.disableInput();
+					client.closePopups();
 					if (!data.lose){
+						if (data.alias == data.active){
+							client.socket.emit('update game', {'action' : 'NextTurn'});
+						}
 						client.socket.emit('resolve activity');
 					}
 					else{
+						console.log("end game enviado");
 						client.socket.emit('update game', {'action' : 'EndGame', 'success':false, 'reason': "¡El Portador del Anillo ha muerto!"});
 					}
 					
@@ -1626,9 +1631,11 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				}				
 			}
 			data['score'] = game.score;
+			game.ended=true;
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
 		draw : function(client, data){
+			client.closePopups();
 			$("#main-game-div").fadeOut(300, function(){ $(this).remove();});
 			$("#end-game-div").appendTo('body').show('slow');
 			if (data.success){
