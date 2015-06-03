@@ -1,37 +1,17 @@
 Proximo commit:
--cambiado colores en consola
--se guardan las polls en la actividad correspondiente en la DB
+-El bug de la asignacion de nombres iguales. Indudablemente se debia a un disconnect client cuando
+	un jugador se unia o creabaa una partida. Hay que testear la solucion.
 
-	ojo:
-	-comente discard remove en linea 402 de Client. si anda algo mal puede ser por eso
-	-testear intensivamente las polls
-	-que pasa cuando alguien muiere? le sigue polleando? CHE QUE ARRRRRRRRR
-	-que pasa cuando queda uno solito? las polls no deberian hacerse (listo, pero CHE QUE AR)
+	
 
 
 Bugs:
-- LA MORTE FLASHA GEDE
-- check discard a veces flasha, a veceeees no
-- a veces cuando armo los polldata me tira un error en la linea 393 de Client que me impide darle click a discar. investigar
-- sigue mostrando carteles correspondientes a las fases una vez muerto el perro y pasado el siguiente turno
-- cuando meure un personaje en su turno y tira el nexst turn, esto puede ocurrir en medio de una actividad circular; ahi se descuajeringa el flujo
+- check discard a veces flasha, a veceeees no (solucion recursiva?)
+- a veces cuando armo los polldata me tira un error en la linea 393 de Client que me impide darle click a discar. investigar (?)
+- cuando meure un personaje en su turno y tira el nexst turn, esto puede ocurrir en medio de una actividad circular; ahi se descuajeringa el flujo (investigar)
 
-
-Fixed:
-
-
-Falta:
-
-- manejar la desconexion
-- hay que agregar un campo loggedin y un campo linked en usuario. o algo así. qcyo
-
-Para manejar mejor la muerte:
--se la implemento como sudden  update siempre con una expecion al asyncack en kill player (investigar si anda bien)
--hay que limitar que sigan llegadno actividades una vez puesto el endgame
+ojo:
+	-comente discard remove en linea 402 de Client. si anda algo mal puede ser por eso
 
 TODO:
--cuando amto a un jugador en el medio de su turno tengo que asegurar que no se emitan o acepten más mensajes (cambio de fase)
-
-EL TEMITA DEL FLUJO DE TURNOS CUANDO MUERE UN PJ:
--la solucion con turn interrupt no funciona porque el interrupt llega despues (sudden update+update, tarda mas que la actividad que genera el Resolve de killplayer)
--se puede probar tratarlo desde killplayer en client-side (proxiuma solucion)
+- recomendaciones. como?

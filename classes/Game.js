@@ -35,6 +35,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		//cosas que se cargan desde la Config en la DB
 		this.score = 0;
 		this.ended = false;
+		this.advices = [];
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -220,7 +221,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	Game.prototype.rollDie = function(){
 		//retorna n random entre 1 y 6
 		var n = Math.floor((Math.random() * 6) + 1);
-		return 5; 
+		return n; 
 	}
 
 	Game.prototype.moveSauron = function(amount){

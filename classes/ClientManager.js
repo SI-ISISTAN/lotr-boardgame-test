@@ -8,13 +8,14 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 	//Clase que maneja los jugadores conectados en el lobby
 	function ClientManager (schemas){
-		this.waitingList = [];
 		this.connectedClients = [];
+		this.clientsInGame = [];
 		this.activeGames = [];
 		this.loadedData = loadedData;
 		this.gameSchema = schemas.gameSchema;
 		this.userSchema = schemas.userSchema;
 		this.chatSchema = schemas.chatSchema;
+		this.adviceSchema =schemas.adviceSchema;
 		this.configSchema = schemas.configSchema;
 		console.log("Creado manager de clientes.");
 	};
@@ -65,6 +66,29 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 		}
 	};
 
+	//Agregar a juego
+	ClientManager.prototype.addClientToGame = function(id){
+		var found = false;
+		var i=0;
+		while (!found && i<this.connectedClients.length){
+			if (this.connectedClients[i].id == id){
+				found=true;
+			}
+			else{
+				i++;
+			}
+		}
+		if (found){	
+			var alias = this.connectedClients[i].alias;
+			this.connectedClients.splice(i,1);
+			this.clientsInGame.push(this.connectedClients[i]);
+			return {'alias' : alias};
+		}
+		else{
+			return {'alias' : null};
+		}
+	};
+
 	//Crear una nueva partida
 	ClientManager.prototype.createNewGame = function(client){
 			var game = new Game(io);
@@ -96,6 +120,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('connect user', function (data){
 				//Recorro el array de juegos activos
 				client.userID = data.userID;
+				client.surveyData = data.surveyData;
 				var activeGames = [];
 				Object.keys(self.activeGames).forEach(function(key, index) {
 						if (!this[key].isActive){	//si no esta ya jugandose
@@ -111,7 +136,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('new game', function (data){
 					var client_obj = {'id' : data.id, 'alias': data.alias, 'userID':client.userID};
 					var game_to_join = self.createNewGame(client_obj).id;
-					self.disconnectClient(client.id);
+					self.addClientToGame(client.id);
 					io.to('waiting').emit('new game',{'gameID' : game_to_join, 'creator':data.alias});				
 					//client.leave('waiting');	//Dejar la lista de espera
 					client.room = game_to_join;	//Setear la room del juego
@@ -134,7 +159,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				if (typeof(data.gameID)!='undefined'){
 					var client_obj = {'id' : client.id, 'alias': client.alias, 'userID':client.userID};
 					self.activeGames[data.gameID].addPlayer(client_obj);			
-					self.disconnectClient(client.id);
+					self.addClientToGame(client.id);
 					io.to('waiting').emit('join game',{'gameID' : data.gameID, 'alias':client.alias});				
 					client.room = data.gameID;	//Setear la room del juego
 					client.player = self.activeGames[data.gameID].getPlayerByID(client.id);		
@@ -283,6 +308,10 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						for (i in playersList){
 							newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character, userID: playersList[i].userID });
 						}
+
+						//meto en el juego las recomendaciones a usar
+						var ad = self.adviceSchema.find({}, {'type' : true, 'conditions':true});
+						console.log(ad);
 						
 						newGame.save(function(err) {
 	                            if (err){
@@ -609,11 +638,11 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
 					//reveer todo esto
-						if (self.activeGames[client.room].activePlayer.alias == client.alias){
+						if (self.activeGames[client.room].activePlayer != null && self.activeGames[client.room].activePlayer.alias == client.alias){
 							client.in(client.room).broadcast.emit('player disconnect', { 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El jugador activo se ha desconectado!"}});
 							self.activeGames[client.room].asyncAck = false;
 						}
-						else if(self.activeGames[client.room].ringBearer.alias == client.alias){
+						else if(self.activeGames[client.room].ringBearer != null && self.activeGames[client.room].ringBearer.alias == client.alias){
 							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El portador del Anillo se ha desconectado!"}});
 							self.activeGames[client.room].asyncAck = false;
 						}

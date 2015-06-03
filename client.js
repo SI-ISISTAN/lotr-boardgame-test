@@ -7,6 +7,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
     var client = new Client();
     client.socket = socket;
     var userID = "";
+    var surveyData = null;
     var surveycomplete = false;
 
 	////////////////////////////// MANEJO DE MENSAJES ////////////////////////////// 
@@ -15,7 +16,10 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
         //Me conecto
 		if (!client.connected){
-			socket.emit('connect user', {'userID' : userID});
+			$.post( "/getsurvey", {'userID' : userID}, function( data ) {
+        		surveyData = data.survey;
+        		socket.emit('connect user', {'userID' : userID, 'surveyData' : surveyData});
+	   	 	});
 			
 		}
 
@@ -490,19 +494,18 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 	function showGameInfo(){
 		
-	}
-  
-	    
+	}   
         $(document).ready(function(){	
         	userID = $("body").data("user");
         	surveycomplete = $("body").data("surveycomplete");
+
         	if (!surveycomplete){
         		$("#survey-button").show();
         	}
+        	
         	console.log("JQuery Init");
         	//tooltip (title fachero)
         	$(document).tooltip();
-
         	//MAIN LOOP DEL CLIENTE (no es un loop porque esta todo implementado con listeners)
         	message_listen();
         	input_listen();
