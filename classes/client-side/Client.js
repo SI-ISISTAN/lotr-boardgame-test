@@ -364,6 +364,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 
 					}
 					//Guardo el texto en el objeto de la poll
+					console.log("pusheo");
 					pollData.push({'text' : texto, 'player':null});
 
 					//Fin de la instanciacion or contenido
@@ -390,6 +391,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						var name = $(this).val();
 						discards.push({'alias' : name, 'discard' : $(this).data("element")});
 						//agrego el user a descartar a la poll
+						console.log(pollData);
 						pollData[index].player = name;
 						index++;
 					});
@@ -706,7 +708,12 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 			$(this).off('click');
 			$(this).addClass("grayed-out-card");
 		});
-		
+
+	}
+
+	Client.prototype.closePopups = function(){
+		console.log("mariano closse");
+		$(".ui-dialog").remove();
 
 	}
 

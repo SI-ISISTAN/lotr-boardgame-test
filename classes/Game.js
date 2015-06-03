@@ -34,6 +34,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.agreementFactor = 0.65;
 		//cosas que se cargan desde la Config en la DB
 		this.score = 0;
+		this.ended = false;
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -180,6 +181,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 		//Cargo cartas y tiles y mezclo cada pilon
 		var p=0;
+
 		while (p<config.storyTiles.length){
 			this.storyTiles.push(config.storyTiles[p]);
 			p++;
@@ -218,7 +220,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	Game.prototype.rollDie = function(){
 		//retorna n random entre 1 y 6
 		var n = Math.floor((Math.random() * 6) + 1);
-		return n; 
+		return 5; 
 	}
 
 	Game.prototype.moveSauron = function(amount){
