@@ -20,6 +20,7 @@ define([], function () {
 		this.hand = [];
 		this.corruption = 0;
 		this.dead= false;
+		this.surveyData = client.surveyData;
 	};
 
 	//Buscar una carta en la mano del jugador

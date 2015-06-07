@@ -74,6 +74,14 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				people[turn].addCard(card);
 				game.currentLocation.featureCards.splice(game.currentLocation.featureCards.length-1,1);
 				given.push({'card' : card, 'player' : people[turn].alias, 'number' : people[turn].hand.length-1});
+
+				//mostrar tip para la carta
+				var advices = game.getAdvices("Card",card.name, people[turn]);
+				for (t in advices){
+					game.io.to(people[turn].id).emit('log message', {'msg' : "Tip para la carta "+advices[t].name+": "+advices[t].text, 'mode':'tip'});
+					//game.io.to(people[turn].id).emit('show tip', {'advice' : advices[t]});
+				}
+
 				if (turn < people.length-1){
 					turn++;
 				}
@@ -500,6 +508,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 	//Se pasa a la siguiente locacion
 	"AdvanceLocation" : {
 		apply : function(game, player,data){
+			//recomendar locacion si hay
 			game.advanceLocation(data);
 			if (game.locationNumber == game.locations.length){
 				data['victory'] = true;
@@ -513,6 +522,14 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				data['isTutorial']=game.isTutorial;
 				game.io.to(player.room).emit('log message', {'msg' : "¡Los aventureros avanzan hacia la siguiente locación! ", 'mode':'good'});
 				data['victory'] = false;
+			}
+			//muestro tips de location
+			for (p in game.players){
+				var advices = game.getAdvices("Location",game.currentLocation.name, game.players[p]);
+				for (j in advices){
+					game.io.to(game.players[p].id).emit('log message', {'msg' : "Tip para el escenario "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
+					//game.io.to(game.players[p].id).emit('show tip', {'advice' : advices[j]});
+				}
 			}
 			game.io.to(player.room).emit('update game', data);	//repetir el evento al jugador
 		},
@@ -1207,6 +1224,15 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				data['dealt'] = null;
 			}
 			game.io.to(player.room).emit('log message', {'msg' : data.player+" recibe como recompensa una Carta Especial.", 'mode':'info'});
+			
+			//mostrar tip para la carta
+			if (data.dealt!=null){
+				var advices = game.getAdvices("Card",data.dealt.name, game.getPlayerByAlias(data.player));
+				for (t in advices){
+					game.io.to(game.getPlayerByAlias(data.player).id).emit('log message', {'msg' : "Tip para la carta "+advices[t].name+": "+advices[t].text, 'mode':'tip'});
+					//game.io.to(people[turn].id).emit('show tip', {'advice' : advices[t]});
+				}
+			}
 			game.io.to(player.room).emit('update game', data);	//enviar siguiente actividad
 
 		},

@@ -134,7 +134,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//El cliente crea una partida nueva
 			client.on('new game', function (data){
-					var client_obj = {'id' : data.id, 'alias': data.alias, 'userID':client.userID};
+					var client_obj = {'id' : data.id, 'alias': data.alias, 'userID':client.userID,  'surveyData':client.surveyData};
 					var game_to_join = self.createNewGame(client_obj).id;
 					self.addClientToGame(client.id);
 					io.to('waiting').emit('new game',{'gameID' : game_to_join, 'creator':data.alias});				
@@ -157,7 +157,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//El cliente pide unirse a una partida
 			client.on('join game', function (data){
 				if (typeof(data.gameID)!='undefined'){
-					var client_obj = {'id' : client.id, 'alias': client.alias, 'userID':client.userID};
+					var client_obj = {'id' : client.id, 'alias': client.alias, 'userID':client.userID, 'surveyData':client.surveyData};
 					self.activeGames[data.gameID].addPlayer(client_obj);			
 					self.addClientToGame(client.id);
 					io.to('waiting').emit('join game',{'gameID' : data.gameID, 'alias':client.alias});				
@@ -186,7 +186,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				
 					var game_found = false;
 					var game_to_join = null;
-					var client_obj = {'id' : data.id, 'alias': data.alias};
+					var client_obj = {'id' : data.id, 'alias': data.alias, 'surveyData':client.surveyData};
 					
 					//Recorro el array de juegos activos
 					Object.keys(self.activeGames).forEach(function(key, index) {
@@ -283,7 +283,29 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 									if (found){
 										self.activeGames[client.room].start(configs[i]);	
 										var players = self.activeGames[client.room].players;
+										//meto en el juego las recomendaciones a usar (si la config usa consejos)
+										if (configs[i].showAdvice){
+											self.adviceSchema.find({}, function(err, result){
+												if (err){
+													console.log("Error");
+												}
+												else{
+													for (p in result){
+														if (result[p].type=="Location"){
+															self.activeGames[client.room].advices["Location"].push(result[p]);
+														}
+														if (result[p].type=="Card"){
+															self.activeGames[client.room].advices["Card"].push(result[p]);
+														}
+														if (result[p].type=="Activity"){
+															self.activeGames[client.room].advices["Activity"].push(result[p]);
+														}
+													}			
+												}
+											});
+										}
 										for (i in players){
+								
 											io.to(players[i].id).emit('ready to start');
 										}
 									}
@@ -309,9 +331,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character, userID: playersList[i].userID });
 						}
 
-						//meto en el juego las recomendaciones a usar
-						var ad = self.adviceSchema.find({}, {'type' : true, 'conditions':true});
-						console.log(ad);
+						
 						
 						newGame.save(function(err) {
 	                            if (err){
@@ -369,6 +389,15 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						self.activeGames[client.room].currentLocation.currentActivity = update;
 					}
 					self.activeGames[client.room].update(update, client, data);
+					
+					//muestro tips de actividad
+					for (p in self.activeGames[client.room].players){
+						var advices = self.activeGames[client.room].getAdvices("Activity",self.activeGames[client.room].currentLocation.currentActivity.name, self.activeGames[client.room].players[p]);
+						for (j in advices){
+							io.to(self.activeGames[client.room].players[p].id).emit('log message', {'msg' : "Tip para la actividad "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
+							//game.io.to(game.players[p].id).emit('show tip', {'advice' : advices[j]});
+						}
+					}
 					//guardo la acicon en la DB
 					self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
 						if (err){

@@ -339,15 +339,16 @@ app.post("/changedefault", function(req, res){
 //Obtener los datos de la encuesta
 app.post("/getsurvey", function(req, res){   
         var survey = null;
-        console.log("userid" + req.body.userID);
         schemas.userSchema.findOne({'local.userID' : req.body.userID}, function(err, user){
                         if (err){
                             return err;
 
                         }
-                        if (user && typeof(user.survey)!='undefined'){
+                        if (user){
+                            if (typeof(user.survey)!='undefined'){
                                 survey = user.survey;
-                                res.json({ 'survey' : survey });
+                            }
+                            res.json({ 'survey' : survey });
                         }
                     });
         

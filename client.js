@@ -1,7 +1,7 @@
 
    ////////////////////////////////////////// FUNCIONES VARIAS /////////////////////////////////////////////////////
 
-require(['./data/activities','./data/gameActions','./classes/client-side/Client','https://code.jquery.com/jquery-1.8.3.js','/socket.io/socket.io.js', 'https://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity','./classes/client-side/Poll'], function(activities, gameActions, Client, jquery, io, jqueryui, Activity, Poll){
+require(['./data/activities','./data/gameActions','./classes/client-side/Client','https://code.jquery.com/jquery-1.8.3.js','/socket.io/socket.io.js', 'https://code.jquery.com/ui/1.11.2/jquery-ui.min.js','./classes/Activity','./classes/client-side/Poll','./classes/client-side/Message'], function(activities, gameActions, Client, jquery, io, jqueryui, Activity, Poll, Message){
 
     var socket = io();  //habilito el socketo
     var client = new Client();
@@ -18,6 +18,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 		if (!client.connected){
 			$.post( "/getsurvey", {'userID' : userID}, function( data ) {
         		surveyData = data.survey;
+        		console.log(surveyData);
         		socket.emit('connect user', {'userID' : userID, 'surveyData' : surveyData});
 	   	 	});
 			
@@ -358,6 +359,12 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 	     socket.on('repeat activity', function(){
 	    	socket.emit('repeat activity');
+	    });
+
+	     //Aplicar un update del lado de cliente
+	    socket.on('show tip', function(res){
+	    		var msg = new Message({title: res.advice.name, text: res.advice.text, visibility:"all"});
+				msg.draw(client);
 	    });
 
 	    socket.on('connect_error', function(err) {

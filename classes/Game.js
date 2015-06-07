@@ -35,7 +35,11 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		//cosas que se cargan desde la Config en la DB
 		this.score = 0;
 		this.ended = false;
-		this.advices = [];
+		this.advices = {
+			"Location" : [],
+			"Card" : [],
+			"Activity" : []
+		};
 	};
 
 	//obtener el objeto player proveyendo un id de cliente
@@ -414,6 +418,24 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		else{
 			
 		}
+	}
+
+	//encuentro si hay recomendaciones de un tipo y nombre determinados (multiuso)
+	Game.prototype.getAdvices = function(type,name,player){
+		var found = [];
+		var advices = this.advices[type];
+		if (typeof(advices)!="undefined"){
+			for (i in advices){
+				if (advices[i].type == type && advices[i].name == name){
+					if (player.surveyData!=null){
+						if (eval(player.surveyData.result.up_down+advices[i].conditions.up_down.comparison+advices[i].conditions.up_down.value) && eval(player.surveyData.result.forward_backward+advices[i].conditions.forward_backward.comparison+advices[i].conditions.forward_backward.value) && eval(player.surveyData.result.positive_negative+advices[i].conditions.positive_negative.comparison+advices[i].conditions.positive_negative.value)){
+							found.push(advices[i]);
+						}
+					}
+				}
+			}
+		}
+		return found;
 	}
 
 	return Game;

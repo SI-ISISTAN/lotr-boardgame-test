@@ -102,8 +102,11 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
             text: String
         }]
     });
-
-
+       
+    // checking if password is valid       
+    userSchema.methods.validPasswordAdmin = function(password) {         
+       return (password == this.admin.password);      
+    };
 
     // generating a hash
     userSchema.methods.generateHash = function(password) {
