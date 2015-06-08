@@ -428,7 +428,20 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 			for (i in advices){
 				if (advices[i].type == type && advices[i].name == name){
 					if (player.surveyData!=null){
-						if (eval(player.surveyData.result.up_down+advices[i].conditions.up_down.comparison+advices[i].conditions.up_down.value) && eval(player.surveyData.result.forward_backward+advices[i].conditions.forward_backward.comparison+advices[i].conditions.forward_backward.value) && eval(player.surveyData.result.positive_negative+advices[i].conditions.positive_negative.comparison+advices[i].conditions.positive_negative.value)){
+						var eval_up_down = true;
+						var eval_positive_negative = true;
+						var eval_forward_backward = true;
+						if (advices[i].conditions.up_down.comparison != "ignore"){
+							console.log(advices[i].conditions.up_down);
+							eval_up_down = eval(player.surveyData.result.up_down+advices[i].conditions.up_down.comparison+advices[i].conditions.up_down.value);
+						}
+						if (advices[i].conditions.forward_backward.comparison != "ignore"){
+							eval_forward_backward = eval(player.surveyData.result.forward_backward+advices[i].conditions.forward_backward.comparison+advices[i].conditions.forward_backward.value);
+						}
+						if (advices[i].conditions.positive_negative.comparison != "ignore"){
+							eval_positive_negative= eval(player.surveyData.result.positive_negative+advices[i].conditions.positive_negative.comparison+advices[i].conditions.positive_negative.value)
+						}
+						if ( eval_up_down && eval_forward_backward && eval_positive_negative ){
 							found.push(advices[i]);
 						}
 					}

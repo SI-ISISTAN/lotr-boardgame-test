@@ -272,6 +272,18 @@ app.get("/getconfigs", function(req, res){
     
 });
 
+//Obtengo todas las recomendaciones
+app.get("/getadvices", function(req, res){
+    schemas.adviceSchema.find({}, function(err, result){
+        if (err){
+            console.log("Error");
+        }
+        else{
+            res.json({ 'advices' : result});           
+        }
+    });
+});
+
 app.post("/changeconfig", function(req, res){
         schemas.configSchema.findOne({}, function(err, config){
                         if (err){
@@ -311,7 +323,23 @@ app.post("/changeconfig", function(req, res){
                                 }
                         }
                     });
-    
+});
+
+app.post("/saveadvice", function(req, res){
+    var ad = new schemas.adviceSchema();
+    ad.type=req.body.type;
+    ad.name=req.body.name;
+    ad.text=req.body.text;
+    ad.explicit = req.body.explicit;
+    ad.conditions = req.body.conditions;
+    ad.save(function(err) {
+            if (err){
+                throw err;
+             }
+             else{
+                res.json({ 'success' : true });
+            }
+    });
 });
 
 app.post("/changedefault", function(req, res){
