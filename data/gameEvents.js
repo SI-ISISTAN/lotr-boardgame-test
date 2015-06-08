@@ -202,7 +202,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 		},
 		draw : function(client, data){
 
-			var popup = new Popup({title: "Elrond", text: "Cada jugador, comenzando por el Portador y siguiendo hasta el último, debe elegir una carta para pasársela al jugador siguiente.", buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
+			var popup = new Popup({title: "Consejo", text: "Cada jugador, comenzando por el Portador y siguiendo hasta el último, debe elegir una carta para pasársela al jugador siguiente.", buttons : [{name : "Ok", id:"ok"}], visibility : "active"});
 			popup.addListener("ok", function(){
 				popup.close();
 				var people = client.getAlivePlayers();
@@ -570,7 +570,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			
 		},
 		draw : function(client, data){
-			var popup = new Popup({title: "Recuperación", text: "Cada jugador, comenzando por el Portador, debe descartar un símbolo de Comodín. De no querer o no poder, debe lanzar el Dado.", buttons : [{name : "Descartar", id:"discard"},{name : "Lanzar el dado", id:"dont"}], visibility : data.player});
+			var popup = new Popup({title: "Prueba de la Dama", text: "Cada jugador, comenzando por el Portador, debe descartar un símbolo de Comodín. De no querer o no poder, debe lanzar el Dado.", buttons : [{name : "Descartar", id:"discard"},{name : "Lanzar el dado", id:"dont"}], visibility : data.player});
 			
 			popup.addListener("discard", function(){
 				popup.close();

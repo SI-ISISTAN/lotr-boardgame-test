@@ -8,13 +8,14 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 	//Clase que maneja los jugadores conectados en el lobby
 	function ClientManager (schemas){
-		this.waitingList = [];
 		this.connectedClients = [];
+		this.clientsInGame = [];
 		this.activeGames = [];
 		this.loadedData = loadedData;
 		this.gameSchema = schemas.gameSchema;
 		this.userSchema = schemas.userSchema;
 		this.chatSchema = schemas.chatSchema;
+		this.adviceSchema =schemas.adviceSchema;
 		this.configSchema = schemas.configSchema;
 		console.log("Creado manager de clientes.");
 	};
@@ -65,6 +66,29 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 		}
 	};
 
+	//Agregar a juego
+	ClientManager.prototype.addClientToGame = function(id){
+		var found = false;
+		var i=0;
+		while (!found && i<this.connectedClients.length){
+			if (this.connectedClients[i].id == id){
+				found=true;
+			}
+			else{
+				i++;
+			}
+		}
+		if (found){	
+			var alias = this.connectedClients[i].alias;
+			this.connectedClients.splice(i,1);
+			this.clientsInGame.push(this.connectedClients[i]);
+			return {'alias' : alias};
+		}
+		else{
+			return {'alias' : null};
+		}
+	};
+
 	//Crear una nueva partida
 	ClientManager.prototype.createNewGame = function(client){
 			var game = new Game(io);
@@ -96,6 +120,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('connect user', function (data){
 				//Recorro el array de juegos activos
 				client.userID = data.userID;
+				client.surveyData = data.surveyData;
 				var activeGames = [];
 				Object.keys(self.activeGames).forEach(function(key, index) {
 						if (!this[key].isActive){	//si no esta ya jugandose
@@ -109,9 +134,9 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//El cliente crea una partida nueva
 			client.on('new game', function (data){
-					var client_obj = {'id' : data.id, 'alias': data.alias, 'userID':client.userID};
+					var client_obj = {'id' : data.id, 'alias': data.alias, 'userID':client.userID,  'surveyData':client.surveyData};
 					var game_to_join = self.createNewGame(client_obj).id;
-					self.disconnectClient(client.id);
+					self.addClientToGame(client.id);
 					io.to('waiting').emit('new game',{'gameID' : game_to_join, 'creator':data.alias});				
 					//client.leave('waiting');	//Dejar la lista de espera
 					client.room = game_to_join;	//Setear la room del juego
@@ -132,9 +157,9 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//El cliente pide unirse a una partida
 			client.on('join game', function (data){
 				if (typeof(data.gameID)!='undefined'){
-					var client_obj = {'id' : client.id, 'alias': client.alias, 'userID':client.userID};
+					var client_obj = {'id' : client.id, 'alias': client.alias, 'userID':client.userID, 'surveyData':client.surveyData};
 					self.activeGames[data.gameID].addPlayer(client_obj);			
-					self.disconnectClient(client.id);
+					self.addClientToGame(client.id);
 					io.to('waiting').emit('join game',{'gameID' : data.gameID, 'alias':client.alias});				
 					client.room = data.gameID;	//Setear la room del juego
 					client.player = self.activeGames[data.gameID].getPlayerByID(client.id);		
@@ -161,7 +186,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				
 					var game_found = false;
 					var game_to_join = null;
-					var client_obj = {'id' : data.id, 'alias': data.alias};
+					var client_obj = {'id' : data.id, 'alias': data.alias, 'surveyData':client.surveyData};
 					
 					//Recorro el array de juegos activos
 					Object.keys(self.activeGames).forEach(function(key, index) {
@@ -258,7 +283,29 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 									if (found){
 										self.activeGames[client.room].start(configs[i]);	
 										var players = self.activeGames[client.room].players;
+										//meto en el juego las recomendaciones a usar (si la config usa consejos)
+										if (configs[i].showAdvice){
+											self.adviceSchema.find({}, function(err, result){
+												if (err){
+													console.log("Error");
+												}
+												else{
+													for (p in result){
+														if (result[p].type=="Location"){
+															self.activeGames[client.room].advices["Location"].push(result[p]);
+														}
+														if (result[p].type=="Card"){
+															self.activeGames[client.room].advices["Card"].push(result[p]);
+														}
+														if (result[p].type=="Activity"){
+															self.activeGames[client.room].advices["Activity"].push(result[p]);
+														}
+													}			
+												}
+											});
+										}
 										for (i in players){
+								
 											io.to(players[i].id).emit('ready to start');
 										}
 									}
@@ -283,6 +330,8 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						for (i in playersList){
 							newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character, userID: playersList[i].userID });
 						}
+
+						
 						
 						newGame.save(function(err) {
 	                            if (err){
@@ -340,6 +389,15 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						self.activeGames[client.room].currentLocation.currentActivity = update;
 					}
 					self.activeGames[client.room].update(update, client, data);
+					
+					//muestro tips de actividad
+					for (p in self.activeGames[client.room].players){
+						var advices = self.activeGames[client.room].getAdvices("Activity",self.activeGames[client.room].currentLocation.currentActivity.name, self.activeGames[client.room].players[p]);
+						for (j in advices){
+							io.to(self.activeGames[client.room].players[p].id).emit('log message', {'msg' : "Tip para la actividad "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
+							//game.io.to(game.players[p].id).emit('show tip', {'advice' : advices[j]});
+						}
+					}
 					//guardo la acicon en la DB
 					self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
 						if (err){
@@ -609,11 +667,11 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
 					//reveer todo esto
-						if (self.activeGames[client.room].activePlayer.alias == client.alias){
+						if (self.activeGames[client.room].activePlayer != null && self.activeGames[client.room].activePlayer.alias == client.alias){
 							client.in(client.room).broadcast.emit('player disconnect', { 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El jugador activo se ha desconectado!"}});
 							self.activeGames[client.room].asyncAck = false;
 						}
-						else if(self.activeGames[client.room].ringBearer.alias == client.alias){
+						else if(self.activeGames[client.room].ringBearer != null && self.activeGames[client.room].ringBearer.alias == client.alias){
 							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El portador del Anillo se ha desconectado!"}});
 							self.activeGames[client.room].asyncAck = false;
 						}

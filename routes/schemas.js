@@ -39,9 +39,25 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
         recomendations : Array
     });
 
-    var adminSchema = mongoose.Schema({
-        username : String,
-        password : String
+    var adviceSchema = mongoose.Schema({
+        type : String,
+        name : String,
+        text: String,
+        conditions:{
+            up_down : {
+                comparison : String,
+                value : Number
+            },
+            positive_negative : {
+                comparison : String,
+                value : Number
+            },
+            forward_backward : {
+                comparison : String,
+                value : Number
+            }
+        },
+        explicit : Boolean
     });
 
     var gameSchema = mongoose.Schema({
@@ -72,8 +88,9 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
             locations : Array,
             hobbitCards : Array,
             storyTiles : Array,
-            gandalfCards : Array
-        }]
+            gandalfCards : Array,
+            showAdvice : Boolean
+        }],
     });
 
      var chatSchema = mongoose.Schema({
@@ -84,8 +101,11 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
             text: String
         }]
     });
-
-
+       
+    // checking if password is valid       
+    userSchema.methods.validPasswordAdmin = function(password) {         
+       return (password == this.admin.password);      
+    };
 
     // generating a hash
     userSchema.methods.generateHash = function(password) {
@@ -97,23 +117,11 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
         return bcrypt.compareSync(password, this.local.password);
     };
 
-    // generating a hash
-    adminSchema.methods.generateHash = function(password) {
-        return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-    };
-
-    // checking if password is valid
-    userSchema.methods.validPasswordAdmin = function(password) {
-        console.log(password);
-        console.log(this.admin.password)
-        return (password == this.admin.password);
-    };
-
 
     var schemas = {};
     // create the model for users and expose it to our app
     schemas.userSchema = mongoose.model('User', userSchema);
-    schemas.adminSchema = mongoose.model('Admin', adminSchema);
+    schemas.adviceSchema = mongoose.model('Advice', adviceSchema);
     schemas.gameSchema = mongoose.model('Game', gameSchema);
     schemas.configSchema = mongoose.model('Config', configSchema);
     schemas.chatSchema = mongoose.model('Chat', chatSchema);

@@ -11,6 +11,12 @@
   <body class="main-div" >
         <h3> Pagina de admin</h3>
         <br>
+        <p> Editar: <select id="edit-select" style="color : black">
+        <option value = "configs"> Configuraciones </option>
+        <option value="advices"> Recomendaciones </option>
+        </select></p>
+
+        <!-- PANEL DE CONFIGS -->
         <div class="row" id="auth-row">
             <div class="col-md-1">
             </div>
@@ -43,7 +49,83 @@
             </div>
             <div class="col-md-1">
             </div>
-
         </div>
+        <!-- columna de advices -->
+
+            <div class="row" id="advice-row" style="display : none">
+                <div class="col-md-1">
+                </div>
+                <div class="col-md-3">
+                    <h3> Agregar recomendacion nueva </h3>
+                    <p>Tipo: 
+                        <select id="type-select" style="color : black">
+                            <option value = "Location"> Escenario </option>
+                            <option value="Card"> Carta </option>
+                            <option value="Activity"> Actividad </option>
+                        </select>
+                    </p>
+                    <p>Nombre: 
+                        <select id="name-select" style="color : black">
+                            <option value = "Bag End"> Bag End </option>
+                            <option value = "Rivendell"> Rivendell </option>
+                            <option value = "Moria"> Moria </option>
+                            <option value = "Lothlorien"> Lothlorien </option>
+                            <option value = "Helms Deep"> Helm's Deep </option>
+                            <option value = "Shelobs Lair">Shelob's Lair </option>
+                            <option value = "Mordor">Mordor </option>
+                        </select>
+                    </p>
+                    <p>Texto: 
+                        <textarea id="advice_text" style="color:#58FA82;  width:100%; height:100%; background-color: #4d4d4a"> </textarea>
+                    </p>
+                    <p>Condiciones:</p>
+                    <p>
+                        <input type="checkbox" id="up-down-check" value="up-down"> Up-Down: 
+                        <select id="up-down-comparison" style="color : black">
+                            <option value = ">"> Mayor que </option>
+                            <option value="<"> Menor que </option>
+                            <option value="=="> Igual a </option>
+                        </select>
+                        <input type="number" name="quantity" id="up-down-value" style="color : black" value="0">
+                    </p>
+                    <br>
+                    <p>
+                        <input type="checkbox" id="positive-negative-check" value="positive-negative"> Positive-Negative: 
+                        <select id="positive-negative-comparison" style="color : black">
+                            <option value = ">"> Mayor que </option>
+                            <option value="<"> Menor que </option>
+                            <option value="=="> Igual a </option>
+                        </select>
+                        <input type="number" name="quantity" id="positive-negative-value" style="color : black" value="0">
+                    </p> 
+                    <br> 
+                    <p>
+                        <input type="checkbox" id="forward-backward-check" value="forward-backward"> Forward-Backward: 
+                        <select id="forward-backward-comparison" style="color : black">
+                            <option value = ">"> Mayor que </option>
+                            <option value="<"> Menor que </option>
+                            <option value="=="> Igual a </option>
+                        </select>
+                        <input type="number" name="quantity" id="forward-backward-value" style="color : black" value="0">
+                    </p>
+                    <br>    
+                    <button class="btn btn-warning btn-lg" id="save-advice-button">Guardar recomendación</button><br><br>
+                    <p> Deben chequearse las checkboxes de las comparaciones que desea que se utilicen. Si se proveen valores inválidos en los campos numéricos de la comparación, irá por defecto un 0. </p>
+                </div>
+                <div class="col-md-1">
+                </div>
+                <div class="col-md-6">
+                    <p> Ver recomendación: 
+                        <select id="advice-selector" style="color : black"> </select>
+                    </p>
+                    <textarea id="advice-area" cols="100" rows="20" style="color:#58FA82;  width:100%; height:100%; background-color: #4d4d4a">
+                    </textarea>
+                    <br><br>
+                    <p>Volver al <a href="/">home</a>.</p>
+                </div>
+                <div class="col-md-1">
+                </div>
+
+            </div>
     </body>
 </html>

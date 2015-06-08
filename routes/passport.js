@@ -48,7 +48,6 @@ module.exports = function(passport,schemas) {
                 return done(null, false, req.flash('loginMessage', 'Contraseña incorrecta.')); // create the loginMessage and save it to session as flashdata
 
             // all is well, return successful user
-            console.log(user);
             user.admin['admin'] = true;
             return done(null, user);
         });
@@ -71,7 +70,6 @@ module.exports = function(passport,schemas) {
 
         // asynchronous
         process.nextTick(function() {
-            console.log(profile);
             // check if the user is already logged in
             if (!req.user) {
                 User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
