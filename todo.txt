@@ -1,6 +1,5 @@
 Proximo commit:
--El bug de la asignacion de nombres iguales. Indudablemente se debia a un disconnect client cuando
-	un jugador se unia o creabaa una partida. Hay que testear la solucion.
+- Solucioando que no se temrinaba el juego con menos de lso escenarios pautados.-Ya no se emite mas de una vez el evento disconnect cuando el juego esta terminado.
 
 	
 
@@ -9,6 +8,10 @@ Bugs:
 - check discard a veces flasha, a veceeees no (solucion recursiva?)
 - a veces cuando armo los polldata me tira un error en la linea 393 de Client que me impide darle click a discar. investigar (?)
 - cuando meure un personaje en su turno y tira el nexst turn, esto puede ocurrir en medio de una actividad circular; ahi se descuajeringa el flujo (investigar)
+
+15/6
+- si uso el poder "Guia" y el avance por la pista resulta en una tirada del dado, una vez tirado el dado, me cierra la otra ventana. arreglar esto
+
 
 ojo:
 	-comente discard remove en linea 402 de Client. si anda algo mal puede ser por eso

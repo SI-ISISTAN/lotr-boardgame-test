@@ -391,13 +391,14 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 					self.activeGames[client.room].update(update, client, data);
 					
 					//muestro tips de actividad
-					for (p in self.activeGames[client.room].players){
-						var advices = self.activeGames[client.room].getAdvices("Activity",self.activeGames[client.room].currentLocation.currentActivity.name, self.activeGames[client.room].players[p]);
-						for (j in advices){
-							io.to(self.activeGames[client.room].players[p].id).emit('log message', {'msg' : "Tip para la actividad "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
-							//game.io.to(game.players[p].id).emit('show tip', {'advice' : advices[j]});
+						for (p in self.activeGames[client.room].players){
+							var advices = self.activeGames[client.room].getAdvices("Activity",data.action, self.activeGames[client.room].players[p]);
+							for (j in advices){
+								io.to(self.activeGames[client.room].players[p].id).emit('log message', {'msg' : "Tip para la actividad "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
+								//game.io.to(game.players[p].id).emit('show tip', {'advice' : advices[j]});
+							}
 						}
-					}
+
 					//guardo la acicon en la DB
 					self.gameSchema.findOne({ 'gameID' : client.room }, function(err, game){
 						if (err){
@@ -666,6 +667,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('disconnect', function (){
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
+					if (!self.activeGames[client.room].ended){
 					//reveer todo esto
 						if (self.activeGames[client.room].activePlayer != null && self.activeGames[client.room].activePlayer.alias == client.alias){
 							client.in(client.room).broadcast.emit('player disconnect', { 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El jugador activo se ha desconectado!"}});
@@ -679,6 +681,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
 							self.activeGames[client.room].asyncAck = false;
 						}
+					}
 				}
 				else{
 					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});
