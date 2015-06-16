@@ -216,6 +216,19 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 							self.socket.emit('add activity', action);
 						}
 						self.socket.emit('resolve activity');
+						//redibujar si borre
+						/*
+						if (self.turnPhase=="cleanUp" && ($("#cleanup-dialog").length < 1)){
+							var popup2 = new Popup({title: "Fin del turno", id:"cleanup-dialog", text: "Es el fin del turno. Antes de darlo por terminado puedes jugar alguna carta especial válida, o, de ser el Portador, utilizar el Anillo.",buttons : [{name : "Terminar turno", id:"ok"}], visibility : "active"});
+							popup2.addListener("ok", function(){	
+								popup2.close();
+								self.socket.emit('add activity', {'action' : 'NextTurn'});
+								self.socket.emit('resolve activity');
+							});
+							popup2.draw(self);
+						}
+						
+						*/
 					}
 					
 					popup.close();
@@ -364,7 +377,6 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 
 					}
 					//Guardo el texto en el objeto de la poll
-					console.log("pusheo");
 					pollData.push({'text' : texto, 'player':null});
 
 					//Fin de la instanciacion or contenido
@@ -711,8 +723,11 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 
 	}
 
+	Client.prototype.disableAsync = function(){
+		$(".async-input").prop('disabled',true);
+	}
+
 	Client.prototype.closePopups = function(){
-		console.log("mariano closse");
 		$(".ui-dialog").remove();
 
 	}
