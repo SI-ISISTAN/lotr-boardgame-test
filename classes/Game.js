@@ -257,8 +257,6 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	//Paso a la location siguiente
 	Game.prototype.advanceLocation = function(data){
 		this.locationNumber++;
-		console.log(this.locationNumber);
-		console.log(this.locations);
 		if (this.locationNumber<this.locations.length){
 			this.currentLocation = new Location(this.locations[this.locationNumber]);
 			data['mov']=gameData.worldPositions[this.locationNumber-1];

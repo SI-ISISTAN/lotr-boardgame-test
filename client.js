@@ -449,7 +449,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 			    //Boton de lanzar dado
 			    $("#roll-dice-button").on('click', function(){
-			    	$(".popup-dialog").dialog('close'); //cierro el popup informativo
+			    	$("#dice-info").dialog('close'); //cierro el popup informativo
 					$("#roll-dice-button").prop('disabled',true);
 					$("#special-card-button").prop('disabled',true);
 					client.socket.emit('update game', {'action' : 'DieRoll'});
