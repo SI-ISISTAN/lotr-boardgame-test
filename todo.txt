@@ -1,5 +1,5 @@
 Proximo commit:
-
+- se elimina la alerta de "lanzar dado" cuando se juega una carta para anular una tirada
 
 	
 

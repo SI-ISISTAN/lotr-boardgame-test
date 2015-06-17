@@ -209,6 +209,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			apply : function (game,player,data){
 			},
 			draw : function(client, data){
+				$("#dice-info").dialog('close'); //cierro el popup informativo
 				client.socket.emit('resolve activity');
 			}
 		},
