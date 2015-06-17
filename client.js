@@ -179,7 +179,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 	    //Se desconecta un jugador
 	    socket.on('player disconnect', function(res){
-			    socket.emit('sudden update',  res.update);
+			    	socket.emit('sudden update',  res.update);
 	    });
 
 	    //Por x o por y se elimina una partida
@@ -357,6 +357,10 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			socket.emit('resolve activity');
 	    });
 
+	    socket.on('force resolve', function(){
+	    	socket.emit('resolve activity');
+	    });
+
 	     socket.on('repeat activity', function(){
 	    	socket.emit('repeat activity');
 	    });
@@ -366,6 +370,10 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    		var msg = new Message({title: res.advice.name, text: res.advice.text, visibility:"all"});
 				msg.draw(client);
 	    });
+
+	    socket.on('reconnect', function(){ // connection restored  
+	   		console.log("evento reconnect");
+	    }); 
 
 	    socket.on('connect_error', function(err) {
 		  // handle server error here
