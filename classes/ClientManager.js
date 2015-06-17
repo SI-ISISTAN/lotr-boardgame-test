@@ -677,8 +677,13 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El portador del Anillo se ha desconectado!"}});
 							self.activeGames[client.room].asyncAck = false;
 						}
+						else if (self.activeGames[client.room].activePlayer != null && typeof(self.activeGames[client.room].currentLocation.currentActivity)!= "undefined" && self.activeGames[client.room].currentLocation.currentActivity.data.player == client.alias){
+							io.to(self.activeGames[client.room].activePlayer.id).emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
+							io.to(self.activeGames[client.room].activePlayer.id).emit('force resolve');
+							self.activeGames[client.room].asyncAck = false;
+						}
 						else{
-							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
+							io.to(self.activeGames[client.room].activePlayer.id).emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
 							self.activeGames[client.room].asyncAck = false;
 						}
 					}

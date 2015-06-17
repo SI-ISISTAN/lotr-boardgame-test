@@ -1,5 +1,4 @@
 Proximo commit:
-- se elimina la alerta de "lanzar dado" cuando se juega una carta para anular una tirada
 
 	
 
@@ -7,7 +6,7 @@ Proximo commit:
 Bugs:
 - check discard a veces flasha, a veceeees no (solucion recursiva?)
 - a veces cuando armo los polldata me tira un error en la linea [completar] de Client que me impide darle click a discar. investigar (?)
-- cuando meure un personaje en su turno y tira el nexst turn, esto puede ocurrir en medio de una actividad circular; ahi se descuajeringa el flujo (investigar)
+
 
 15/6
 - si uso el poder "Guia" y el avance por la pista resulta en una tirada del dado, una vez tirado el dado, me cierra la otra ventana. arreglar esto (FIX'D. TEST)
@@ -17,5 +16,5 @@ Bugs:
 ojo:
 	-comente discard remove en linea 402 de Client. si anda algo mal puede ser por eso
 
-TODO:
-- recomendaciones. como?
+TEST:
+- Agregue un caso en desconexción: un usuario se desconecta durante un evento circular. Se arregla con un resolve pedido al jugador activo, testeat.
