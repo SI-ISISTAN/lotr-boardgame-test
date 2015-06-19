@@ -456,7 +456,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    //Boton de lanzar dado
 			    $("#roll-dice-button").on('click', function(){
 			    	if ($("#dice-info").length>0){
-   							$("#dice-info").dialog('close'); //cierro el popup informativo
+   						$("#dice-info").remove(); //cierro el popup informativo
 			    	}
 					$("#roll-dice-button").prop('disabled',true);
 					$("#special-card-button").prop('disabled',true);
