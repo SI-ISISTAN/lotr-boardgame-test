@@ -683,8 +683,10 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							self.activeGames[client.room].asyncAck = false;
 						}
 						else{
-							io.to(self.activeGames[client.room].activePlayer.id).emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
-							self.activeGames[client.room].asyncAck = false;
+							if (self.activeGames[client.room].activePlayer!= null){
+								io.to(self.activeGames[client.room].activePlayer.id).emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
+								self.activeGames[client.room].asyncAck = false;
+							}
 						}
 					}
 				}
