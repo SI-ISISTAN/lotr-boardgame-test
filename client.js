@@ -18,7 +18,6 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 		if (!client.connected){
 			$.post( "/getsurvey", {'userID' : userID}, function( data ) {
         		surveyData = data.survey;
-        		console.log(surveyData);
         		socket.emit('connect user', {'userID' : userID, 'surveyData' : surveyData});
 	   	 	});
 			
@@ -26,7 +25,6 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 		//Se conecta un nuevo usuario
 	    socket.on('send connection data', function(res){
-	    	console.log(res.connected);
 	    		client.connected=true;
 	    		client.alias = res.alias;
 	    		client.id = res.id;
@@ -332,7 +330,6 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	    	var poll = new Poll({title: "Decisión", text: texto});
 	    	var div = $("<div>  </div>");
 	    	var discards = res.data;
-	    	console.log(discards);
 	    	for (i in discards){
 	    		if (typeof(discards[i].text) != 'undefined'){
 	    			div.append("<p>"+discards[i].text+": "+discards[i].player+"</p>");
@@ -432,7 +429,6 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 			    //Salir de una partida y volver a la lista de clientes
 			    $('#quit-button').on('click', function(){
-			    	console.log("game id "+$(".game-list-item-highlighted").data('id'));
 			    	$("#tutorial-btn").prop('disabled', false);
 			    	$("#survey-button").prop('disabled', false);
 			    	socket.emit('quit game', {'gameID' : $(".game-list-item-highlighted").data('id')});
@@ -440,7 +436,9 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 			    //Botón de sacar tile
 			    $("#draw-tile-button").on('click', function(){
-			    	$(".popup-dialog").dialog('close'); //cierro el popup informativo
+			    	if ($(".popup-dialog").length>1){
+			    		$(".popup-dialog").dialog('close'); //cierro el popup informativo
+			    	}
 			    	$("#draw-tile-button").prop('disabled', true);
 			    	client.disableInput();
 			    	if (client.turnPhase == "drawTiles"){
@@ -457,7 +455,9 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 			    //Boton de lanzar dado
 			    $("#roll-dice-button").on('click', function(){
-			    	$("#dice-info").dialog('close'); //cierro el popup informativo
+			    	if ($("#dice-info").length>0){
+   							$("#dice-info").dialog('close'); //cierro el popup informativo
+			    	}
 					$("#roll-dice-button").prop('disabled',true);
 					$("#special-card-button").prop('disabled',true);
 					client.socket.emit('update game', {'action' : 'DieRoll'});

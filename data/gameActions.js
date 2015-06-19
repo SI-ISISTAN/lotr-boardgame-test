@@ -1125,6 +1125,11 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'NextTurn'});
 				client.socket.emit('resolve activity');
+				if ($(".ui-dialog-content").length>0){
+					if ($('.ui-dialog-content').is('dialog')) {
+   						$('.ui-dialog-content').dialog('close');
+					}
+				}
 			});
 			popup.draw(client);
 		}
