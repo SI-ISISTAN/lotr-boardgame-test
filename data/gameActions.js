@@ -640,8 +640,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 	//Accion de juego de tirar el dado
 	'MoveTrack' :  {
 		apply : function(game, player,data){
-			if (game.currentLocation.tracks[data.trackName]!=null){
-					
+			if (game.currentLocation.tracks[data.trackName]!=null){	
 					data['track'] = game.currentLocation.tracks[data.trackName];
 					if (game.currentLocation.tracks[data.trackName].position < game.currentLocation.tracks[data.trackName].spaces.length){
 						game.currentLocation.tracks[data.trackName].position++;
@@ -1126,6 +1125,11 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				popup.close();
 				client.socket.emit('add activity', {'action' : 'NextTurn'});
 				client.socket.emit('resolve activity');
+				if ($(".ui-dialog-content").length>0){
+					if ($('.ui-dialog-content').is('dialog')) {
+   						$('.ui-dialog-content').dialog('close');
+					}
+				}
 			});
 			popup.draw(client);
 		}
@@ -1640,7 +1644,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 						client.socket.emit('resolve activity');
 					}
 					else{
-						console.log("end game enviado");
 						client.socket.emit('update game', {'action' : 'EndGame', 'success':false, 'reason': "¡El Portador del Anillo ha muerto!"});
 					}
 					

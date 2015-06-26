@@ -4,7 +4,17 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 	var configs = {};
 	var currentConfig = "";
 	var configurationChanged = false;
-	var newconfig = {};
+	var newconfig =  {
+            "configName": "newConfig",
+            "isTutorial": false,
+            "sauronPosition": 15,
+            "hobbitPosition": 0,
+            "showAdvice": true,
+            "gandalfCards": [],
+            "storyTiles": [],
+            "hobbitCards": [],
+            "locations": []
+    };
 	var advices = [];
 
 	$("#config-select").on('change', function(){
@@ -26,6 +36,22 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 	$("#default-select").on('change', function(){
 		var name = $("#default-select").val();
 		$("#default-change-button").prop("disabled",false);
+	});
+
+	$("#new-config-button").on('click', function(){
+		
+		$("#json-area").text(JSON.stringify({
+            "configName": "newConfig",
+            "isTutorial": false,
+            "sauronPosition": 15,
+            "hobbitPosition": 0,
+            "showAdvice": true,
+            "gandalfCards": [],
+            "storyTiles": [],
+            "hobbitCards": [],
+            "locations": []},null, 4));
+    	$("#config-select").append('<option value='+newconfig.configName+'>'+newconfig.configName+'</option>');
+    	$("#config-select").val(newconfig.configName);
 	});
 
 	$("#config-change-button").on('click', function(){
@@ -54,7 +80,7 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 				reason = "La posición inicial de los Hobbits debe ser menor o igual a la de Sauron";
 			}
 			if (valid){
-				$.post( "/changeconfig", {'config' : currentConfig, 'data': json}, function( data ) {
+				$.post( "/changeconfig", {'config' : json.configName, 'data': json}, function( data ) {
 					if (data.success){
 						alert("Configuracion modificada con éxito.");
 						location.reload();

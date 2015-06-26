@@ -211,11 +211,13 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		}
 
 		//Cargo escenarios
-		for (t in config.locations){
-			this.locations.push(locations[config.locations[t]]);
+		var x=0;
+		while (x < config.locations.length){
+			this.locations.push(locations[config.locations[x]]);
+			x++;
 		}
 
-		this.locations.push(locations.Mordor);
+		//this.locations.push(locations.Mordor);
 
 		//inicio en la 1º location
 		this.currentLocation = new Location(this.locations[this.locationNumber]);
