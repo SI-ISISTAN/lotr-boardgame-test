@@ -488,15 +488,17 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 				$("#send-survey-button").on('click', function(){
 					var result = [0,0,0];
+					var answers = [];
 					$('input:checked').each(function(){
 							var val = JSON.parse($(this).val());
+							answers.push($(this).val());
 							var i=0;
 							while (i < 3){
 								result[i] += val[i];
 								i++;
 							}
 					});
-					client.socket.emit('fill survey', {'result' : result});
+					client.socket.emit('fill survey', {'result' : result, 'answers': answers});
 					$("#main-lobby-div").show();
 					$("#survey-div").hide();
 					$("#survey-button").hide();

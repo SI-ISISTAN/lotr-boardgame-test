@@ -326,6 +326,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						newGame.gameID = self.activeGames[client.room].gameID;
 						newGame.created = new Date();
 						newGame.complete = false;
+						newGame.analyzed = false;
 						var playersList = self.activeGames[client.room].players;
 						for (i in playersList){
 							newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character, userID: playersList[i].userID });
@@ -522,7 +523,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						user.survey.result.up_down = data.result[0];
 						user.survey.result.positive_negative =data.result[1];
 						user.survey.result.forward_backward= data.result[2];
-
+						user.survey.answers = data.answers;
 						user.save(function(err) {
 	                            if (err){
 	                                throw err;
@@ -647,7 +648,8 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 								item['poll'] = {
 									'poller' : self.activeGames[client.room].currentPoll.poller,
 									'votes' : self.activeGames[client.room].currentPoll.votes,
-									'agreement' : agreement
+									'agreement' : agreement,
+									'actions' : self.activeGames[client.room].currentPoll.actions
 								};
 
 								game.gameActions.push(item);

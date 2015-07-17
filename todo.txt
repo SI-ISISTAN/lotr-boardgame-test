@@ -1,6 +1,6 @@
 Proximo commit:
-
-	
+-agregados campos extra a la base de datos, guardadas todas las opciones elegidas en la encuesta
+-se guardan las acciones en los polls
 
 
 Bugs:

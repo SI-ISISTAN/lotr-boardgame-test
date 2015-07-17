@@ -30,6 +30,7 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
         },
         survey: {
             complete:Boolean,
+            answers : Array,
             result : {
                 up_down : Number,
                 positive_negative : Number,
@@ -75,7 +76,8 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
             victory : Boolean,
             reason : String,
             score : Number
-        }
+        },
+        analyzed : Boolean
     });
 
     var configSchema = mongoose.Schema({
