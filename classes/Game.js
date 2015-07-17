@@ -172,6 +172,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	Game.prototype.start = function(config){
 		this.sauronPosition = config.sauronPosition;
 		if (config.isTutorial){
+			console.log("E TUTORIAL E");
 			this.isTutorial = true;
 		}
 		//asigno a cada player un personaje

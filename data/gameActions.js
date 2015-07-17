@@ -1690,12 +1690,13 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 
 	"StartConflict" :  {
 		apply : function(game, player,data){
-			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
 			data['isTutorial'] = game.isTutorial;
+			game.io.to(player.id).emit('update game', data);	//repetir el evento al jugador
+			
 		},
 		draw : function(client, data){
 			if (data.isTutorial){
-			client.turnPhase = "drawTiles";	
+								client.turnPhase = "drawTiles";	
 								client.buttonCheck({phase: client.turnPhase});
 								$("#buttons-col").append('<br><div class="board-element-div" id="ring-bearer-div"><img src="./assets/img/ripped/ring.png" class="img-responsive token-img" title="Anillo"><br><button type="button" class="btn btn-success async-input" id="use-ring-button" style="font-size: 1.6vm; font-size: 1.6vmin">Usar el Anillo</button></div>').show('slow');
 					        	
