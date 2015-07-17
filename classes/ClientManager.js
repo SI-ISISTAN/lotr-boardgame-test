@@ -648,7 +648,8 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 								item['poll'] = {
 									'poller' : self.activeGames[client.room].currentPoll.poller,
 									'votes' : self.activeGames[client.room].currentPoll.votes,
-									'agreement' : agreement
+									'agreement' : agreement,
+									'actions' : self.activeGames[client.room].currentPoll.actions
 								};
 
 								game.gameActions.push(item);
