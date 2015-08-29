@@ -19,7 +19,8 @@ requirejs.config({
 });
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/lotr');
+mongoose.connect('mongodb://matanegui:patrite0@ds061611.mongolab.com:61611/lotr-test');
+
 
 var ClientManager = requirejs('./classes/ClientManager');
 var schemas = requirejs('./routes/schemas');

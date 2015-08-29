@@ -1,4 +1,3 @@
-
 define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
     //Ejemplo ser eliminado de forma impiadosa
     

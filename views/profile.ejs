@@ -62,6 +62,7 @@
                   <strong>id</strong>: <%= user.facebook.id %><br>
                   <strong>name</strong>: <%= user.facebook.name %><br>
                 </p>  
+
               <% } else { %>
                 <a href="/connect/facebook" class="btn btn-primary">Connect Facebook</a>
               <% } %>
@@ -111,6 +112,7 @@
           <center> <h3> Encuesta </h3> </center>
           <div class="default-div">
           <br>
+
            <% if (user.survey.complete) { %>
                  <div id="survey_bar_chart" style="height:800px;"></div>
            <div id="survey_bubble_chart" style="height:800px;"></div>
@@ -218,6 +220,7 @@
             <% } else { %>
                 No has completado la encuesta aún.
             <% } %>
+
           <br><br>
             
           </div>
