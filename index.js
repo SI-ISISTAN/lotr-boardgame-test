@@ -19,7 +19,7 @@ requirejs.config({
 });
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://localhost/lotr');
 
 var ClientManager = requirejs('./classes/ClientManager');
 var schemas = requirejs('./routes/schemas');
@@ -381,6 +381,29 @@ app.post("/getsurvey", function(req, res){
                     });
         
 });
+
+//Obtener los datos del análisis
+app.post("/getsymlog", function(req, res){   
+        var symlog = null;
+        schemas.userSchema.findOne({'local.userID' : req.body.userID}, function(err, user){
+                        if (err){
+                            return err;
+
+                        }
+                        if (user){
+                            var sl= JSON.parse(JSON.stringify(user)).symlog;
+                            
+                            if (typeof(sl)!='undefined'){
+                                symlog=sl;
+                            }
+                            else{
+                            }
+                            res.json({ 'symlog' : symlog });
+                        }
+                    });
+        
+});
+
 
 // route middleware to make sure
 function isLoggedIn(req, res, next) {
