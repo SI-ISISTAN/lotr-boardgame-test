@@ -78,7 +78,8 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
             reason : String,
             score : Number
         },
-        analyzed : Boolean
+        analyzed : Boolean,
+        configName : String
     });
 
     var configSchema = mongoose.Schema({
