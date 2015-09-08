@@ -23,6 +23,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.sauronPosition = 15;		//Valores por defecto
 		this.ringUsed = false;
 		this.specialEvents=[];
+		this.configName="";
 		this.blockResolve = false;
 		this.isTutorial = false;	//todos los juegos son asi, salvo que se juegue el tutorial
 		this.asyncAck = true; //flag para controlar la recepcion de respuestas ante eventos asíncronos
@@ -170,9 +171,9 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 	//iniciar juego. se le cargan los valores definidos en la configuracion elegida
 	Game.prototype.start = function(config){
+		this.configName=config.configName;
 		this.sauronPosition = config.sauronPosition;
 		if (config.isTutorial){
-			console.log("E TUTORIAL E");
 			this.isTutorial = true;
 		}
 		//asigno a cada player un personaje
