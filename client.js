@@ -512,7 +512,25 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	function showGameInfo(){
 		
 	}   
-        $(document).ready(function(){	
+        $(document).ready(function(){
+
+        	$(function(){
+			    /*
+			     * this swallows backspace keys on any non-input element.
+			     * stops backspace -> back
+			     */
+			    var rx = /INPUT|SELECT|TEXTAREA/i;
+
+			    $(document).bind("keydown keypress", function(e){
+			        if( e.which == 8 ){ // 8 == backspace
+			            if(!rx.test(e.target.tagName) || e.target.disabled || e.target.readOnly ){
+			                e.preventDefault();
+			            }
+			        }
+			    });
+			});	
+
+			//codigo original
         	userID = $("body").data("user");
         	surveycomplete = $("body").data("surveycomplete");
 
