@@ -192,11 +192,11 @@
                             var ud = (18+surveyData.result.up_down)/36;
                             var pn = (18+surveyData.result.positive_negative)/36;
                             var fb = (18+surveyData.result.forward_backward)/36;
-                            console.log("ud"+ud+"pn"+pn+"fb"+fb);
                             //creo el array con los datos
                             var data_array = [
                             ['ID', 'Negative/Positive', 'Backward/Forward', 'Color',     'Up/Down'],
-                            ['Según la encuesta',   pn,              fb,      'S.E',  ud]
+                            ['Según la encuesta',   pn,              fb,      'S.E',  ud],
+                            ['Valor ideal promediado',   0.59,              0.68,      'V.I.P',  0.58]
                             ];
 
                             $.post( "/getsymlog", {'userID' : $("body").data("userid")}, function( data ) {
