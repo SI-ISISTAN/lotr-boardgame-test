@@ -39,6 +39,8 @@ define([], function () {
 				}));
 				this.popup.append('<br>');
 		}
+
+
 	}
 
 	//var estática popups abiertos
@@ -84,6 +86,7 @@ define([], function () {
 			Popup.openPopups++;
 			this.popup.dialog({
 				dialogClass : 'no-close',
+				closeOnEscape : false,
 				modal:this.modal,
 				show : {
 					effect: "bounce",
