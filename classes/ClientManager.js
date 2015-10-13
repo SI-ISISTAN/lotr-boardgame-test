@@ -708,6 +708,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
 						}		
 					}
+					
 				}
 				else{
 					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
