@@ -694,7 +694,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						}
 					}
 					//SI EL CLIENTE SE DESCONECTO EN EL LOBBY PERO estaba EN UNA PARTIDA
-					else if (!self.activeGames[client.room].getPlayerByID(client.id).playing){
+					if (!self.activeGames[client.room].getPlayerByID(client.id).playing){
 						if (typeof(client.room) != 'undefined'){
 							self.activeGames[client.room].removePlayer(client.id);
 							//self.connectedClients.push({'id' : client.id, 'alias' : client.alias});
