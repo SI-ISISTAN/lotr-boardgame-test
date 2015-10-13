@@ -683,9 +683,6 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 						//si es el ultimo espacio de la main track cambio de escenario
 						if (client.isActivePlayer()){
 							client.socket.emit('add activity', {'action' : 'ClaimReward', 'reward' : data.reward});
-							if (data.endScenario){	
-								client.socket.emit('add activity', {'action' : 'EndScenario'});				
-							}
 							client.socket.emit('resolve activity');
 						}
 					});
