@@ -284,6 +284,18 @@ app.get("/getadvices", function(req, res){
     });
 });
 
+//Obtengo todas los usuarios
+app.get("/getallusers", function(req, res){
+    schemas.userSchema.find({}, function(err, result){
+        if (err){
+            console.log("Error");
+        }
+        else{
+            res.json({ 'users' : result});           
+        }
+    });
+});
+
 app.post("/changeconfig", function(req, res){
         schemas.configSchema.findOne({}, function(err, config){
                         if (err){
