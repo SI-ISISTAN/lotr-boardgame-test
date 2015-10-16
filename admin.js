@@ -16,6 +16,7 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
             "locations": []
     };
 	var advices = [];
+	var users = [];
 
 	$("#config-select").on('change', function(){
 		var name = $("#config-select").val();
@@ -153,10 +154,17 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 		if ($("#edit-select").val() == "configs"){
 			$("#auth-row").show();
 			$("#advice-row").hide();
+			$("#users-row").hide();
 		}
 		else if ($("#edit-select").val() == "advices"){
 			$("#auth-row").hide();
 			$("#advice-row").show();
+			$("#users-row").hide();
+		}
+		else if ($("#edit-select").val() == "users"){
+			$("#auth-row").hide();
+			$("#advice-row").hide();
+			$("#users-row").show();
 		}
 	});
 
@@ -177,6 +185,10 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 
 	$("#advice-selector").on('change', function(){
 		$("#advice-area").val(JSON.stringify(advices[parseInt($("#advice-selector").val())],null, 4));
+	});
+
+	$("#users-selector").on('change', function(){
+		$("#users-area").val(JSON.stringify(users[parseInt($("#users-selector").val())],null, 4));
 	});
 
 	$(document).ready(function(){
@@ -200,6 +212,17 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 			}
 			if (advices.length>0){
 				$("#advice-area").val(JSON.stringify(advices[0],null, 4));
+			}
+	    });
+	    $.get( "/getallusers", function( data ) {
+			users = data.users;
+			var j=0;
+			while (j < users.length){
+				$("#users-selector").append('<option value='+j+'>'+j+'</option>')
+				j++;
+			}
+			if (users.length>0){
+				$("#users-area").val(JSON.stringify(users[0],null, 4));
 			}
 	    });
 
