@@ -1,9 +1,9 @@
 module.exports = {
 
     'facebookAuth' : {
-        'clientID'      : '478885892262648', // your App ID
-        'clientSecret'  : 'c5a40304dd32d52b14272c3a9ac28c55', // your App Secret
-        'callbackURL'   : 'http://lotr-test.herokuapp.com/auth/facebook/callback'
+        'clientID'      : '1506108253046534', // your App ID
+        'clientSecret'  : 'c152e2750dca1ee9be036a1fc9515f28', // your App Secret
+        'callbackURL'   : 'http://lotr2.herokuapp.com/auth/facebook/callback'
     },
     'twitterAuth' : {
 		'consumerKey' 		: 'sTTVohfCvRdj8QN5kC7RrXTEV',
