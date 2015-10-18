@@ -1,18 +1,18 @@
 module.exports = {
 
     'facebookAuth' : {
-        'clientID'      : '478885892262648', // your App ID
-        'clientSecret'  : 'c5a40304dd32d52b14272c3a9ac28c55', // your App Secret
-        'callbackURL'   : 'http://lotr-test.herokuapp.com/auth/facebook/callback'
+        'clientID'      : '1506108253046534', // your App ID
+        'clientSecret'  : 'c152e2750dca1ee9be036a1fc9515f28', // your App Secret
+        'callbackURL'   : 'http://lotr2.herokuapp.com/auth/facebook/callback'
     },
     'twitterAuth' : {
-		'consumerKey' 		: 'sTTVohfCvRdj8QN5kC7RrXTEV',
-		'consumerSecret' 	: 'mHUkkxBXSM6It4jqvpHydwsbgdoYKdAcsmXGtR1Fa3Svw5lYDE',
-		'callbackURL' 		: 'http://lotr-test.herokuapp.com/auth/twitter/callback'
+		'consumerKey' 		: 'LEPbc9mPKhSMcNdDpHEOd9tyu',
+		'consumerSecret' 	: 'Ok4CngY3xCQXBk7jjF48I03hqayyQwX26nciFyP3Pst15dP9nQ',
+		'callbackURL' 		: 'http://lotr2.herokuapp.com/auth/twitter/callback'
 	},
 	'googleAuth' : {
-		'clientID' 		: '607013064623-pp9cv1j5j7e15f77de8qrvd73g8tor71.apps.googleusercontent.com',
-		'clientSecret' 	: '7wwiMD6pu9QhlQfy5t7O7nLy',
-		'callbackURL' 	: 'http://lotr-test.herokuapp.com/auth/google/callback'
+		'clientID' 		: '577879920818-8fhspq7imm2052lbcngbjr1q90lrqiuq.apps.googleusercontent.com',
+		'clientSecret' 	: 'KeAEXqygAFCb8WIL0ERaI8nh',
+		'callbackURL' 	: 'http://lotr2.herokuapp.com/auth/google/callback'
 	}
 }
