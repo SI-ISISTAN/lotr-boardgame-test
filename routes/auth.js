@@ -11,8 +11,8 @@ module.exports = {
 		'callbackURL' 		: 'http://lotr2.herokuapp.com/auth/twitter/callback'
 	},
 	'googleAuth' : {
-		'clientID' 		: '607013064623-pp9cv1j5j7e15f77de8qrvd73g8tor71.apps.googleusercontent.com',
-		'clientSecret' 	: '7wwiMD6pu9QhlQfy5t7O7nLy',
-		'callbackURL' 	: 'http://lotr-test.herokuapp.com/auth/google/callback'
+		'clientID' 		: '577879920818-8fhspq7imm2052lbcngbjr1q90lrqiuq.apps.googleusercontent.com',
+		'clientSecret' 	: 'KeAEXqygAFCb8WIL0ERaI8nh',
+		'callbackURL' 	: 'http://lotr2.herokuapp.com/auth/google/callback'
 	}
 }
