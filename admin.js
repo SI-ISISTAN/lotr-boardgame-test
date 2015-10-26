@@ -94,6 +94,33 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 		}
 	});
 
+	$("#advice-change-button").on('click', function(){
+		var json = null;
+		var valid = true;
+		var reason = "";
+		try{
+			json = JSON.parse($("#advice-area").val());
+		}
+		catch(err){
+			valid=false;
+			alert("La recomendación tiene un formato inválido. Chequear el formato del documento.")
+		}
+		//chequeos de validez
+		if (valid){
+			//ver cuales son los datos que hay que pasarle si o si al advice
+			$.post( "/changeadvice", {'id' : json._id, 'data': json}, function( data ) {
+				if (data.success){
+					alert("Configuracion modificada con éxito.");
+					location.reload();
+				}
+			});
+		}
+		else{
+			alert(reason);
+		}
+
+	});
+
 	$("#default-change-button").on('click', function(){
 		$.post( "/changedefault", {'default' : $("#default-select").val()}, function( data ) {
 					if (data.success){

@@ -337,6 +337,31 @@ app.post("/changeconfig", function(req, res){
                     });
 });
 
+//Modificar el contenido de un advice ya creado
+app.post("/changeadvice", function(req, res){
+        schemas.adviceSchema.findOne({"_id": req.body.id}, function(err, advice){
+                        if (err){
+                            return err;
+
+                        }
+                        if (advice){
+                            advice.type=req.body.data.type;
+                            advice.name=req.body.data.name;
+                            advice.text=req.body.data.text;
+                            advice.explicit = req.body.data.explicit;
+                            advice.conditions = req.body.data.conditions;
+                            advice.save(function(err) {
+                                    if (err){
+                                        throw err;
+                                     }
+                                     else{
+                                        res.json({ 'success' : true });
+                                    }
+                            });
+                        }
+                    });
+});
+
 app.post("/saveadvice", function(req, res){
     var ad = new schemas.adviceSchema();
     ad.type=req.body.type;
