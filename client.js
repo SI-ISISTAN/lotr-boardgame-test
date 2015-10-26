@@ -499,9 +499,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 							}
 					});
 					client.socket.emit('fill survey', {'result' : result, 'answers': answers});
-					$("#main-lobby-div").show();
-					$("#survey-div").hide();
-					$("#survey-button").hide();
+					location.reload();
 				});
 
 				$("#tutorial-btn").on('click', function(){
@@ -535,7 +533,12 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
         	surveycomplete = $("body").data("surveycomplete");
 
         	if (!surveycomplete){
-        		$("#survey-button").show();
+        		$("#newgame-button").hide();
+        		$("#join-button").hide();
+        		$("#game-col").append("<p> Para poder jugar, primero debes completar la encuesta. </p>")
+        	}
+        	else{
+        		$("#survey-button").text("Rehacer encuesta");
         	}
         	
         	console.log("JQuery Init");
