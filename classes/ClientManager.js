@@ -286,6 +286,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 										var players = self.activeGames[client.room].players;
 										//meto en el juego las recomendaciones a usar (si la config usa consejos)
 										if (configs[i].showAdvice){
+
 											self.adviceSchema.find({}, function(err, result){
 												if (err){
 													console.log("Error");
