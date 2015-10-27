@@ -275,7 +275,22 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 			users = data.users;
 			var j=0;
 			while (j < users.length){
-				$("#users-selector").append('<option value='+j+'>'+j+'</option>')
+				//getear alguno de los nombres, si los hay
+				var name=null;
+				if (users[j].facebook!=undefined){
+					name=users[j].facebook.name;
+				}
+				else if (users[j].twitter!=undefined){
+					name=users[j].twitter.displayName;
+				}
+				else if (users[j].google!=undefined){
+					name=users[j].google.name;
+				}
+				else{
+					name=local.userID;
+				}
+				//
+				$("#users-selector").append('<option value='+j+'>'+name+'</option>')
 				j++;
 			}
 			if (users.length>0){
