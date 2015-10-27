@@ -463,6 +463,44 @@ app.post("/getsurvey", function(req, res){
         
 });
 
+//Obtener los advices personalizados
+app.post("/getpersonaladvices", function(req, res){   
+        var recomendations = null;
+        schemas.userSchema.findOne({'local.userID' : req.body.userID}, function(err, user){
+                        if (err){
+                            return err;
+
+                        }
+                        if (user){
+                            if (typeof(user.recomendations)!='undefined'){
+
+                                recomendations = user.recomendations;
+                            }
+                            res.json({ 'recs' : recomendations });
+                        }
+                    });
+        
+});
+
+//Obtener los advices personalizados
+app.post("/getuseradvices", function(req, res){   
+        var recomendations = [];
+        schemas.adviceSchema.find({}, function(err, result){
+                                        if (err){
+                                            console.log("Error");
+                                          }
+                                          else{
+                                              for (p in result){
+                                                   if (result[p].type=="User"){
+                                                       recomendations.push(result[p]);
+                                                   }
+                                              }
+                                           res.json({ 'advices' : recomendations });           
+                                        }
+        });
+        
+});
+
 //Obtener los datos del análisis
 app.post("/getsymlog", function(req, res){   
         var symlog = null;

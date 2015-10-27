@@ -41,7 +41,9 @@
            js.src = "//connect.facebook.net/en_US/sdk.js";
            fjs.parentNode.insertBefore(js, fjs);
          }(document, 'script', 'facebook-jssdk'));
-     
+      
+        //get recomendaciones específicas y generales
+
     </script>
   </head>
   <body class="main-div" data-userid= <%= user.local.userID %>>
@@ -231,7 +233,45 @@
         </div>
         <div class="col-md-3">
           <center> <h3> Recomendaciones </h3> </center>
-          <div class="default-div">
+          <div class="default-div" id="adv-column">
+          <br>
+          <script>
+                //carga las recomendaciones
+                $(document).ready(function(){
+                    $.post( "/getpersonaladvices", {'userID' : $("body").data("userid")}, function( data ) {
+                          for (i in data.recs){
+                              $("#adv-column").append("<p>"+data.recs[i]+"</p>")
+                          }
+                    });
+                    $.post( "/getsurvey", {'userID' : $("body").data("userid")}, function( data ) {
+                            surveyData = data.survey;
+                              $.post( "/getuseradvices", {'userID' : $("body").data("userid")}, function( data ) {
+                                  advices=data.advices;
+                                  if (typeof(advices)!="undefined"){
+                                  for (i in advices){
+                                      if (surveyData!=null){
+                                        var eval_up_down = true;
+                                        var eval_positive_negative = true;
+                                        var eval_forward_backward = true;
+                                        if (advices[i].conditions.up_down.comparison != "ignore"){
+                                          eval_up_down = eval(surveyData.result.up_down+advices[i].conditions.up_down.comparison+advices[i].conditions.up_down.value);
+                                        }
+                                        if (advices[i].conditions.forward_backward.comparison != "ignore"){
+                                          eval_forward_backward = eval(surveyData.result.forward_backward+advices[i].conditions.forward_backward.comparison+advices[i].conditions.forward_backward.value);
+                                        }
+                                        if (advices[i].conditions.positive_negative.comparison != "ignore"){
+                                          eval_positive_negative= eval(surveyData.result.positive_negative+advices[i].conditions.positive_negative.comparison+advices[i].conditions.positive_negative.value)
+                                        }
+                                        if ( eval_up_down && eval_forward_backward && eval_positive_negative ){
+                                          $("#adv-column").append("<p>"+advices[i].text+"</p>")
+                                        }
+                                      }
+                                  }
+                                }
+                        });
+                    });
+                });
+                </script>
           </div>
         </div>
         <div class="col-md-1">
