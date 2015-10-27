@@ -464,8 +464,6 @@ app.post("/getsurvey", function(req, res){
                             if (typeof(user.evaluation)!='undefined'){
                                 evaluation = user.evaluation;
                             }
-                            console.log("eval");
-                            console.log(evaluation);
                             res.json({ 'survey' : survey, 'evaluation': evaluation });
                         }
                     });
