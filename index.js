@@ -362,6 +362,50 @@ app.post("/changeadvice", function(req, res){
                     });
 });
 
+//Modificar el contenido de un usuario
+app.post("/changeuserjson", function(req, res){
+        schemas.userSchema.findOne({"_id": req.body.id}, function(err, user){
+                        if (err){
+                            return err;
+
+                        }
+                        if (user){
+                            if (req.body.data.admin != 'undefined'){    
+                                user.admin=req.body.data.admin;
+                            }
+                            if (req.body.data.facebook != 'undefined'){    
+                                user.facebook=req.body.data.facebook;
+                            }
+                            if (req.body.data.local != 'undefined'){    
+                                user.local=req.body.data.local;
+                            }
+                            if (req.body.data.twitter != 'undefined'){    
+                                user.twitter=req.body.data.twitter;
+                            }
+                            if (req.body.data.google != 'undefined'){    
+                                user.google=req.body.data.google;
+                            }
+                            if (req.body.data.survey != 'undefined'){    
+                                user.survey=req.body.data.survey;
+                            }
+                            if (req.body.data.recomendations != 'undefined'){    
+                                user.recomendations=req.body.data.recomendations;
+                            }
+                            if (req.body.data.symlog != 'undefined'){    
+                                user.symlog=req.body.data.symlog;
+                            }
+                            user.save(function(err) {
+                                    if (err){
+                                        throw err;
+                                     }
+                                     else{
+                                        res.json({ 'success' : true });
+                                    }
+                            });
+                        }
+                    });
+});
+
 app.post("/saveadvice", function(req, res){
     var ad = new schemas.adviceSchema();
     ad.type=req.body.type;
