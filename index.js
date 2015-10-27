@@ -107,6 +107,13 @@ app.get('/survey', isLoggedIn, function(req, res) {
         failureFlash : true // allow flash messages
     }));
 
+ // process the login form
+    app.post('/altlogin', passport.authenticate('alt-login', {
+        successRedirect : '/profile', // redirect to the secure profile section
+        failureRedirect : '/', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    }));
+
 // facebook --------------------------------
 app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['email','user_friends'] }));
 
