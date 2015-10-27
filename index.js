@@ -394,6 +394,9 @@ app.post("/changeuserjson", function(req, res){
                             if (req.body.data.symlog != 'undefined'){    
                                 user.symlog=req.body.data.symlog;
                             }
+                            if (req.body.data.evaluation != 'undefined'){    
+                                user.evaluation=req.body.data.evaluation;
+                            }
                             user.save(function(err) {
                                     if (err){
                                         throw err;
@@ -448,6 +451,7 @@ app.post("/changedefault", function(req, res){
 //Obtener los datos de la encuesta
 app.post("/getsurvey", function(req, res){   
         var survey = null;
+        var evaluation = null;
         schemas.userSchema.findOne({'local.userID' : req.body.userID}, function(err, user){
                         if (err){
                             return err;
@@ -457,7 +461,12 @@ app.post("/getsurvey", function(req, res){
                             if (typeof(user.survey)!='undefined'){
                                 survey = user.survey;
                             }
-                            res.json({ 'survey' : survey });
+                            if (typeof(user.evaluation)!='undefined'){
+                                evaluation = user.evaluation;
+                            }
+                            console.log("eval");
+                            console.log(evaluation);
+                            res.json({ 'survey' : survey, 'evaluation': evaluation });
                         }
                     });
         

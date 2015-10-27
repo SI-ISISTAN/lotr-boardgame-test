@@ -127,36 +127,38 @@
                   function drawMultSeries() {
                      $.post( "/getsurvey", {'userID' : $("body").data("userid")}, function( data ) {
                           surveyData = data.survey;
+                          evaluationAnswers=data.evaluation.answers;
                           var answers= surveyData.answers;
                           var values = [
-                              ['Dimension', 'Valor obtenido', 'Valor ideal promediado'],
-                              ['U', 0, 0.62],
-                              ['UP', 0, 0.7],
-                              ['UPF', 0, 0.8],
-                              ['UF', 0, 0.7],
-                              ['UNF', 0, 0.5],
-                              ['UN',0, 0.48],
-                              ['UNB', 0, 0.22],
-                              ['UB', 0, 0.5],
-                              ['UPB', 0, 0.69],
-                              ['P', 0, 0.72],
-                              ['PF', 0, 0.78],
-                              ['F', 0, 0.65],
-                              ['NF', 0, 0.57],
-                              ['N', 0, 0.1],
-                              ['NB', 0, 0.15],
-                              ['B', 0, 0.62],
-                              ['PB', 0, 0.7],
-                              ['DP', 0, 0.72],
-                                ['DPF', 0, 0.72],
-                              ['DF', 0, 0.65],
-                              ['DNF', 0, 0.55],
-                              ['DN', 0, 0.25],
-                              ['DNB', 0, 0.1],
-                              ['DB', 0, 0.05],
-                              ['DPB', 0, 0.35],
-                              ['D', 0, 0.16]
+                              ['Dimension', 'Valor obtenido', 'Valor ideal promediado', 'Valores según evaluación de pares'],
+                              ['U', 0, 0.62,0],
+                              ['UP', 0, 0.7,0],
+                              ['UPF', 0, 0.8,0],
+                              ['UF', 0, 0.7,0],
+                              ['UNF', 0, 0.5,0],
+                              ['UN',0, 0.48,0],
+                              ['UNB', 0, 0.22,0],
+                              ['UB', 0, 0.5,0],
+                              ['UPB', 0, 0.69,0],
+                              ['P', 0, 0.72,0],
+                              ['PF', 0, 0.78,0],
+                              ['F', 0, 0.65,0],
+                              ['NF', 0, 0.57,0],
+                              ['N', 0, 0.1,0],
+                              ['NB', 0, 0.15,0],
+                              ['B', 0, 0.62,0],
+                              ['PB', 0, 0.7,0],
+                              ['DP', 0, 0.72,0],
+                                ['DPF', 0, 0.72,0],
+                              ['DF', 0, 0.65,0],
+                              ['DNF', 0, 0.55,0],
+                              ['DN', 0, 0.25,0],
+                              ['DNB', 0, 0.1,0],
+                              ['DB', 0, 0.05,0],
+                              ['DPB', 0, 0.35,0],
+                              ['D', 0, 0.16,0]
                             ];
+                          //cargo los valores de valor obtenido  
                           for (var i=1; i<27; i++){
                               var val=0;
                               var t=0;
@@ -168,6 +170,20 @@
                               }
                             values[i][1] = val;
                           }
+
+                          //cargo valorwes de evaluacion ajena
+                          for (var j=1; j<27; j++){
+                              var val=0;
+                              var t=0;
+                              while (val==0 && t<3){
+                                if (Math.abs(JSON.parse(evaluationAnswers[j-1])[t])>0){
+                                    val= Math.abs(JSON.parse(evaluationAnswers[j-1])[t]);
+                                  }
+                                  t++;
+                              }
+                            values[j][3] = val;
+                          }
+
                             var data = google.visualization.arrayToDataTable(values);
 
                             var options = {
@@ -187,7 +203,6 @@
                             chart.draw(data, options);
                            
 
-
                             //dibujo el chart de torta
 
                             //normalizo los datos de la encuesta
@@ -205,6 +220,7 @@
                               if (data.symlog!=null){                  
                                   data_array.push(['Según el análisis',    data.symlog.positive_negative,              data.symlog.forward_backward,      'S.A',  data.symlog.up_down]);                              
                               }
+
                               var data2 = google.visualization.arrayToDataTable(data_array);
 
                                   var options2 = {
