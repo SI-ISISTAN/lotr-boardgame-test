@@ -71,19 +71,20 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
                                                               }
                                                             values[i][1] = val;
                                                           }
-                                                          
-                                                          //cargo valorwes de evaluacion ajena
-                                                          for (var j=1; j<27; j++){
-                                                              var val=0;
-                                                              var t=0;
-                                                              while (val==0 && t<3){
-                                                                if (Math.abs(JSON.parse(evaluationAnswers[j-1])[t])>0){
-                                                                    val= Math.abs(JSON.parse(evaluationAnswers[j-1])[t]);
-                                                                  }
-                                                                  t++;
-                                                              }
-                                                            values[j][3] = val;
-                                                          }
+                                                          if (evaluationAnswers.length!=0){
+		                                                          //cargo valorwes de evaluacion ajena
+		                                                          for (var j=1; j<27; j++){
+		                                                              var val=0;
+		                                                              var t=0;
+		                                                              while (val==0 && t<3){
+		                                                                if (Math.abs(JSON.parse(evaluationAnswers[j-1])[t])>0){
+		                                                                    val= Math.abs(JSON.parse(evaluationAnswers[j-1])[t]);
+		                                                                  }
+		                                                                  t++;
+		                                                              }
+		                                                            values[j][3] = val;
+		                                                          }
+                                                      		}
 
                                                             var data = google.visualization.arrayToDataTable(values);
 
