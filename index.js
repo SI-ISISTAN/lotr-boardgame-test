@@ -108,6 +108,13 @@ app.get('/survey', isLoggedIn, function(req, res) {
         failureFlash : true // allow flash messages
     }));
 
+ // process the login form
+    app.post('/altlogin', passport.authenticate('alt-login', {
+        successRedirect : '/profile', // redirect to the secure profile section
+        failureRedirect : '/', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    }));
+
 // facebook --------------------------------
 app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['email','user_friends'] }));
 
@@ -338,6 +345,78 @@ app.post("/changeconfig", function(req, res){
                     });
 });
 
+//Modificar el contenido de un advice ya creado
+app.post("/changeadvice", function(req, res){
+        schemas.adviceSchema.findOne({"_id": req.body.id}, function(err, advice){
+                        if (err){
+                            return err;
+
+                        }
+                        if (advice){
+                            advice.type=req.body.data.type;
+                            advice.name=req.body.data.name;
+                            advice.text=req.body.data.text;
+                            advice.explicit = req.body.data.explicit;
+                            advice.conditions = req.body.data.conditions;
+                            advice.save(function(err) {
+                                    if (err){
+                                        throw err;
+                                     }
+                                     else{
+                                        res.json({ 'success' : true });
+                                    }
+                            });
+                        }
+                    });
+});
+
+//Modificar el contenido de un usuario
+app.post("/changeuserjson", function(req, res){
+        schemas.userSchema.findOne({"_id": req.body.id}, function(err, user){
+                        if (err){
+                            return err;
+
+                        }
+                        if (user){
+                            if (req.body.data.admin != 'undefined'){    
+                                user.admin=req.body.data.admin;
+                            }
+                            if (req.body.data.facebook != 'undefined'){    
+                                user.facebook=req.body.data.facebook;
+                            }
+                            if (req.body.data.local != 'undefined'){    
+                                user.local=req.body.data.local;
+                            }
+                            if (req.body.data.twitter != 'undefined'){    
+                                user.twitter=req.body.data.twitter;
+                            }
+                            if (req.body.data.google != 'undefined'){    
+                                user.google=req.body.data.google;
+                            }
+                            if (req.body.data.survey != 'undefined'){    
+                                user.survey=req.body.data.survey;
+                            }
+                            if (req.body.data.recomendations != 'undefined'){    
+                                user.recomendations=req.body.data.recomendations;
+                            }
+                            if (req.body.data.symlog != 'undefined'){    
+                                user.symlog=req.body.data.symlog;
+                            }
+                            if (req.body.data.evaluation != 'undefined'){    
+                                user.evaluation=req.body.data.evaluation;
+                            }
+                            user.save(function(err) {
+                                    if (err){
+                                        throw err;
+                                     }
+                                     else{
+                                        res.json({ 'success' : true });
+                                    }
+                            });
+                        }
+                    });
+});
+
 app.post("/saveadvice", function(req, res){
     var ad = new schemas.adviceSchema();
     ad.type=req.body.type;
@@ -380,6 +459,7 @@ app.post("/changedefault", function(req, res){
 //Obtener los datos de la encuesta
 app.post("/getsurvey", function(req, res){   
         var survey = null;
+        var evaluation = null;
         schemas.userSchema.findOne({'local.userID' : req.body.userID}, function(err, user){
                         if (err){
                             return err;
@@ -389,9 +469,50 @@ app.post("/getsurvey", function(req, res){
                             if (typeof(user.survey)!='undefined'){
                                 survey = user.survey;
                             }
-                            res.json({ 'survey' : survey });
+                            if (typeof(user.evaluation)!='undefined'){
+                                evaluation = user.evaluation;
+                            }
+                            res.json({ 'survey' : survey, 'evaluation': evaluation });
                         }
                     });
+        
+});
+
+//Obtener los advices personalizados
+app.post("/getpersonaladvices", function(req, res){   
+        var recomendations = null;
+        schemas.userSchema.findOne({'local.userID' : req.body.userID}, function(err, user){
+                        if (err){
+                            return err;
+
+                        }
+                        if (user){
+                            if (typeof(user.recomendations)!='undefined'){
+
+                                recomendations = user.recomendations;
+                            }
+                            res.json({ 'recs' : recomendations });
+                        }
+                    });
+        
+});
+
+//Obtener los advices personalizados
+app.post("/getuseradvices", function(req, res){   
+        var recomendations = [];
+        schemas.adviceSchema.find({}, function(err, result){
+                                        if (err){
+                                            console.log("Error");
+                                          }
+                                          else{
+                                              for (p in result){
+                                                   if (result[p].type=="User"){
+                                                       recomendations.push(result[p]);
+                                                   }
+                                              }
+                                           res.json({ 'advices' : recomendations });           
+                                        }
+        });
         
 });
 

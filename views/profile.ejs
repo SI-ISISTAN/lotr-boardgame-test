@@ -41,7 +41,9 @@
            js.src = "//connect.facebook.net/en_US/sdk.js";
            fjs.parentNode.insertBefore(js, fjs);
          }(document, 'script', 'facebook-jssdk'));
-     
+      
+        //get recomendaciones específicas y generales
+
     </script>
   </head>
   <body class="main-div" data-userid= <%= user.local.userID %>>
@@ -127,36 +129,38 @@
                   function drawMultSeries() {
                      $.post( "/getsurvey", {'userID' : $("body").data("userid")}, function( data ) {
                           surveyData = data.survey;
+                          evaluationAnswers=data.evaluation.answers;
                           var answers= surveyData.answers;
                           var values = [
-                              ['Dimension', 'Valor obtenido', 'Valor ideal promediado'],
-                              ['U', 0, 0.62],
-                              ['UP', 0, 0.7],
-                              ['UPF', 0, 0.8],
-                              ['UF', 0, 0.7],
-                              ['UNF', 0, 0.5],
-                              ['UN',0, 0.48],
-                              ['UNB', 0, 0.22],
-                              ['UB', 0, 0.5],
-                              ['UPB', 0, 0.69],
-                              ['P', 0, 0.72],
-                              ['PF', 0, 0.78],
-                              ['F', 0, 0.65],
-                              ['NF', 0, 0.57],
-                              ['N', 0, 0.1],
-                              ['NB', 0, 0.15],
-                              ['B', 0, 0.62],
-                              ['PB', 0, 0.7],
-                              ['DP', 0, 0.72],
-                                ['DPF', 0, 0.72],
-                              ['DF', 0, 0.65],
-                              ['DNF', 0, 0.55],
-                              ['DN', 0, 0.25],
-                              ['DNB', 0, 0.1],
-                              ['DB', 0, 0.05],
-                              ['DPB', 0, 0.35],
-                              ['D', 0, 0.16]
+                              ['Dimension', 'Valor obtenido', 'Valor ideal promediado', 'Valores según evaluación de pares'],
+                              ['U', 0, 0.62,0],
+                              ['UP', 0, 0.7,0],
+                              ['UPF', 0, 0.8,0],
+                              ['UF', 0, 0.7,0],
+                              ['UNF', 0, 0.5,0],
+                              ['UN',0, 0.48,0],
+                              ['UNB', 0, 0.22,0],
+                              ['UB', 0, 0.5,0],
+                              ['UPB', 0, 0.69,0],
+                              ['P', 0, 0.72,0],
+                              ['PF', 0, 0.78,0],
+                              ['F', 0, 0.65,0],
+                              ['NF', 0, 0.57,0],
+                              ['N', 0, 0.1,0],
+                              ['NB', 0, 0.15,0],
+                              ['B', 0, 0.62,0],
+                              ['PB', 0, 0.7,0],
+                              ['DP', 0, 0.72,0],
+                                ['DPF', 0, 0.72,0],
+                              ['DF', 0, 0.65,0],
+                              ['DNF', 0, 0.55,0],
+                              ['DN', 0, 0.25,0],
+                              ['DNB', 0, 0.1,0],
+                              ['DB', 0, 0.05,0],
+                              ['DPB', 0, 0.35,0],
+                              ['D', 0, 0.16,0]
                             ];
+                          //cargo los valores de valor obtenido  
                           for (var i=1; i<27; i++){
                               var val=0;
                               var t=0;
@@ -168,6 +172,20 @@
                               }
                             values[i][1] = val;
                           }
+
+                          //cargo valorwes de evaluacion ajena
+                          for (var j=1; j<27; j++){
+                              var val=0;
+                              var t=0;
+                              while (val==0 && t<3){
+                                if (Math.abs(JSON.parse(evaluationAnswers[j-1])[t])>0){
+                                    val= Math.abs(JSON.parse(evaluationAnswers[j-1])[t]);
+                                  }
+                                  t++;
+                              }
+                            values[j][3] = val;
+                          }
+
                             var data = google.visualization.arrayToDataTable(values);
 
                             var options = {
@@ -187,7 +205,6 @@
                             chart.draw(data, options);
                            
 
-
                             //dibujo el chart de torta
 
                             //normalizo los datos de la encuesta
@@ -205,6 +222,7 @@
                               if (data.symlog!=null){                  
                                   data_array.push(['Según el análisis',    data.symlog.positive_negative,              data.symlog.forward_backward,      'S.A',  data.symlog.up_down]);                              
                               }
+
                               var data2 = google.visualization.arrayToDataTable(data_array);
 
                                   var options2 = {
@@ -234,7 +252,45 @@
         </div>
         <div class="col-md-3">
           <center> <h3> Recomendaciones </h3> </center>
-          <div class="default-div">
+          <div class="default-div" id="adv-column">
+          <br>
+          <script>
+                //carga las recomendaciones
+                $(document).ready(function(){
+                    $.post( "/getpersonaladvices", {'userID' : $("body").data("userid")}, function( data ) {
+                          for (i in data.recs){
+                              $("#adv-column").append("<p>"+data.recs[i]+"</p>")
+                          }
+                    });
+                    $.post( "/getsurvey", {'userID' : $("body").data("userid")}, function( data ) {
+                            surveyData = data.survey;
+                              $.post( "/getuseradvices", {'userID' : $("body").data("userid")}, function( data ) {
+                                  advices=data.advices;
+                                  if (typeof(advices)!="undefined"){
+                                  for (i in advices){
+                                      if (surveyData!=null){
+                                        var eval_up_down = true;
+                                        var eval_positive_negative = true;
+                                        var eval_forward_backward = true;
+                                        if (advices[i].conditions.up_down.comparison != "ignore"){
+                                          eval_up_down = eval(surveyData.result.up_down+advices[i].conditions.up_down.comparison+advices[i].conditions.up_down.value);
+                                        }
+                                        if (advices[i].conditions.forward_backward.comparison != "ignore"){
+                                          eval_forward_backward = eval(surveyData.result.forward_backward+advices[i].conditions.forward_backward.comparison+advices[i].conditions.forward_backward.value);
+                                        }
+                                        if (advices[i].conditions.positive_negative.comparison != "ignore"){
+                                          eval_positive_negative= eval(surveyData.result.positive_negative+advices[i].conditions.positive_negative.comparison+advices[i].conditions.positive_negative.value)
+                                        }
+                                        if ( eval_up_down && eval_forward_backward && eval_positive_negative ){
+                                          $("#adv-column").append("<p>"+advices[i].text+"</p>")
+                                        }
+                                      }
+                                  }
+                                }
+                        });
+                    });
+                });
+                </script>
           </div>
         </div>
         <div class="col-md-1">

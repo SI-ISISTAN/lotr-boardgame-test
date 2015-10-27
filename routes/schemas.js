@@ -37,6 +37,17 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
                 forward_backward : Number
             }
         },
+        symlog: {
+            model:String,
+            answers : Array,
+            up_down : Number,
+            positive_negative : Number,
+            forward_backward : Number,
+            interactions:Number
+        },
+        evaluation: {
+            answers : Array
+        },
         recomendations : Array
     });
 

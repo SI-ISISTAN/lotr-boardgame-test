@@ -6,7 +6,11 @@
     <link rel="stylesheet" type="text/css" href="./style/lobby.css" media="screen" />
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+            <script type="text/javascript" src="https://www.google.com/jsapi?autoload= 
+            {'modules':[{'name':'visualization','version':'1.1','packages':
+            ['corechart','bar']}]}"></script>
     <script data-main="/admin.js" src="/node_modules/requirejs/require.js"></script>
+
   </head>
   <body class="main-div" >
         <h3> Pagina de admin</h3>
@@ -63,6 +67,7 @@
                             <option value = "Location"> Escenario </option>
                             <option value="Card"> Carta </option>
                             <option value="Activity"> Actividad </option>
+                            <option value="User"> Usuario </option>
                         </select>
                     </p>
                     <p>Nombre: 
@@ -122,6 +127,8 @@
                     <textarea id="advice-area" cols="100" rows="20" style="color:#58FA82;  width:100%; height:100%; background-color: #4d4d4a">
                     </textarea>
                     <br><br>
+                    <button class="btn btn-warning btn-lg" id="advice-change-button">Guardar cambios en la recomendación</button>
+                    <br><br>
                     <p>Volver al <a href="/">home</a>.</p>
                 </div>
                 <div class="col-md-1">
@@ -134,17 +141,26 @@
                 <div class="col-md-1">
                 </div>
                 <div class="col-md-3">
-                    <h3> Lista de usuarios </h3>
-                    <p> Ver usuario: 
-                        <select id="users-selector" style="color : black"> </select>
-                    </p>
+                    <div class="row">
+                        <h3> Lista de usuarios </h3>
+                        <p> Ver usuario: 
+                            <select id="users-selector" style="color : black"> </select>
+                        </p>
+                    </div>
+                    <br>
+                    <div class="row" id="charts-row">
+                        <h3> Gráficos de usuario </h3>
+                         <div id="survey_bar_chart" style="height:800px;"></div>
+                        <div id="survey_bubble_chart" style="height:800px;"></div>
+                    </div>
                 </div>
                 <div class="col-md-1">
                 </div>
                 <div class="col-md-6">
-                    
                     <textarea id="users-area" cols="100" rows="20" style="color:#58FA82;  width:100%; height:100%; background-color: #4d4d4a">
                     </textarea>
+                    <br><br>
+                    <button class="btn btn-warning btn-lg" id="users-change-button">Guardar cambios en el usuario</button>
                     <br><br>
                     <p>Volver al <a href="/">home</a>.</p>
                 </div>
