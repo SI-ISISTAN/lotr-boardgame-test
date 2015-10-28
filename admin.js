@@ -417,7 +417,7 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 					name=users[j].google.name;
 				}
 				else{
-					name=local.userID;
+					name=users[j].local.userID;
 				}
 				//
 				$("#users-selector").append('<option value='+j+'>'+name+'</option>')
