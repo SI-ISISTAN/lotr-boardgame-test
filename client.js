@@ -498,7 +498,16 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 								i++;
 							}
 					});
-					client.socket.emit('fill survey', {'result' : result, 'answers': answers});
+					$.post( "/fillsurvey", {'userID' : userID ,'result' : result, 'answers': answers}, function( data ) {
+						if (data.success){
+							alert("Encuesta cargada con éxito.");
+							location.reload();
+						}
+						else{
+							alert("Error en carga de encuesta.");
+						}
+					});
+					//client.socket.emit('fill survey', {'result' : result, 'answers': answers});
 					location.reload();
 				});
 

@@ -537,6 +537,33 @@ app.post("/getsymlog", function(req, res){
         
 });
 
+//guardar datos de encuesta
+app.post("/fillsurvey", function(req, res){   
+        schemas.userSchema.findOne({ 'local.userID' : req.body.userID }, function(err, user){
+                    if (err){
+                        return err;
+                    }
+                    if (user){
+                        //guardar resultado de la encuesta
+                        user.survey.complete = true;
+                        user.survey.result.up_down = req.body.result[0];
+                        user.survey.result.positive_negative =req.body.result[1];
+                        user.survey.result.forward_backward= req.body.result[2];
+                        user.survey.answers = req.body.answers;
+                        user.save(function(err) {
+                                if (err){
+                                    throw err;
+                                    res.json({ 'success' :  false });
+                                }
+                                else{
+                                    res.json({ 'success' : true });
+                                }
+                        });
+                    }
+                });
+        
+});
+
 
 // route middleware to make sure
 function isLoggedIn(req, res, next) {
