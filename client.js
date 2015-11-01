@@ -248,6 +248,14 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 	        	d.scrollTop(d.prop("scrollHeight"));
 	    });
 
+	    //mensaje de admin
+	    socket.on('admin message', function(res){
+	    		console.log("me llega claneor");
+	    		var d = $('#chat-msg-div');	
+	        	d.append('<p class="chat-message" style= "color: #58D3F7"> <b style= "color: #58D3F7"> Administrador: </b>'+ res.msg+' </p>');
+	        	d.scrollTop(d.prop("scrollHeight"));
+	    });
+
 	    //mensaje de log
 	    socket.on('log message', function(res){
 	    	if (res.mode=='alert'){
