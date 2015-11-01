@@ -509,14 +509,15 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 					$.post( "/fillsurvey", {'userID' : userID ,'result' : result, 'answers': answers}, function( data ) {
 						if (data.success){
 							alert("Encuesta cargada con éxito.");
-							location.reload();
+							location.replace("/profile");
 						}
 						else{
 							alert("Error en carga de encuesta.");
+
 						}
 					});
 					//client.socket.emit('fill survey', {'result' : result, 'answers': answers});
-					location.reload();
+					
 				});
 
 				$("#tutorial-btn").on('click', function(){
