@@ -432,7 +432,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						}
 					});
 				}
-				
 			});
 
 			//Updatea que no respeta la estructura (evento súbito, como la desconexion de un jugador)
@@ -714,6 +713,48 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				else{
 					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
 				}
+			});
+		
+			//FUNCIONES DE ADMIN //////////////////////////////////////////////////////////////////////77
+			client.on('admin connect', function (){
+				disconnectedAlias = self.disconnectClient(client.id).alias;
+				var gamesData=[];
+				Object.keys(self.activeGames).forEach(function(key, index) {
+						if (this[key].isActive && !this[key].ended){	//si no esta ya jugandose
+					  		gamesData.push({'gameID' : this[key].gameID})
+						}
+				}, self.activeGames);
+				io.to(client.id).emit("send lobby info", {"games":gamesData});
+			});
+
+			client.on('ask lobby info', function (data){
+				//si el juego sigue activo
+				var gamesData=[];
+				Object.keys(self.activeGames).forEach(function(key, index) {
+						if (this[key].isActive && !this[key].ended){	//si no esta ya jugandose
+					  		gamesData.push({'gameID' : this[key].gameID})
+						}
+				}, self.activeGames);
+				io.to(client.id).emit("send lobby info", {"games":gamesData});
+			});
+
+			client.on('admin join game', function (data){
+				//si el juego sigue activo
+
+					client.leave('waiting');	//Dejar la lista de espera	
+					client.join(data);	//Unirse a la room del juego
+			});
+
+			client.on('admin leave game', function (data){
+				//si el juego sigue activo
+
+					client.leave(data);	//Dejar la lista de espera	
+					client.join('waiting');	//Unirse a la room del juego
+			});
+
+			client.on('admin message', function (gameID, msg){
+				//si el juego sigue activo
+					io.to(gameID).emit('admin message', {'msg' : msg});	//avisar a los demás clientes
 			});
 
 		});
