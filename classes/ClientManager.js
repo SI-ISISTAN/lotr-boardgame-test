@@ -386,7 +386,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//Updatear juego con activity
 			client.on('update game', function (data){
-				console.log("Llego a client manager un update de actividad: "+data.action);
+				//console.log("Llego a client manager un update de actividad: "+data.action);
 				if (!self.activeGames[client.room].ended){
 					var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 					if (update.name!="ChangeLocation"){
