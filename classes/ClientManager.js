@@ -700,7 +700,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							//self.connectedClients.push({'id' : client.id, 'alias' : client.alias});
 							if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
 								io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });
-								delete self.activeGames[client.room];
+								//delete self.activeGames[client.room];
 							}
 							client.room = 'waiting';	//Setear la room del juego
 							client.player = null;
