@@ -693,22 +693,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							}
 						}
 					}
-					//SI EL CLIENTE SE DESCONECTO EN EL LOBBY PERO estaba EN UNA PARTIDA
-					if (!self.activeGames[client.room].getPlayerByID(client.id).playing){
-						if (typeof(client.room) != 'undefined'){
-							self.activeGames[client.room].removePlayer(client.id);
-							//self.connectedClients.push({'id' : client.id, 'alias' : client.alias});
-							if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
-								io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });
-								//delete self.activeGames[client.room];
-							}
-							client.room = 'waiting';	//Setear la room del juego
-							client.player = null;
-							client.in(client.room).broadcast.emit('quit game',{'gameID' : client.room, 'alias':client.alias});	
-							client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
-						}		
-					}
-					
 				}
 				else{
 					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
