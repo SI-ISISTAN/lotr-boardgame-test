@@ -386,7 +386,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//Updatear juego con activity
 			client.on('update game', function (data){
-				console.log("Llego a client manager un update de actividad: "+data.action);
+				//console.log("Llego a client manager un update de actividad: "+data.action);
 				if (!self.activeGames[client.room].ended){
 					var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 					if (update.name!="ChangeLocation"){
@@ -475,6 +475,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('add activity', function (data){
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				if (typeof self.activeGames[client.room].currentLocation.currentActivity != 'undefined'){
+					console.log("Add activity. Room del cliente emisor: "+client.room+". Si no es undefined se esta borrando una partida.");
 					self.activeGames[client.room].currentLocation.currentActivity.addSubActivity(new_act);
 				}
 			});
@@ -483,6 +484,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('add activity first', function (data){
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				if (typeof self.activeGames[client.room].currentLocation.currentActivity != 'undefined'){
+					console.log("Add activity first. Room del cliente emisor: "+client.room+". Si no es undefined se esta borrando una partida.");
 					self.activeGames[client.room].currentLocation.currentActivity.addSubActivityFirst(new_act);
 				}
 			});
@@ -693,22 +695,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 							}
 						}
 					}
-					//SI EL CLIENTE SE DESCONECTO EN EL LOBBY PERO estaba EN UNA PARTIDA
-					if (!self.activeGames[client.room].getPlayerByID(client.id).playing){
-						if (typeof(client.room) != 'undefined'){
-							self.activeGames[client.room].removePlayer(client.id);
-							//self.connectedClients.push({'id' : client.id, 'alias' : client.alias});
-							if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
-								io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });
-								delete self.activeGames[client.room];
-							}
-							client.room = 'waiting';	//Setear la room del juego
-							client.player = null;
-							client.in(client.room).broadcast.emit('quit game',{'gameID' : client.room, 'alias':client.alias});	
-							client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
-						}		
-					}
-					
 				}
 				else{
 					client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});	
