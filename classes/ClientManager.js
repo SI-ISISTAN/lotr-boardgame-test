@@ -475,6 +475,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('add activity', function (data){
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				if (typeof self.activeGames[client.room].currentLocation.currentActivity != 'undefined'){
+					console.log("Add activity. Room del cliente emisor: "+client.room+". Si no es undefined se esta borrando una partida.");
 					self.activeGames[client.room].currentLocation.currentActivity.addSubActivity(new_act);
 				}
 			});
@@ -483,6 +484,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			client.on('add activity first', function (data){
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				if (typeof self.activeGames[client.room].currentLocation.currentActivity != 'undefined'){
+					console.log("Add activity first. Room del cliente emisor: "+client.room+". Si no es undefined se esta borrando una partida.");
 					self.activeGames[client.room].currentLocation.currentActivity.addSubActivityFirst(new_act);
 				}
 			});
