@@ -678,26 +678,43 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
 					if (!self.activeGames[client.room].ended){
-					//reveer todo esto
-						if (self.activeGames[client.room].activePlayer != null && self.activeGames[client.room].activePlayer.alias == client.alias){
-							client.in(client.room).broadcast.emit('player disconnect', { 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El jugador activo se ha desconectado!"}});
-							self.activeGames[client.room].asyncAck = false;
+						//SI EL CLIENTE SE DESCONECTO EN EL LOBBY PERO estaba EN UNA PARTIDA		
+						if (!self.activeGames[client.room].getPlayerByID(client.id).playing){		
+								if (typeof(client.room) != 'undefined'){		
+									self.activeGames[client.room].removePlayer(client.id);		
+									//self.connectedClients.push({'id' : client.id, 'alias' : client.alias});		
+									if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego		
+										io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });		
+										delete self.activeGames[client.room];		
+									}		
+									client.room = 'waiting';	//Setear la room del juego		
+									client.player = null;		
+									client.in(client.room).broadcast.emit('quit game',{'gameID' : client.room, 'alias':client.alias});			
+									client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});			
+								}				
 						}
-						else if(self.activeGames[client.room].ringBearer != null && self.activeGames[client.room].ringBearer.alias == client.alias){
-							client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El portador del Anillo se ha desconectado!"}});
-							self.activeGames[client.room].asyncAck = false;
-						}
-						else if (self.activeGames[client.room].activePlayer != null && typeof(self.activeGames[client.room].currentLocation.currentActivity)!= "undefined" && self.activeGames[client.room].currentLocation.currentActivity.data.player == client.alias){
-							io.to(self.activeGames[client.room].activePlayer.id).emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
-							io.to(self.activeGames[client.room].activePlayer.id).emit('force resolve');
-							self.activeGames[client.room].asyncAck = false;
-						}
-						else{
-							if (self.activeGames[client.room].activePlayer!= null){
-								io.to(self.activeGames[client.room].activePlayer.id).emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
+						else{	
+							//reveer todo esto
+							if (self.activeGames[client.room].activePlayer != null && self.activeGames[client.room].activePlayer.alias == client.alias){
+								client.in(client.room).broadcast.emit('player disconnect', { 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El jugador activo se ha desconectado!"}});
 								self.activeGames[client.room].asyncAck = false;
 							}
-						}
+							else if(self.activeGames[client.room].ringBearer != null && self.activeGames[client.room].ringBearer.alias == client.alias){
+								client.in(client.room).broadcast.emit('player disconnect',{ 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El portador del Anillo se ha desconectado!"}});
+								self.activeGames[client.room].asyncAck = false;
+							}
+							else if (self.activeGames[client.room].activePlayer != null && typeof(self.activeGames[client.room].currentLocation.currentActivity)!= "undefined" && self.activeGames[client.room].currentLocation.currentActivity.data.player == client.alias){
+								io.to(self.activeGames[client.room].activePlayer.id).emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
+								io.to(self.activeGames[client.room].activePlayer.id).emit('force resolve');
+								self.activeGames[client.room].asyncAck = false;
+							}
+							else{
+								if (self.activeGames[client.room].activePlayer!= null){
+									io.to(self.activeGames[client.room].activePlayer.id).emit('player disconnect',{ 'update' : {'action' : 'KillPlayer', 'alias':client.alias, 'reason': "¡Se ha desconectado de la partida!"}});
+									self.activeGames[client.room].asyncAck = false;
+								}
+							}
+					}
 					}
 				}
 				else{
