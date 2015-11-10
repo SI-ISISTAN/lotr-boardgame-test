@@ -296,34 +296,15 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 
 	//Elijo al nuevo ring bearer
 	Game.prototype.changeRingBearer = function(){
-		var most = -100;
-		var neu = null;
+		var most = -100;	
 		var candidates = this.getAlivePlayers();
-		var i=0;
-		var playerNumber = this.ringBearer.number;
-		if (candidates.length>1){
-			if (playerNumber<candidates.length-1){
-						i = playerNumber+1;
-			}
-			while (candidates[i].alias != this.ringBearer.alias){
-					if (candidates[i].lifeTokens > most){
+		//aseguroi que si falla el ring vaya a un jugador vivo
+		var neu = candidates[0];
+		for (i in candidates){
+					if (candidates[i].alias!=this.ringBearer.alias && candidates[i].lifeTokens > most){
 						most=candidates[i].lifeTokens;
 						neu = candidates[i];
 					}
-					if (i<candidates.length-1){
-						i++;
-					}
-					else{
-						i=0;
-					}
-			}
-		}
-		else if (candidates.length==1){
-			neu=candidates[0];
-		}
-		else{
-			//retorno el actual para evitar que crashee (revisar!)
-			neu=this.ringBearer;
 		}
 		return neu;
 	}
