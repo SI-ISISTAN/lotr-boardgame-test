@@ -98,6 +98,10 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
         configs : [{
             configName : String,
             isTutorial : Boolean,
+            shieldTokens : Number,
+            lifeTokens : Number,
+            sunTokens : Number,
+            ringTokens : Number,
             sauronPosition : Number,
             hobbitPosition : Number,
             locations : Array,
