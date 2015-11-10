@@ -176,9 +176,24 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		if (config.isTutorial){
 			this.isTutorial = true;
 		}
+
 		//asigno a cada player un personaje
 		for (var i = 0; i < this.players.length; i++) {
 			this.players[i].corruption = config.hobbitPosition;
+			//asgino tokens
+			if (typeof(config.shieldTokens)!="undefined"){
+				this.players[i].shields=config.shieldTokens;
+			}
+			if (typeof(config.lifeTokens)!="undefined"){
+				this.players[i].lifeTokens=config.lifeTokens;
+			}
+			if (typeof(config.sunTokens)!="undefined"){
+				this.players[i].sunTokens=config.sunTokens;
+			}
+			if (typeof(config.ringTokens)!="undefined"){
+				this.players[i].ringTokens=config.ringTokens;
+			}
+			//asigno personajes
 			this.players[i].character = gameData.characters[i];
 		};
 		this.turnedPlayer=0;
