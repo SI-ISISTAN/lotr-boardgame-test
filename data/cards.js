@@ -143,7 +143,6 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			description : "Hierbabuena: Previene a un aventurero de moverse en la Línea de Corrupción si le faltan fichas al final del escenario.",
 			apply : function (game,player,data){
 				game.specialEvents.push({'event' : "PreventAdvance", 'player':player.alias});
-				console.log(game.specialEvents);
 			},
 			draw : function(client, data){
 				
@@ -210,6 +209,24 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			},
 			draw : function(client, data){
 				$("#dice-info").dialog('close'); //cierro el popup informativo
+				client.socket.emit('resolve activity');
+			}
+		},
+
+		"Dagger" : {
+			phases : ["drawTiles","playCards","cleanUp"],
+			activities : [],
+			description : "Sacrificio (y rock and roll): El jugador activo retrocede 2 espacios en la Línea de Corrupción, pero todos sus compañeros avanzan en la Línea 1 espacio hacia el Malvado.",
+			apply : function (game,player,data){
+			},
+			draw : function(client, data){
+				client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : client.alias, 'amount' : -2});
+				var others = client.getAlivePlayers();
+				for (i in others){
+					if (others[i].alias!=client.alias){
+						client.socket.emit('add activity', {'action' : 'MovePlayer', 'alias' : others[i].alias, 'amount' : 1});
+					}
+				}
 				client.socket.emit('resolve activity');
 			}
 		},

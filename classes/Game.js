@@ -378,10 +378,12 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 			card = this.hobbitCards.splice(position,1);
 		}
 		else{
-			//vuelvo a dar cartas
+			//vuelvo a dar cartas (pero no reinstancio las especiales)
 			for (i in gameData.hobbitCards){
-				var card = new Card(gameData.hobbitCards[i]);
-				this.hobbitCards.push(card);
+				if (typeof(gameData.hobbitCards[i].type)=="undefined"){
+					var card = new Card(gameData.hobbitCards[i]);
+					this.hobbitCards.push(card);
+				}
 			}
 			this.hobbitCards = this.shuffleArray(this.hobbitCards);
 			card = this.hobbitCards.splice(position,1);
