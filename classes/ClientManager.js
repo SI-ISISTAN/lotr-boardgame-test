@@ -330,6 +330,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						newGame.complete = false;
 						newGame.analyzed = false;
 						newGame.configName = self.activeGames[client.room].configName;
+						newGame.configObj = self.activeGames[client.room].configObj;
 						var playersList = self.activeGames[client.room].players;
 						for (i in playersList){
 							newGame.players.push({playerID: playersList[i].id , alias: playersList[i].alias , character: playersList[i].character, userID: playersList[i].userID });

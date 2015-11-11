@@ -89,7 +89,22 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
             score : Number
         },
         analyzed : Boolean,
-        configName : String
+        configName : String,
+        configObj : {
+            configName : String,
+            isTutorial : Boolean,
+            shieldTokens : Number,
+            lifeTokens : Number,
+            sunTokens : Number,
+            ringTokens : Number,
+            sauronPosition : Number,
+            hobbitPosition : Number,
+            locations : Array,
+            hobbitCards : Array,
+            storyTiles : Array,
+            gandalfCards : Array,
+            showAdvice : Boolean
+        }
     });
 
     var configSchema = mongoose.Schema({

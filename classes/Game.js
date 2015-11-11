@@ -24,6 +24,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		this.ringUsed = false;
 		this.specialEvents=[];
 		this.configName="";
+		this.configObj=null;
 		this.blockResolve = false;
 		this.isTutorial = false;	//todos los juegos son asi, salvo que se juegue el tutorial
 		this.asyncAck = true; //flag para controlar la recepcion de respuestas ante eventos asíncronos
@@ -172,6 +173,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	//iniciar juego. se le cargan los valores definidos en la configuracion elegida
 	Game.prototype.start = function(config){
 		this.configName=config.configName;
+		this.configObj=config;
 		this.sauronPosition = config.sauronPosition;
 		if (config.isTutorial){
 			this.isTutorial = true;
@@ -362,16 +364,26 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		}
 	}
 
+	Game.prototype.replenishTiles = function(){
+		//repongo los tiles
+			for (i in gameData.storyTiles){
+				this.storyTiles.push(gameData.storyTiles[i]);
+			}
+			this.storyTiles = this.shuffleArray(this.storyTiles);
+	}
+
 	Game.prototype.dealHobbitCard= function(position){
 		var card = {};
 		if (this.hobbitCards.length > 0 && typeof(this.hobbitCards[position]) != 'undefined' ){
 			card = this.hobbitCards.splice(position,1);
 		}
 		else{
-			//vuelvo a dar cartas
+			//vuelvo a dar cartas (pero no reinstancio las especiales)
 			for (i in gameData.hobbitCards){
-				var card = new Card(gameData.hobbitCards[i]);
-				this.hobbitCards.push(card);
+				if (typeof(gameData.hobbitCards[i].type)=="undefined"){
+					var card = new Card(gameData.hobbitCards[i]);
+					this.hobbitCards.push(card);
+				}
 			}
 			this.hobbitCards = this.shuffleArray(this.hobbitCards);
 			card = this.hobbitCards.splice(position,1);
