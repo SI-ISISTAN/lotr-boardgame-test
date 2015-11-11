@@ -231,6 +231,22 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			}
 		},
 
+		"Devil" : {
+			phases : ["drawTiles","playCards","cleanUp"],
+			activities : [],
+			description : "Pacto con el Mal: El jugador activo recibe 3 escudos, 1 ficha de Sol, 1 de Vida y 1 de Anillo. A cambio, el Malvado avanza 1 espacio hacia los aventureros.",
+			apply : function (game,player,data){
+			},
+			draw : function(client, data){
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': 'shield', 'amount':3});
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': 'ring', 'amount':1});
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': 'life', 'amount':1});
+				client.socket.emit('add activity', {'action' : 'ChangeTokens', 'alias' :client.alias, 'token': 'sun', 'amount':1});
+				client.socket.emit('add activity', {'action' : 'MoveSauron', 'amount' : 1});
+				client.socket.emit('resolve activity');
+			}
+		}
+
 
 
 	};
