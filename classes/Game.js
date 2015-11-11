@@ -362,6 +362,14 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 		}
 	}
 
+	Game.prototype.replenishTiles = function(){
+		//repongo los tiles
+			for (i in gameData.storyTiles){
+				this.storyTiles.push(gameData.storyTiles[i]);
+			}
+			this.storyTiles = this.shuffleArray(this.storyTiles);
+	}
+
 	Game.prototype.dealHobbitCard= function(position){
 		var card = {};
 		if (this.hobbitCards.length > 0 && typeof(this.hobbitCards[position]) != 'undefined' ){

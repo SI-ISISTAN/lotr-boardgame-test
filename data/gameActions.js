@@ -1509,6 +1509,9 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 	"RearrangeTiles" : {
 		apply : function(game, player,data){
 			var tiles = [];
+			if (game.storyTiles.length<3){
+				game.replenishTiles();
+			}
 			var i=0;
 			while (i<3){ 
 				tiles.push(game.storyTiles[game.storyTiles.length-i-1]);
