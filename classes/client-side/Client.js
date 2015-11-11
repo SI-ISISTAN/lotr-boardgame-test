@@ -131,7 +131,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 								discarded= data.amount;
 							}
 							else{
-								discarded+= $(this).data("card").amount;
+								discarded+= parseInt($(this).data("card").amount);
 								$(this).data("put", ($(this).data("card").amount));
 							}
 						}
@@ -141,7 +141,7 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 							$(this).data("selected", false);
 							cards.push($(this).data("discarded"));
 							$(this).data("discarded", null);
-							discarded-= $(this).data("put");
+							discarded-= parseInt($(this).data("put"));
 
 						}
 						if (discarded != data.amount){
