@@ -362,6 +362,10 @@ define(['../classes/Activity'], function (Activity) {
 		"featureCards" : []
 	};
 
+	exports.Mordor.featureCards.push({name: 'Asylum',symbol : "Friendship", color : "White", amount : 2, image:"friend_card_white_2"});
+	exports.Mordor.featureCards.push({name: 'Wollys',symbol : "Fighting", color : "Gray", amount : 2, image:"fight_card_gray_2"});
+	exports.Mordor.featureCards.push({name: 'DyerMaker',symbol : "Joker", color : "None", amount : 2, image:"joker_card_2"});
+
 	return exports;
 
 });
