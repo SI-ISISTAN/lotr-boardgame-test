@@ -858,7 +858,7 @@ define(['../classes/client-side/Popup'], function (Popup) {
 			var candidates = [];
 			var people =game.getAlivePlayers();
 			for (v in people){
-				if (people[v].hasTokens('shield',5)){
+				if (people[v].shields>=5){
 					candidates.push(people[v].alias);
 				}
 			}

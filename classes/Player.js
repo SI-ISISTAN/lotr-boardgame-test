@@ -172,15 +172,19 @@ define([], function () {
 		switch (token){
 			case 'ring':
 				this.ringTokens+=amount;
+				//console.log("Ahora tiene "+this.ringTokens+" anillos");
 			break;
 			case 'life':
 				this.lifeTokens+=amount;
+				//console.log("Ahora tiene "+this.lifeTokens+" vida");
 			break;
 			case 'sun':
 				this.sunTokens+=amount;
+				//console.log("Ahora tiene "+this.sunTokens+" soles");
 			break;
 			case 'shield':
 				this.shields+=amount;
+				//console.log("Ahora tiene "+this.shields+" escudos");
 			break;
 		}
 	};
