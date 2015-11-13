@@ -815,6 +815,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				}
 				else if (data.discards[i].discard.element == 'token'){	//lo mismo pero con los tokens
 					if (game.getPlayerByAlias(data.discards[i].alias).hasTokens(data.discards[i].discard.token,data.discards[i].discard.amount)){
+						discarded.push({'alias' : data.discards[i].alias, 'type': "token", 'token':data.discards[i].discard.token, 'amount': data.discards[i].discard.amount});
 						game.getPlayerByAlias(data.discards[i].alias).addToken(data.discards[i].discard.token, -data.discards[i].discard.amount);
 					}
 					else{
@@ -829,7 +830,7 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 					game.getPlayerByAlias(discarded[j].alias).replenishCard(discarded[j].element);
 				}
 				else if (discarded[j].type == 'token'){
-					game.getPlayerByAlias(discarded[j].alias).addToken(discarded[j].element.token, discarded[j].element.amount);
+					game.getPlayerByAlias(discarded[j].alias).addToken(discarded[j].token, discarded[j].amount);
 				}
 			}
 			data['isValid'] = isValid;
