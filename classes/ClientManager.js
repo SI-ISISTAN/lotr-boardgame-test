@@ -679,22 +679,6 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				var disconnectedAlias = self.disconnectClient(client.id).alias;
 				if (client.room!="waiting"){
 					if (!self.activeGames[client.room].ended){
-						//SI EL CLIENTE SE DESCONECTO EN EL LOBBY PERO estaba EN UNA PARTIDA		
-						if (!self.activeGames[client.room].getPlayerByID(client.id).playing){		
-								if (typeof(client.room) != 'undefined'){		
-									self.activeGames[client.room].removePlayer(client.id);		
-									//self.connectedClients.push({'id' : client.id, 'alias' : client.alias});		
-									if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego		
-										io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });		
-										delete self.activeGames[client.room];		
-									}		
-									client.room = 'waiting';	//Setear la room del juego		
-									client.player = null;		
-									client.in(client.room).broadcast.emit('quit game',{'gameID' : client.room, 'alias':client.alias});			
-									client.in(client.room).broadcast.emit('user disconnect',{ 'alias' : client.alias});			
-								}				
-						}
-						else{	
 							//reveer todo esto
 							if (self.activeGames[client.room].activePlayer != null && self.activeGames[client.room].activePlayer.alias == client.alias){
 								client.in(client.room).broadcast.emit('player disconnect', { 'update' : {'action' : 'EndGame', 'success':false, 'reason': "¡El jugador activo se ha desconectado!"}});
@@ -715,7 +699,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 									self.activeGames[client.room].asyncAck = false;
 								}
 							}
-					}
+					
 					}
 				}
 				else{
