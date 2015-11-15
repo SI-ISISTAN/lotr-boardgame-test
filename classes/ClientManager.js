@@ -173,7 +173,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						self.connectedClients.push({'id' : client.id, 'alias' : client.alias});
 						if (self.activeGames[client.room].players.length == 0){	//si no quedo nadie destruyo el juego
 							io.to('waiting').emit('game finished',{ 'gameID' :self.activeGames[client.room].gameID });
-							delete self.activeGames[client.room];
+							//delete self.activeGames[client.room];
 						}
 						client.room = 'waiting';	//Setear la room del juego
 						client.player = null;
@@ -388,6 +388,9 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 			//Updatear juego con activity
 			client.on('update game', function (data){
 				//console.log("Llego a client manager un update de actividad: "+data.action);
+				if (typeof(client.room)=="undefined"){
+					console.log("CLIENT ROOM UNDEFINED ERROR");
+				}
 				if (!self.activeGames[client.room].ended){
 					var update = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 					if (update.name!="ChangeLocation"){
@@ -474,6 +477,9 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 
 			//e agrega una subactividad a la actividad que está en curso en ese momento, que se ejecutará cuando se resuelva la actividad en curso
 			client.on('add activity', function (data){
+				if (typeof(client.room)=="undefined"){
+					console.log("CLIENT ROOM UNDEFINED ERROR");
+				}
 				var new_act = new Activity(data,[],self.activeGames[client.room].currentLocation.currentActivity);
 				if (typeof self.activeGames[client.room].currentLocation.currentActivity != 'undefined'){
 					if (typeof(client.room)=="undefined" || client.room==null){
