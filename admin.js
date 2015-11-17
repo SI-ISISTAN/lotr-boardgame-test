@@ -20,6 +20,21 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 
                                             //google.setOnLoadCallback(drawMultSeries);
                                             function drawMultSeries(userID) {
+                                            	$("#stats-area").children().remove();
+                                            	$.post( "/getstats", {'userID' : userID}, function( data ) {
+                                            		if (data.stats!=null){
+                                            			$("#stats-area").append("<p>Partidas jugadas: "+data.stats.games+"</p>");
+                                            			$("#stats-area").append("<p>Partidas ganadas: "+data.stats.won+"</p>");
+                                            			$("#stats-area").append("<p>Puntos obtenidos: "+data.stats.points+"</p>");
+                                            			$("#stats-area").append("<p>Chats emitidos: "+data.stats.chats+"</p>");
+
+                                            		}
+                                            		else{
+                                            			$("#stats-area").append("<p>No hay datos sobre este usuario.</p>");
+                                            		}
+
+												});
+
                                                      $.post( "/getsurvey", {'userID' : userID}, function( data ) {
 
                                                           surveyData = data.survey;
@@ -261,7 +276,7 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 		}
 		catch(err){
 			valid=false;
-			alert("La recomendación tiene un formato inválido. Chequear el formato del documento.")
+			alert("El usuario tiene un formato inválido. Chequear el formato del documento.")
 		}
 		//chequeos de validez
 		if (valid){
@@ -378,6 +393,7 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 
 	$("#users-selector").on('change', function(){
 		$("#users-area").val(JSON.stringify(users[parseInt($("#users-selector").val())],null, 4));
+		
 		drawMultSeries(users[parseInt($("#users-selector").val())].local.userID);
 
 	});
