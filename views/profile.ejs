@@ -252,48 +252,70 @@
           </div>
         </div>
         <div class="col-md-3">
-          <center> <h3> Recomendaciones </h3> </center>
-          <div class="default-div" id="adv-column">
           <br>
-          <script>
-                //carga las recomendaciones
-                $(document).ready(function(){
-                    $.post( "/getpersonaladvices", {'userID' : $("body").data("userid")}, function( data ) {
-                          for (i in data.recs){
-                              $("#adv-column").append("<p>"+data.recs[i]+"</p>")
-                          }
-                    });
-                    $.post( "/getsurvey", {'userID' : $("body").data("userid")}, function( data ) {
-                            surveyData = data.survey;
-                              $.post( "/getuseradvices", {'userID' : $("body").data("userid")}, function( data ) {
-                                  advices=data.advices;
-                                  if (typeof(advices)!="undefined"){
-                                  for (i in advices){
-                                      if (surveyData!=null){
-                                        var eval_up_down = true;
-                                        var eval_positive_negative = true;
-                                        var eval_forward_backward = true;
-                                        if (advices[i].conditions.up_down.comparison != "ignore"){
-                                          eval_up_down = eval(surveyData.result.up_down+advices[i].conditions.up_down.comparison+advices[i].conditions.up_down.value);
+          <div class="default-div" id="adv-stats">
+            
+            <center> <h3> Recomendaciones </h3> </center>
+            <div  id="adv-column"> </div>
+            <br>
+            <center> <h3> Estadísticas </h3> </center>
+            <div id="stats-area"></div>
+            <br>
+            <script>
+                  //carga las recomendaciones
+                  $(document).ready(function(){
+                      $.post( "/getpersonaladvices", {'userID' : $("body").data("userid")}, function( data ) {
+                            for (i in data.recs){
+                                $("#adv-column").append("<p>"+data.recs[i]+"</p>")
+                            }
+                      });
+                      $.post( "/getsurvey", {'userID' : $("body").data("userid")}, function( data ) {
+                              surveyData = data.survey;
+                                $.post( "/getuseradvices", {'userID' : $("body").data("userid")}, function( data ) {
+                                    advices=data.advices;
+                                    if (typeof(advices)!="undefined"){
+                                    for (i in advices){
+                                        if (surveyData!=null){
+                                          var eval_up_down = true;
+                                          var eval_positive_negative = true;
+                                          var eval_forward_backward = true;
+                                          if (advices[i].conditions.up_down.comparison != "ignore"){
+                                            eval_up_down = eval(surveyData.result.up_down+advices[i].conditions.up_down.comparison+advices[i].conditions.up_down.value);
+                                          }
+                                          if (advices[i].conditions.forward_backward.comparison != "ignore"){
+                                            eval_forward_backward = eval(surveyData.result.forward_backward+advices[i].conditions.forward_backward.comparison+advices[i].conditions.forward_backward.value);
+                                          }
+                                          if (advices[i].conditions.positive_negative.comparison != "ignore"){
+                                            eval_positive_negative= eval(surveyData.result.positive_negative+advices[i].conditions.positive_negative.comparison+advices[i].conditions.positive_negative.value)
+                                          }
+                                          if ( eval_up_down && eval_forward_backward && eval_positive_negative ){
+                                            $("#adv-column").append("<p>"+advices[i].text+"</p>")
+                                          }
                                         }
-                                        if (advices[i].conditions.forward_backward.comparison != "ignore"){
-                                          eval_forward_backward = eval(surveyData.result.forward_backward+advices[i].conditions.forward_backward.comparison+advices[i].conditions.forward_backward.value);
-                                        }
-                                        if (advices[i].conditions.positive_negative.comparison != "ignore"){
-                                          eval_positive_negative= eval(surveyData.result.positive_negative+advices[i].conditions.positive_negative.comparison+advices[i].conditions.positive_negative.value)
-                                        }
-                                        if ( eval_up_down && eval_forward_backward && eval_positive_negative ){
-                                          $("#adv-column").append("<p>"+advices[i].text+"</p>")
-                                        }
-                                      }
+                                    }
                                   }
-                                }
+                          });
+                      });
+
+                      //carga las recomendaciones
+                    $.post( "/getstats", {'userID' : $("body").data("userid")}, function( data ) {
+                                                if (data.stats!=null){
+                                                  $("#stats-area").append("<p>Partidas jugadas: "+data.stats.games+"</p>");
+                                                  $("#stats-area").append("<p>Partidas ganadas: "+data.stats.won+"</p>");
+                                                  $("#stats-area").append("<p>Puntos obtenidos: "+data.stats.points+"</p>");
+                                                  $("#stats-area").append("<p>Chats emitidos: "+data.stats.chats+"</p>");
+
+                                                }
+                                                else{
+                                                  $("#stats-area").append("<p>No hay datos sobre este usuario.</p>");
+                                                }
+
                         });
-                    });
-                });
-                </script>
-          </div>
+                  });
+              </script>
+              </div>
         </div>
+        
         <div class="col-md-1">
         </div>
       </div>

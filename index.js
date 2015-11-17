@@ -538,6 +538,28 @@ app.post("/getsymlog", function(req, res){
         
 });
 
+//Obtener los stats
+app.post("/getstats", function(req, res){   
+        var stats = null;
+        schemas.userSchema.findOne({'local.userID' : req.body.userID}, function(err, user){
+                        if (err){
+                            return err;
+
+                        }
+                        if (user){
+                            var sl= JSON.parse(JSON.stringify(user)).stats;
+                            
+                            if (typeof(sl)!='undefined'){
+                                stats=sl;
+                            }
+                            else{
+                            }
+                            res.json({ 'stats' : stats });
+                        }
+                    });
+        
+});
+
 //guardar datos de encuesta
 app.post("/fillsurvey", function(req, res){   
         schemas.userSchema.findOne({ 'local.userID' : req.body.userID }, function(err, user){
