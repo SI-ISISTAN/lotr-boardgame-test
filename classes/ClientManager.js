@@ -427,6 +427,17 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 									game.result.victory = data.success;
 									game.result.reason = data.reason;
 									game.result.score = data.score;
+									//extraigo los jugadores vivos y muertos
+									var players=[];
+									for (i in self.activeGames[client.room].players){
+										if (self.activeGames[client.room].players[i].dead){
+											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":true})
+										}
+										else{
+											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":false})
+										}
+									}
+									game.result.players=players;
 								}
 								game.save(function(err) {
 		                            if (err){
@@ -464,6 +475,17 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 									game.result.victory = data.success;
 									game.result.reason = data.reason;
 									game.result.score = data.score;
+									//extraigo los jugadores vivos y muertos
+									var players=[];
+									for (i in self.activeGames[client.room].players){
+										if (self.activeGames[client.room].players[i].dead){
+											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":true})
+										}
+										else{
+											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":false})
+										}
+									}
+									game.result.players=players;
 								}
 								game.save(function(err) {
 		                            if (err){

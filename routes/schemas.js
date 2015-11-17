@@ -87,7 +87,8 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
         result : {
             victory : Boolean,
             reason : String,
-            score : Number
+            score : Number,
+            players:Array
         },
         analyzed : Boolean,
         configName : String,
