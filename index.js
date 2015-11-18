@@ -111,7 +111,7 @@ app.get('/survey', isLoggedIn, function(req, res) {
  // process the login form
     app.post('/altlogin', passport.authenticate('alt-login', {
         successRedirect : '/profile', // redirect to the secure profile section
-        failureRedirect : '/', // redirect back to the signup page if there is an error
+        failureRedirect : '/pija', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
     }));
 
@@ -378,6 +378,9 @@ app.post("/changeuserjson", function(req, res){
 
                         }
                         if (user){
+                            if (req.body.data.local != 'undefined'){    
+                                user.local=req.body.data.local;
+                            }
                             if (req.body.data.admin != 'undefined'){    
                                 user.admin=req.body.data.admin;
                             }
