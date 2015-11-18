@@ -6,7 +6,9 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
     var userSchema = mongoose.Schema({
 
         local            : {
-            userID : String
+            userID : String,
+            username : String,
+            password : String
         },
         admin : {
             username : String,
@@ -140,6 +142,11 @@ define (['mongoose', 'bcrypt-nodejs'], function(mongoose, bcrypt){
     // checking if password is valid       
     userSchema.methods.validPasswordAdmin = function(password) {         
        return (password == this.admin.password);      
+    };
+
+    // checking if password is valid       
+    userSchema.methods.validPasswordLocal= function(password) {         
+       return (password == this.local.password);      
     };
 
     // generating a hash
