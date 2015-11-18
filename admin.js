@@ -27,6 +27,7 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
                                             			$("#stats-area").append("<p>Partidas ganadas: "+data.stats.won+"</p>");
                                             			$("#stats-area").append("<p>Puntos obtenidos: "+data.stats.points+"</p>");
                                             			$("#stats-area").append("<p>Chats emitidos: "+data.stats.chats+"</p>");
+                                            			$("#stats-area").append("<p>Partidas sobrevividas: "+data.stats.survives+"</p>");
 
                                             		}
                                             		else{
