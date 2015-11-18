@@ -430,11 +430,16 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 									//extraigo los jugadores vivos y muertos
 									var players=[];
 									for (i in self.activeGames[client.room].players){
-										if (self.activeGames[client.room].players[i].dead){
-											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":true})
+										if (game.result.victory){
+											if (self.activeGames[client.room].players[i].dead){
+												players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":true})
+											}
+											else{
+												players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":false})
+											}
 										}
 										else{
-											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":false})
+											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":true})
 										}
 									}
 									game.result.players=players;
@@ -478,11 +483,16 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 									//extraigo los jugadores vivos y muertos
 									var players=[];
 									for (i in self.activeGames[client.room].players){
-										if (self.activeGames[client.room].players[i].dead){
-											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":true})
+										if (game.result.victory){
+											if (self.activeGames[client.room].players[i].dead){
+												players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":true})
+											}
+											else{
+												players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":false})
+											}
 										}
 										else{
-											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":false})
+											players.push({"alias" : self.activeGames[client.room].players[i].alias, "dead":true})
 										}
 									}
 									game.result.players=players;
