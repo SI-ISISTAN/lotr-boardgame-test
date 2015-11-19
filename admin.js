@@ -303,6 +303,21 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 		});
 	});
 
+	$("#create-user-button").on('click', function(){
+		if ($("#username-input").val().length > 0  && $("#password-input").val().length > 0){
+			console.log("U PAN CHO RO LAAAA");
+			$.post( "/newlocaluser", {'username' : $("#username-input").val(), "password": $("#password-input").val()}, function( data ) {
+					if (data.success){
+						alert("Usuario creado con éxito.");
+						location.reload();
+					}
+					else{
+						alert("Hubo un error en la transaccion o el usuario ya existe.");
+					}
+		});
+		}
+	});
+
 	$("#save-advice-button").on('click', function(){
 		var up_down = {
 			comparison : "ignore",
@@ -437,6 +452,9 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 				}
 				else if (users[j].google!=undefined){
 					name=users[j].google.name;
+				}
+				else if (users[j].local.username!=undefined){
+					name=users[j].local.username;
 				}
 				else{
 					name=users[j].local.userID;
