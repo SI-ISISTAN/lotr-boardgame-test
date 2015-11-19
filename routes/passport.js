@@ -68,23 +68,24 @@ module.exports = function(passport,schemas) {
             // if there are any errors, return the error before anything else
             
             if (err){
-                console.log("u pan cho ro la");
+
                 return done(err);
             }
 
             // if no user is found, return the message
             if (!user){
-                console.log("u pan cho ro la suer");
+
                 return done(null, false, req.flash('loginMessage', 'No se ha hallado a este usuario.')); // req.flash is the way to set flashdata using connect-flash
             }
 
             // if the user is found but the password is wrong
             if (!user.validPasswordLocal(password)){
-                console.log("u pan cho ro la pass");
+
                 return done(null, false, req.flash('loginMessage', 'Contraseña incorrecta.')); // create the loginMessage and save it to session as flashdata
             }
 
             // all is well, return successful user
+
             user.local['local'] = true;
             return done(null, user);
         });

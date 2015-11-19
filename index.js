@@ -111,7 +111,7 @@ app.get('/survey', isLoggedIn, function(req, res) {
  // process the login form
     app.post('/altlogin', passport.authenticate('alt-login', {
         successRedirect : '/profile', // redirect to the secure profile section
-        failureRedirect : '/pija', // redirect back to the signup page if there is an error
+        failureRedirect : '/', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
     }));
 
@@ -563,6 +563,40 @@ app.post("/getstats", function(req, res){
         
 });
 
+//Obtener los stats
+app.post("/newlocaluser", function(req, res){   
+        //CHEQUEAR QUE NO EXISTA UN USUARIO CON ESE NOMBRE Y USERNAME EN LOCAL
+        //SI NO EXISTE, CREARLO
+        schemas.userSchema.findOne({'local.username' : req.body.username}, function(err, user){
+             if (err){
+                    return err;
+                    res.json({ 'success' :  false });
+            }
+            if (user){
+                res.json({ 'success' :  false });
+            }
+            else{
+                //crear el usuario
+                var newUser            = new schemas.userSchema();
+                        newUser.local.userID = Math.random().toString(36).substring(7);   //Nombre random
+                        newUser.local.username=req.body.username;
+                        newUser.local.password=req.body.password;
+                        newUser.survey.complete= false;
+                        newUser.save(function(err) {
+                            if (err){
+                                res.json({ 'success' :  false });
+                                throw err;
+                            }
+                            else{
+                                res.json({ 'success' :  true });
+                            }
+                
+                });
+            }
+        });
+        
+    });
+
 //guardar datos de encuesta
 app.post("/fillsurvey", function(req, res){   
         schemas.userSchema.findOne({ 'local.userID' : req.body.userID }, function(err, user){
@@ -593,7 +627,6 @@ app.post("/fillsurvey", function(req, res){
 
 // route middleware to make sure
 function isLoggedIn(req, res, next) {
-
 	// if user is authenticated in the session, carry on
 	if (req.isAuthenticated())
 		return next();
