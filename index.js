@@ -115,9 +115,9 @@ app.get('/survey', isLoggedIn, function(req, res) {
       passport.authenticate('alt-login', function(err, user, info) {
         if (err) { return next(err); }
         // Redirect if it fails
-        if (!user) { return res.redirect('/pijita'); }
+        if (!user) { return res.redirect('/'); }
         req.logIn(user, function(err) {
-          if (err) {console.log("err"); return next(err); }
+          if (err) { return next(err); }
           // Redirect if it succeeds
           return res.redirect('/profile');
         });
