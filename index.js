@@ -80,14 +80,9 @@ app.get('/login', function(req, res) {
     });
 
 app.get('/profile', isLoggedIn, function(req, res) {
-        if (req.user.facebook.token == undefined && req.user.twitter.token == undefined && req.user.google.token == undefined){
-                res.redirect('/');
-        }
-        else{
     		res.render('profile.ejs', {
     			user : req.user
     		});
-        }
 	});
 
 app.get('/survey', isLoggedIn, function(req, res) {
@@ -108,11 +103,25 @@ app.get('/survey', isLoggedIn, function(req, res) {
     }));
 
  // process the login form
+ /*
     app.post('/altlogin', passport.authenticate('alt-login', {
         successRedirect : '/profile', // redirect to the secure profile section
-        failureRedirect : '/', // redirect back to the signup page if there is an error
+        failureRedirect : '/pijita', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
     }));
+*/
+    app.post('/altlogin', function(req, res, next) {
+      passport.authenticate('alt-login', function(err, user, info) {
+        if (err) { return next(err); }
+        // Redirect if it fails
+        if (!user) { return res.redirect('/pijita'); }
+        req.logIn(user, function(err) {
+          if (err) {console.log("err"); return next(err); }
+          // Redirect if it succeeds
+          return res.redirect('/profile');
+        });
+      })(req, res, next);
+    });
 
 // facebook --------------------------------
 app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['email','user_friends'] }));
@@ -587,7 +596,9 @@ app.post("/newlocaluser", function(req, res){
                                 throw err;
                             }
                             else{
+
                                 res.json({ 'success' :  true });
+                                
                             }
                 
                 });

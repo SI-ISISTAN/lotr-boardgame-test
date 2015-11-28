@@ -85,7 +85,7 @@ module.exports = function(passport,schemas) {
             }
 
             // all is well, return successful user
-
+            console.log("UPANMCHOROLA!!!!");
             user.local['local'] = true;
             return done(null, user);
         });

@@ -147,10 +147,11 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 
 	                                                                  var options2 = {
 	                                                                    title: 'Ubicación en la escala SYMLOG',
-	                                                                    hAxis: {title: 'Negative/Positive', minValue:-0.5, maxValue:1.5},
-	                                                                    vAxis: {title: 'Backward/Forward', minValue:-0.5, maxValue:1.5},
-	                                                                    sizeAxis: {minValue: 0, maxValue:1, maxSize:80, minSize:5},
-	                                                                    bubble: {textStyle: {fontSize: 11}}
+									                                    hAxis: {title: 'Negative/Positive', minValue:0, maxValue:1, textPosition : "none", baseline:0.5, gridlines:{"count":5}},
+									                                    vAxis: {title: 'Backward/Forward', minValue:0, maxValue:1, textPosition : "none", baseline:0.5},
+									                                    sizeAxis: {minValue: 0, maxValue:1, maxSize:60, minSize:5},
+									                                    axisTitlesPosition:"none",
+									                                    bubble: {textStyle: {fontSize: 11}}
 	                                                                  };
 
 	                                                                  var chart = new google.visualization.BubbleChart(document.getElementById('survey_bubble_chart'));
