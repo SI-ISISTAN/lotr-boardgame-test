@@ -9,6 +9,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
     var userID = "";
     var surveyData = null;
     var surveycomplete = false;
+    var ayudante;
 
 	////////////////////////////// MANEJO DE MENSAJES ////////////////////////////// 
 
@@ -376,6 +377,14 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 				msg.draw(client);
 	    });
 
+	    //Advice con Clippy
+	    socket.on('show advice', function(res){
+	    	console.log("UPANCHOROLA");
+	    		ayudante.speak(res.msg);
+	    		ayudante.animate();
+				//msg.draw(client);
+	    });
+
 	    socket.on('reconnect', function(){ // connection restored  
 	   		console.log("evento reconnect");
 	    }); 
@@ -546,6 +555,7 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 			    });
 			});	
 
+
 			//codigo original
         	userID = $("body").data("user");
         	surveycomplete = $("body").data("surveycomplete");
@@ -560,6 +570,12 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
         	}
         	
         	console.log("JQuery Init");
+
+        	clippy.load('Merlin', function(agent) {
+		        // Do anything with the loaded agent
+		        ayudante=agent;
+		        agent.show();
+		    });
         	//tooltip (title fachero)
         	$(document).tooltip();
         	//MAIN LOOP DEL CLIENTE (no es un loop porque esta todo implementado con listeners)

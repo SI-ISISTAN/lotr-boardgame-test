@@ -444,6 +444,7 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 	Game.prototype.getAdvices = function(type,name,player){
 		var found = [];
 		var advices = this.advices[type];
+		console.log(this.advices[type]);
 		if (typeof(advices)!="undefined"){
 			for (i in advices){
 				if (advices[i].type == type && advices[i].name == name){
@@ -452,7 +453,6 @@ define(['./Player','./Card', '../data/data', '../data/locations','./Location','.
 						var eval_positive_negative = true;
 						var eval_forward_backward = true;
 						if (advices[i].conditions.up_down.comparison != "ignore"){
-							console.log(advices[i].conditions.up_down);
 							eval_up_down = eval(player.surveyData.result.up_down+advices[i].conditions.up_down.comparison+advices[i].conditions.up_down.value);
 						}
 						if (advices[i].conditions.forward_backward.comparison != "ignore"){
