@@ -402,7 +402,9 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 						for (p in self.activeGames[client.room].players){
 							var advices = self.activeGames[client.room].getAdvices("Activity",data.action, self.activeGames[client.room].players[p]);
 							for (j in advices){
-								io.to(self.activeGames[client.room].players[p].id).emit('log message', {'msg' : "Tip para la actividad "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
+								console.log("encontr im adice!");
+								//io.to(self.activeGames[client.room].players[p].id).emit('log message', {'msg' : "Tip para la actividad "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
+								io.to(self.activeGames[client.room].players[p].id).emit('show advice', {'msg' : "Tip para la actividad "+advices[j].name+": "+advices[j].text});
 								//game.io.to(game.players[p].id).emit('show tip', {'advice' : advices[j]});
 							}
 						}

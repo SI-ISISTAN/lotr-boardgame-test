@@ -78,7 +78,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 				//mostrar tip para la carta
 				var advices = game.getAdvices("Card",card.name, people[turn]);
 				for (t in advices){
-					game.io.to(people[turn].id).emit('log message', {'msg' : "Tip para la carta "+advices[t].name+": "+advices[t].text, 'mode':'tip'});
+					//game.io.to(people[turn].id).emit('log message', {'msg' : "Tip para la carta "+advices[t].name+": "+advices[t].text, 'mode':'tip'});
+					game.io.to(people[turn].id).emit('show advice', {'msg' : "Tip para la carta "+advices[t].name+": "+advices[t].text});
 					//game.io.to(people[turn].id).emit('show tip', {'advice' : advices[t]});
 				}
 
@@ -527,7 +528,8 @@ define(['../classes/client-side/Popup','../classes/client-side/Message','../clas
 			for (p in game.players){
 				var advices = game.getAdvices("Location",game.currentLocation.name, game.players[p]);
 				for (j in advices){
-					game.io.to(game.players[p].id).emit('log message', {'msg' : "Tip para el escenario "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
+					//game.io.to(game.players[p].id).emit('log message', {'msg' : "Tip para el escenario "+advices[j].name+": "+advices[j].text, 'mode':'tip'});
+					game.io.to(game.players[p].id).emit('show advice', {'msg' : "Tip para el escenario "+advices[j].name+": "+advices[j].text});
 					//game.io.to(game.players[p].id).emit('show tip', {'advice' : advices[j]});
 				}
 			}
