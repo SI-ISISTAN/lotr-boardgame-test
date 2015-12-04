@@ -403,7 +403,9 @@ define(['./Popup','./Alert'], function (Popup, Alert) {
 						var name = $(this).val();
 						discards.push({'alias' : name, 'discard' : $(this).data("element")});
 						//agrego el user a descartar a la poll
-						pollData[index].player = name;
+						if (typeof(pollData[index])!="undefined"){
+							pollData[index].player = name;
+						}
 						index++;
 					});
 					

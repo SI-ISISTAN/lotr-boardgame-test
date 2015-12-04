@@ -166,7 +166,7 @@ define (['./Game','../data/data', './Activity'],function(Game,loadedData, Activi
 				}		
 			});
 
-			//El cliente pide unirse a una partida
+			//El cliente pide irse de una partida
 			client.on('quit game', function (data){
 				if (typeof(data.gameID) != 'undefined'){
 						self.activeGames[data.gameID].removePlayer(client.id);
