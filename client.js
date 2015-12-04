@@ -379,7 +379,6 @@ require(['./data/activities','./data/gameActions','./classes/client-side/Client'
 
 	    //Advice con Clippy
 	    socket.on('show advice', function(res){
-	    	console.log("UPANCHOROLA");
 	    		ayudante.speak(res.msg);
 	    		ayudante.animate();
 				//msg.draw(client);
