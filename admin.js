@@ -454,7 +454,7 @@ define(['https://code.jquery.com/jquery-1.8.3.js'], function(jquery){
 				else if (users[j].google!=undefined){
 					name=users[j].google.name;
 				}
-				else if (users[j].local.username!=undefined){
+				else if (users[j].local!=undefined){
 					name=users[j].local.username;
 				}
 				else{
