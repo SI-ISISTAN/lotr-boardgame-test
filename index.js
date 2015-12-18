@@ -19,7 +19,7 @@ requirejs.config({
 });
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://matanegui:patrite0@ds061611.mongolab.com:61611/lotr-test');
+mongoose.connect('mongodb://lotradmin:lotradmin@ds033175.mongolab.com:33175/lotr-game');
 
 
 var ClientManager = requirejs('./classes/ClientManager');
