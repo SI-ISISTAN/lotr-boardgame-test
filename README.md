@@ -1,3 +1,10 @@
+This software was used in:
+
+Berdun, F. D., Armentano, M. G., Berdun, L. S., & Cincunegui, M. (2018). Building SYMLOG profiles with an online collaborative game. International Journal of Human-Computer Studies.
+
+Berdun, F. D., & Armentano, M. G. (2018). Modeling Users Collaborative Behavior with a Serious Game. IEEE Transactions on Games.
+
+
 # lotr-boardgame-test
 Proyecto de tesis.
 
